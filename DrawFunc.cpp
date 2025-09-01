@@ -24,7 +24,7 @@ void DrawSprite::Draw(WtF& wt, Camera* camera, int srcX, int srcY, int srcW, int
 	}
 
 	// --- 2. ワールド座標 → スクリーン座標
-	Matrix3x3 vpMatrix = MatrixMix(camera->matView, camera->matProjection, camera->viewPort);
+	Matrix3x3 vpMatrix = camera->matView * camera->matProjection * camera->viewPort;
 	Vector2 screenPos[4];
 	for (int i = 0; i < 4; i++) {
 		screenPos[i] = Transform(worldPos[i], vpMatrix);
