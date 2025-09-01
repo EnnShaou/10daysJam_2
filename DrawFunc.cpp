@@ -36,7 +36,7 @@ void DrawSprite::Draw(WtF& wt, Camera* camera, int srcX, int srcY, int srcW, int
 		static_cast<int>(screenPos[1].x), static_cast<int>(screenPos[1].y),
 		static_cast<int>(screenPos[2].x), static_cast<int>(screenPos[2].y),
 		static_cast<int>(screenPos[3].x), static_cast<int>(screenPos[3].y),
-		srcX * 32, srcY,
+		srcX, srcY,
 		srcW, srcH,
 		texture_, color_
 	);

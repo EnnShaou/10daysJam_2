@@ -1,6 +1,7 @@
 #include "Title.h"
 #include "ImGui.h"
-
+#include"keys.h"
+#include"Novice.h"
 
 TitleScene::TitleScene() {}
 
@@ -29,7 +30,7 @@ void TitleScene::Update() {
 		break;
 	case TitleScene::Phase::kMaui:
 		fade_->Update(); // フェードの更新
-		if (/*Input::GetInstance()->PushKey(DIK_SPACE)*/true) {
+		if (Keys::IsPress(DIK_SPACE)) {
 			phase_ = TitleScene::Phase::kFadeOut;      // フェードアウトフェーズに移行
 			fade_->Start(Fade::Status::FadeOut, 1.0f); // フェードアウトを開始
 		}
@@ -56,4 +57,5 @@ void TitleScene::Update() {
 void TitleScene::Draw() {
 
 	fade_->Draw();
+	Novice::ScreenPrintf(0, 0, "Title Scene Phase:");
 }

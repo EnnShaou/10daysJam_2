@@ -74,10 +74,10 @@
     <ClCompile Include="DrawFunc.cpp">
       <Filter>Tool</Filter>
     </ClCompile>
-    <ClCompile Include="keys.cpp">
-      <Filter>KamataEngine</Filter>
-    </ClCompile>
     <ClCompile Include="Player.cpp">
+      <Filter>source</Filter>
+    </ClCompile>
+    <ClCompile Include="keys.cpp">
       <Filter>source</Filter>
     </ClCompile>
   </ItemGroup>
@@ -179,8 +179,10 @@
     <ClInclude Include="DrawFunc.h">
       <Filter>Tool</Filter>
     </ClInclude>
-    <ClInclude Include="keys.h" />
     <ClInclude Include="Player.h">
+      <Filter>include</Filter>
+    </ClInclude>
+    <ClInclude Include="keys.h">
       <Filter>include</Filter>
     </ClInclude>
   </ItemGroup>

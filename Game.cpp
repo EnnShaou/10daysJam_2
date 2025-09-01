@@ -30,6 +30,7 @@ Game::~Game() {
 }
 
 void Game::Initialize() {
+
 	// マップチップフィールドの初期化
 	mapChipField_ = new MapChipField();
 	mapChipField_->LoadMapChipCsv("Resources/MapData/map_data1.csv");
