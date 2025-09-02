@@ -1,5 +1,6 @@
 #pragma once
 #include "Vector2.h"
+class Player;
 class Camera
 {
 public:
@@ -8,6 +9,10 @@ public:
 	~Camera();
 	void Initialize(UINT kWindowWidth, UINT kWindowHeight);
 	void Update();
+	void setTarget(Player* player) {
+
+		target_ = player;
+	}
 	//Vector2 CameraTransform(Vector2 pos, Vector2 localSpace);
 
 	//void Move(char* keys, char* preKyes, const float map_maxX, const float map_maxY, Player* player);
@@ -21,7 +26,9 @@ public:
 private:
 	UINT kWindowWidth_; // ウィンドウの横幅
 	UINT kWindowHeight_; // ウィンドウの縦幅
-	
+	Player* target_ = nullptr; // カメラの注視点
+	float desiredY_ = 0.0f;  // 内部ターゲットY（スムーズ制御用）
+	float currentLookAheadX_ = 0.0f;
 	// コピー禁止
 	Camera(const Camera&) = delete;
 	Camera& operator=(const Camera&) = delete;

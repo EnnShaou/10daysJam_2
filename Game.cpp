@@ -35,8 +35,8 @@ void Game::Initialize() {
 	mapChipField_ = new MapChipField();
 	mapChipField_->LoadMapChipCsv("Resources/MapData/map_data1.csv");
 
-	blockSprite_ = new DrawSprite(Novice::LoadTexture("white1x1.png"), 32);
-	camera_ = new Camera({ -1280 / 2,-720 / 2 });
+	blockSprite_ = new DrawSprite(Novice::LoadTexture("white1x1.png"), {64,64});
+	camera_ = new Camera({0,0 });
 	camera_->Initialize(1280, 720);
 
 	// プレイヤーの初期化
@@ -45,6 +45,7 @@ void Game::Initialize() {
 	player_->Initialize(camera_, playerPos);
 	player_->SetMapChipField(mapChipField_);
 	GenerateBlocks();
+	camera_->setTarget(player_);
 	// フェードの初期化
 	fade_ = new Fade();
 	fade_->Initialize();
@@ -93,7 +94,7 @@ void Game::Update() {
 void Game::Draw() {
 
 	player_->Draw();
-	
+
 	for (std::vector<BlockManager*>& wtfby : wTfBlock_) {
 		for (BlockManager* wtfb : wtfby) {
 			if (wtfb) {

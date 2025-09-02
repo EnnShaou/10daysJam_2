@@ -14,7 +14,7 @@ void Player::Initialize(Camera* camera, Vector2& pos) {
 	camera_ = camera;
 	worldTransform_.Initialize();
 	worldTransform_.translation_ = pos;
-	playerSprite_ = new DrawSprite(Novice::LoadTexture("white1x1.png"), 32);
+	playerSprite_ = new DrawSprite(Novice::LoadTexture("white1x1.png"), { 68,72 });
 	playerSprite_->SetColor(RED);
 
 }
@@ -60,7 +60,7 @@ void Player::Update() {
 
 void Player::Draw() {
 	if (!isDead_) {
-		playerSprite_->Draw(worldTransform_, camera_, 0, 0, 32, 32); // プレイヤーを描画
+		playerSprite_->Draw(worldTransform_, camera_, 0, 0, 68, 72); // プレイヤーを描画
 	}
 }
 void Player::Move() {
@@ -300,7 +300,6 @@ void Player::GroundStates(const CollisonMapInfo& info) {
 		if (info.Bottom) {
 
 			onGround = true;
-			vel_.x *= (1.0f - kPlayerSpeed);
 			vel_.y = 0.0f;
 		}
 	}

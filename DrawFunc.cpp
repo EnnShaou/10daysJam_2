@@ -1,6 +1,6 @@
 #include"DrawFunc.h"
 
-DrawSprite::DrawSprite(int texture, float textureSize) :texture_(texture), color_(0xffffffff), textureSize_(textureSize)
+DrawSprite::DrawSprite(int texture, Vector2 textureSize) :texture_(texture), color_(0xffffffff), textureSize_(textureSize)
 {
 }
 
@@ -14,10 +14,10 @@ void DrawSprite::Draw(WtF& wt, Camera* camera, int srcX, int srcY, int srcW, int
 	// --- 1. ローカル座標 → ワールド座標
 	Vector2 worldPos[4];
 	Vector2 localVertices[4] = {
-	{ -textureSize_ / 2.0f,textureSize_ / 2.0f},
-	{  textureSize_ / 2.0f, textureSize_ / 2.0f},
-	{ -textureSize_ / 2.0f,-textureSize_ / 2.0f},
-	{  textureSize_ / 2.0f,  -textureSize_ / 2.0f}
+	{ -textureSize_.x / 2.0f,  textureSize_.y / 2.0f},
+	{  textureSize_.x / 2.0f,  textureSize_.y / 2.0f},
+	{ -textureSize_.x / 2.0f, -textureSize_.y / 2.0f},
+	{  textureSize_.x / 2.0f, -textureSize_.y / 2.0f}
 	};
 	for (int i = 0; i < 4; i++) {
 		worldPos[i] = Transform(localVertices[i], wt.matWorld_);

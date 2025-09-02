@@ -26,8 +26,8 @@ public:
 		float top;
 	};
 
-	static inline const float kBlockWidth = 32.0f;
-	static inline const float kBlockHeight = 32.0f;
+	static inline const float kBlockWidth = 64;
+	static inline const float kBlockHeight = 64;
 	uint32_t blockCountX_ = 0;
 	uint32_t blockCountY_ = 0;
 

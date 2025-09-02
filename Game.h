@@ -24,7 +24,7 @@ public:
 	void CheckAllCollisions();
 	enum class Phase { FadeIn, kPlay, kDeath, kFadeOut };
 	void ChangePhase(); // フェーズを変更する
-
+	
 	struct BlockManager {
 		WtF* wtf = nullptr;
 		MapChipType mapChipType;

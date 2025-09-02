@@ -102,18 +102,18 @@ private:
 	Camera* camera_ = nullptr;            // カメラのハンドル
 	Vector2 vel_;                         // プレイヤーの移動速度
 	LRDir lrDir_ = LRDir::kRight;                       // プレイヤーの向き
-	static inline const float kPlayerSpeed = 2.0f;    // プレイヤーの移動速度の減少率
-	static inline const float kPlayerSpeedMax = kPlayerSpeed * 2.f;   // プレイヤーの移動速度の最大値
+	static inline const float kPlayerSpeed = 1.0f;    // プレイヤーの移動速度の減少率
+	static inline const float kPlayerSpeedMax = kPlayerSpeed * 4.f;   // プレイヤーの移動速度の最大値
 	bool onGround = false;                              // 地面にいるかどうか
 	bool isJumping = false;                             // ジャンプ中かどうか
 	static inline const float kGravity = 0.98f;         // 重力
-	static inline const float kLimitFallSpeed = kGravity * 10.f;   // 落下速度の制限
-	static inline const float kJumpAcceleration = 10.00f; // ジャンプの加速度
+	static inline const float kLimitFallSpeed = kGravity * 20.f;   // 落下速度の制限
+	static inline const float kJumpAcceleration = 15.00f; // ジャンプの加速度
 	MapChipField* mapChipField_ = nullptr;              // マップチップフィールド
 	// std::array<KamataEngine::Vector3, kNumCorner> posNew; // コーナーの位置を格納する配列
-	static inline const float kWidth = 30;     // 当たり判定の幅
-	static inline const float kHeight = 30;    // 当たり判定の高さ
-	static inline const float kBlank =1.f;     // 当たり判定の余白
+	static inline const float kWidth = 60;     // 当たり判定の幅
+	static inline const float kHeight = 60;    // 当たり判定の高さ
+	static inline const float kBlank =4.f;     // 当たり判定の余白
 	bool isDead_ = false;                        // プレイヤーが死亡しているかどうか
 	Behavior behavior_ = Behavior::kRoot;        // プレイヤーの行動
 	Behavior behaviorNext_ = Behavior::kUnknown; // 次のプレイヤーの行動

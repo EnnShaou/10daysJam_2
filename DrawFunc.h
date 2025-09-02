@@ -4,7 +4,7 @@
 class DrawSprite
 {
 public:
-	DrawSprite(int texture, float textureSize);
+	DrawSprite(int texture, Vector2 textureSize);
 	~DrawSprite();
 	void SetColor(unsigned int color) { color_ = color; }
 	void Draw(WtF& wt,               // 物体変換
@@ -13,7 +13,7 @@ public:
 
 private:
 	int texture_ = 0;
-	float textureSize_;
+	Vector2 textureSize_;
 	unsigned int color_;
 };
 
