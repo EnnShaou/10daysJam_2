@@ -80,6 +80,9 @@
     <ClCompile Include="keys.cpp">
       <Filter>source</Filter>
     </ClCompile>
+    <ClCompile Include="Enemies.cpp">
+      <Filter>KamataEngine</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="C:\KamataEngine\DirectXGame\audio\Audio.h">
@@ -185,6 +188,7 @@
     <ClInclude Include="keys.h">
       <Filter>include</Filter>
     </ClInclude>
+    <ClInclude Include="Enemies.h" />
   </ItemGroup>
   <ItemGroup>
     <None Include=".editorconfig" />
