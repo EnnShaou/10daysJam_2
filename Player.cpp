@@ -16,20 +16,25 @@ void Player::Initialize(Camera* camera, Vector2& pos) {
 	camera_ = camera;
 	worldTransform_.Initialize();
 	worldTransform_.translation_ = pos;
+	tentativeWorldTransform_.Initialize();
 	playerSprite_ = new DrawSprite(Novice::LoadTexture("white1x1.png"), { 68,72 });
 	playerSprite_->SetColor(RED);
-
+	astralBodySprite_ = new DrawSprite(Novice::LoadTexture("white1x1.png"), { 68,72 });
+	astralBodySprite_->SetColor(BLUE);
+	dathSprite_ = new DrawSprite(Novice::LoadTexture("white1x1.png"), { 68,72 });
+	dathSprite_->SetColor(BLACK);
 }
 
 void Player::Update()
 {
-
-	if (behaviorNext_ != Behavior::kUnknown) {
+	if (behaviorNext_ != Behavior::kUnknown) 
+	{
 		behavior_ = behaviorNext_;
 		behaviorNext_ = Behavior::kUnknown;
 
 		// 初期化処理
-		switch (behavior_) {
+		switch (behavior_)
+		{
 		case Behavior::kRoot:
 			BehaviorRootInitialize();
 			break;
@@ -45,7 +50,8 @@ void Player::Update()
 	}
 
 	// 行動ごとの更新処理
-	switch (behavior_) {
+	switch (behavior_)
+	{
 	case Behavior::kRoot:
 		BehaviorRootUpdate();
 		break;
@@ -59,21 +65,32 @@ void Player::Update()
 		break;
 	}
 
+	if (behavior_ != Behavior::kAstral)
+	{
+		CollisonMapInfo info;
+		info.vel = vel_;
+		MapCollision(info);
+		MapCollisionMove(info);
+		MapAfterCollision(info);
+		MapWallCollision(info);
+		GroundStates(info);
+	}
 
-	CollisonMapInfo info;
-	info.vel = vel_;
-	MapCollision(info);
-	MapCollisionMove(info);
-	MapAfterCollision(info);
-	MapWallCollision(info);
-	GroundStates(info);
+
 
 	worldTransform_.Update();
 }
 
 void Player::Draw() {
-	if (!isDead_) {
+	if (!isDead_ && behavior_ != Behavior::kAstral) 
+	{
 		playerSprite_->Draw(worldTransform_, camera_, 0, 0, 68, 72); // プレイヤーを描画
+	}
+
+	if (behavior_ == Behavior::kAstral)
+	{
+		dathSprite_->Draw(tentativeWorldTransform_, camera_, 0, 0, 68, 72); // プレイヤーを描画
+		astralBodySprite_->Draw(worldTransform_, camera_, 0, 0, 68, 72);
 	}
 
 	Novice::ScreenPrintf(30, 50, "behavior_: %d", behavior_);
@@ -82,8 +99,6 @@ void Player::Draw() {
 	Novice::ScreenPrintf(30, 110, "Astralbehavior_: %d", Astralbehavior_);
 	Novice::ScreenPrintf(30, 130, "AstralbehaviorNext_: %d", AstralbehaviorNext_);
 	Novice::ScreenPrintf(30, 150, "astralBodyTimer: %f", astralBodyTimer_);
-
-	//Novice
 }
 void Player::Move() {
 	if (isDead_) {
@@ -126,9 +141,55 @@ void Player::Move() {
 	}
 }
 
-void Player::Turn() {
+void Player::AstralMove()
+{
+	if (Keys::IsPress(DIK_D) || Keys::IsPress(DIK_A) || Keys::IsPress(DIK_W) || Keys::IsPress(DIK_S))
+	{
+		Vector2 acc = Vector2();
 
+		if (Keys::IsPress(DIK_D))
+		{
+			if (astralVel_.x < 0.0f)
+			{
+				astralVel_.x = kPlayerSpeed;
+			}
+			acc.x += kPlayerSpeed;
+		}
+		else if (Keys::IsPress(DIK_A))
+		{
+			if (astralVel_.x > 0.0f) {
+				astralVel_.x = kPlayerSpeed;
+			}
+
+			acc.x -= kPlayerSpeed;
+		}
+		else if (Keys::IsPress(DIK_W))
+		{
+			if (astralVel_.y < 0.0f)
+			{
+				astralVel_.y = kPlayerSpeed;
+			}
+			acc.y += kPlayerSpeed;
+		}
+		else if (Keys::IsPress(DIK_S))
+		{
+			if (astralVel_.y > 0.0f)
+			{
+				astralVel_.y = kPlayerSpeed;
+			}
+			acc.y -= kPlayerSpeed;
+		}
+		astralVel_ += acc;
+		astralVel_.x = std::clamp(astralVel_.x, -kPlayerSpeedMax, kPlayerSpeedMax);
+		astralVel_.y = std::clamp(astralVel_.y, -kPlayerSpeedMax, kPlayerSpeedMax);
+		worldTransform_.translation_ += astralVel_;
+	}
+	else
+	{
+		astralVel_ = Vector2(0, 0);
+	}
 }
+
 void Player::MapCollision(CollisonMapInfo& info) {
 	MapCollisionTop(info);
 	MapCollisionBottom(info);
@@ -276,7 +337,10 @@ Vector2 Player::CornerPos(const Vector2 center, Corner corner) {
 	};
 	return (center + offsetTable[static_cast<uint32_t>(corner)]);
 }
-void Player::MapCollisionMove(const CollisonMapInfo& info) { worldTransform_.translation_ += info.vel; }
+void Player::MapCollisionMove(const CollisonMapInfo& info) 
+{
+	worldTransform_.translation_ += info.vel; 
+}
 void Player::MapAfterCollision(const CollisonMapInfo& info) {
 
 	if (info.Top) {
@@ -355,6 +419,7 @@ void Player::BehaviorRootInitialize()
 {
 	{
 		behavior_ = Behavior::kRoot;
+		astralVel_ = Vector2(0, 0);
 		worldTransform_.scale_ = Vector2(1.0f, 1.0f);
 
 	}
@@ -366,13 +431,12 @@ void Player::BehaviorRootUpdate()
 		coolTime_ = max(0.0f, coolTime_);
 	}
 
-	if (Keys::IsTrigger(DIK_F))
+	if (Keys::IsTrigger(DIK_F) && onGround)
 	{
 		SwitchBody();
 	}
 
 	Move();
-	Turn();
 	if (Keys::IsTrigger(DIK_SPACE) && !onGround) {
 		behaviorNext_ = Behavior::kAttack; // 攻撃行動に切り替え
 	}
@@ -391,8 +455,6 @@ void Player::BehaviorAttackUpdate() {
 
 }
 
-
-
 void Player::BehaviorAstralInitialize()
 {
 	coolTime_ = 5.f;
@@ -403,12 +465,14 @@ void Player::BehaviorAstralInitialize()
 
 void Player::BehaviorAstralUpdate()
 {
-	if (AstralbehaviorNext_ != AstralBehavior::kUnknown) {
+	if (AstralbehaviorNext_ != AstralBehavior::kUnknown) 
+	{
 		Astralbehavior_ = AstralbehaviorNext_;
 		AstralbehaviorNext_ = AstralBehavior::kUnknown;
 
 		// 初期化処理
-		switch (Astralbehavior_) {
+		switch (Astralbehavior_) 
+		{
 		case AstralBehavior::kRoot:
 			AstralBodyBehaviorRootInitialize();
 			break;
@@ -421,7 +485,8 @@ void Player::BehaviorAstralUpdate()
 	}
 
 	// 行動ごとの更新処理
-	switch (Astralbehavior_) {
+	switch (Astralbehavior_) 
+	{
 	case AstralBehavior::kRoot:
 		AstralBodyBehaviorRootUpdate();
 		break;
@@ -440,6 +505,9 @@ void Player::SwitchBody()
 		return;
 	}
 
+	// 霊体化する前の位置を保存
+	tentativeWorldTransform_ = worldTransform_;
+
 	behaviorNext_ = Behavior::kAstral;
 }
 
@@ -450,13 +518,14 @@ void Player::AstralBodyBehaviorRootInitialize()
 
 void Player::AstralBodyBehaviorRootUpdate()
 {
-	Move();
+	AstralMove();
 
 	astralBodyTimer_ += frameTime;
 
 	if (astralBodyTimer_ >= astralBodyDuration_)
 	{
 		behaviorNext_ = Behavior::kRoot;
+		worldTransform_ = tentativeWorldTransform_;
 		
 	}
 }
