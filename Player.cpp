@@ -4,6 +4,8 @@
 #include <algorithm>
 #include "keys.h"
 #include <array>
+
+
 Player::Player() : vel_(0, 0) {}
 
 Player::~Player() {}
@@ -19,34 +21,45 @@ void Player::Initialize(Camera* camera, Vector2& pos) {
 
 }
 
-void Player::Update() {
+void Player::Update()
+{
 
 	if (behaviorNext_ != Behavior::kUnknown) {
-		behavior_ = behaviorNext_; // 次の行動に切り替える
+		behavior_ = behaviorNext_;
+		behaviorNext_ = Behavior::kUnknown;
+
+		// 初期化処理
 		switch (behavior_) {
-		case Player::kRoot:
-		default:
+		case Behavior::kRoot:
 			BehaviorRootInitialize();
 			break;
-
-		case Player::kAttack:
+		case Behavior::kAttack:
 			BehaviorAttackInitialize();
 			break;
-
+		case Behavior::kAstral:
+			BehaviorAstralInitialize();
+			break;
+		default:
+			break;
 		}
-
-		behaviorNext_ = Behavior::kUnknown; // 次の行動をリセット
 	}
 
+	// 行動ごとの更新処理
 	switch (behavior_) {
-	case Player::kRoot:
+	case Behavior::kRoot:
 		BehaviorRootUpdate();
 		break;
-	case Player::kAttack:
+	case Behavior::kAttack:
 		BehaviorAttackUpdate();
 		break;
-
+	case Behavior::kAstral:
+		BehaviorAstralUpdate();
+		break;
+	default:
+		break;
 	}
+
+
 	CollisonMapInfo info;
 	info.vel = vel_;
 	MapCollision(info);
@@ -54,14 +67,23 @@ void Player::Update() {
 	MapAfterCollision(info);
 	MapWallCollision(info);
 	GroundStates(info);
-	worldTransform_.Update();
 
+	worldTransform_.Update();
 }
 
 void Player::Draw() {
 	if (!isDead_) {
 		playerSprite_->Draw(worldTransform_, camera_, 0, 0, 32, 32); // プレイヤーを描画
 	}
+
+	Novice::ScreenPrintf(30, 50, "behavior_: %d", behavior_);
+	Novice::ScreenPrintf(30, 70, "behaviorNext_: %d", behaviorNext_);
+	Novice::ScreenPrintf(30, 90, "coolTimer: %.2f", coolTime_);
+	Novice::ScreenPrintf(30, 110, "Astralbehavior_: %d", Astralbehavior_);
+	Novice::ScreenPrintf(30, 130, "AstralbehaviorNext_: %d", AstralbehaviorNext_);
+	Novice::ScreenPrintf(30, 150, "astralBodyTimer: %f", astralBodyTimer_);
+
+	//Novice
 }
 void Player::Move() {
 	if (isDead_) {
@@ -292,9 +314,7 @@ void Player::GroundStates(const CollisonMapInfo& info) {
 	else {
 		isJumping = true; // ジャンプ中フラグを立てる
 		float Gravity = kGravity;
-		if (slide) {
-			Gravity = slideSpeed;
-		}
+
 		vel_ += Vector2(0, -Gravity);
 		vel_.y = max(vel_.y, -kLimitFallSpeed);
 		if (info.Bottom) {
@@ -332,27 +352,34 @@ void Player::OnCollision(const Enemies* enemies) {
 	// }
 	isDead_ = true; // プレイヤーが死亡
 }
-void Player::BehaviorRootInitialize() {
+void Player::BehaviorRootInitialize()
+{
 	{
 		behavior_ = Behavior::kRoot;
 		worldTransform_.scale_ = Vector2(1.0f, 1.0f);
-		slide = false;
 
 	}
 }
-void Player::BehaviorRootUpdate() {
+void Player::BehaviorRootUpdate()
+{
+	if (coolTime_ > 0.0f) {
+		coolTime_ -= frameTime;
+		coolTime_ = max(0.0f, coolTime_);
+	}
+
+	if (Keys::IsTrigger(DIK_F))
+	{
+		SwitchBody();
+	}
 
 	Move();
 	Turn();
-	if (Keys::IsTrigger(DIK_SPACE) && !onGround) {
-		behaviorNext_ = Behavior::kAttack; // 攻撃行動に切り替え
-	}
 	JumpAnimetion();
 	MoveAnimation();
 }
 
-void Player::BehaviorAttackInitialize() {
-	behavior_ = Behavior::kAttack;
+void Player::BehaviorAttackInitialize()
+{
 
 }
 
@@ -366,9 +393,88 @@ void Player::BehaviorAttackUpdate() {
 
 void Player::JumpAnimetion() {
 
-
 }
 
 void Player::MoveAnimation() {
 
+}
+
+void Player::BehaviorAstralInitialize()
+{
+	coolTime_ = 5.f;
+	astralBodyTimer_ = 0.0f;
+	behavior_ = Behavior::kAstral;
+
+}
+
+void Player::BehaviorAstralUpdate()
+{
+	if (AstralbehaviorNext_ != AstralBehavior::kUnknown) {
+		Astralbehavior_ = AstralbehaviorNext_;
+		AstralbehaviorNext_ = AstralBehavior::kUnknown;
+
+		// 初期化処理
+		switch (Astralbehavior_) {
+		case AstralBehavior::kRoot:
+			AstralBodyBehaviorRootInitialize();
+			break;
+		case AstralBehavior::kAttack:
+			AstralBodyBehaviorAttackInitialize();
+			break;
+		default:
+			break;
+		}
+	}
+
+	// 行動ごとの更新処理
+	switch (Astralbehavior_) {
+	case AstralBehavior::kRoot:
+		AstralBodyBehaviorRootUpdate();
+		break;
+	case AstralBehavior::kAttack:
+		AstralBodyBehaviorAttackUpdate();
+		break;
+	default:
+		break;
+	}
+}
+
+void Player::SwitchBody()
+{
+	if (coolTime_ > 0.0f)
+	{
+		return;
+	}
+
+	behaviorNext_ = Behavior::kAstral;
+}
+
+void Player::AstralBodyBehaviorRootInitialize()
+{
+	Astralbehavior_ = AstralBehavior::kRoot;
+}
+
+void Player::AstralBodyBehaviorRootUpdate()
+{
+	Move();
+
+	astralBodyTimer_ += frameTime;
+
+	if (astralBodyTimer_ >= astralBodyDuration_)
+	{
+		behaviorNext_ = Behavior::kRoot;
+		
+	}
+}
+
+void Player::AstralBodyBehaviorAttackInitialize()
+{
+	
+	Astralbehavior_ = AstralBehavior::kAttack;
+	attackTimer = 0.0f;
+
+}
+
+void Player::AstralBodyBehaviorAttackUpdate()
+{
 }
