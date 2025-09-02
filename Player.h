@@ -70,9 +70,7 @@ public:
 
 	// --- 移動処理 ---
 	void Move();
-
-	// --- 向きの変更処理 ---
-	void Turn();
+	void AstralMove();
 
 	// --- 衝突判定関連 ---
 	void MapCollision(CollisonMapInfo& info);            // マップ全体の衝突判定
@@ -133,10 +131,12 @@ private:
 
 	// --- トランスフォーム・カメラ ---
 	WtF worldTransform_;          // ワールドトランスフォーム
+	WtF tentativeWorldTransform_; // 仮のワールドトランスフォーム
 	Camera* camera_ = nullptr;    // カメラポインタ
 
 	// --- 速度・向き ---
 	Vector2 vel_;                 // 移動速度
+	Vector2 astralVel_;           // 幽体状態の移動速度
 	LRDir lrDir_ = LRDir::kRight; // 向き
 
 	// --- 定数 ---
@@ -174,11 +174,13 @@ private:
 
 	// --- スプライト ---
 	DrawSprite* playerSprite_ = nullptr;
+	DrawSprite* astralBodySprite_ = nullptr;
+	DrawSprite* dathSprite_ = nullptr;
 
 	// --- 幽体状態関連 ---
 	float astralBodyTimer_ = 0.0f;           // 幽体状態の残り時間タイマー
 	const float astralBodyDuration_ = 10.0f; // 幽体状態持続時間
-	float coolTime_ = 5.0f;                  // 幽体状態になるまでのクールタイム
+	float coolTime_ = 3.0f;                  // 幽体状態になるまでのクールタイム
 
 	// --- 体力 ---
 	const float nomalBodyHP = 3.0f;  // 通常状態の体力
