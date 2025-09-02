@@ -16,8 +16,8 @@ void Player::Initialize(Camera* camera, Vector2& pos) {
 	camera_ = camera;
 	worldTransform_.Initialize();
 	worldTransform_.translation_ = pos;
-	playerSprite_ = new DrawSprite(Novice::LoadTexture("white1x1.png"), { 68,72 });
-	playerSprite_->SetColor(RED);
+	playerSprite_ = new DrawSprite(Novice::LoadTexture("./Resources/Player/player.png"), { 58,72 });
+	playerSprite_->SetColor(0xffffffff);
 
 }
 
@@ -67,13 +67,13 @@ void Player::Update()
 	MapAfterCollision(info);
 	MapWallCollision(info);
 	GroundStates(info);
-
+	Animation();
 	worldTransform_.Update();
 }
 
 void Player::Draw() {
 	if (!isDead_) {
-		playerSprite_->Draw(worldTransform_, camera_, 0, 0, 68, 72); // プレイヤーを描画
+		playerSprite_->Draw(worldTransform_, camera_, (animationCount * 58) + (lrDir_ == LRDir::kRight ? 0 : 58), static_cast<int>(animationBehavior_) * 72 + 2, (lrDir_ == LRDir::kRight ? 1 : -1) * 58, 72); // プレイヤーを描画
 	}
 
 	Novice::ScreenPrintf(30, 50, "behavior_: %d", behavior_);
@@ -286,7 +286,6 @@ void Player::MapAfterCollision(const CollisonMapInfo& info) {
 void Player::GroundStates(const CollisonMapInfo& info) {
 
 	if (onGround) {
-		isJumping = false; // ジャンプ中フラグを下ろす
 		if (vel_.y > 0.0f) {
 			onGround = false;
 		}
@@ -298,10 +297,10 @@ void Player::GroundStates(const CollisonMapInfo& info) {
 			}
 			std::array<Corner, 2> checkCorners = { kLeftBottom, kRightBottom };
 			for (auto corner : checkCorners) {
-				auto index = mapChipField_->GetMapChipIndexByPosition(posNew[corner] + Vector2(0.f, -kBlank));
+				auto index = mapChipField_->GetMapChipIndexByPosition(posNew[corner] + Vector2(0.f, -(kBlank + 1.f)));
 				auto type = mapChipField_->GetMapChipTypeIndex(index.xIndex, index.yIndex);
 				if (type == MapChipType::kBlock || type == MapChipType::kBlock2) {
-					isHit = true; // 地面にいない
+					isHit = true;
 					break;
 				}
 			}
@@ -312,7 +311,6 @@ void Player::GroundStates(const CollisonMapInfo& info) {
 
 	}
 	else {
-		isJumping = true; // ジャンプ中フラグを立てる
 		float Gravity = kGravity;
 
 		vel_ += Vector2(0, -Gravity);
@@ -376,7 +374,6 @@ void Player::BehaviorRootUpdate()
 	if (Keys::IsTrigger(DIK_SPACE) && !onGround) {
 		behaviorNext_ = Behavior::kAttack; // 攻撃行動に切り替え
 	}
-	Animation();
 }
 
 void Player::BehaviorAttackInitialize()
@@ -457,13 +454,13 @@ void Player::AstralBodyBehaviorRootUpdate()
 	if (astralBodyTimer_ >= astralBodyDuration_)
 	{
 		behaviorNext_ = Behavior::kRoot;
-		
+
 	}
 }
 
 void Player::AstralBodyBehaviorAttackInitialize()
 {
-	
+
 	Astralbehavior_ = AstralBehavior::kAttack;
 	attackTimer = 0.0f;
 
@@ -474,5 +471,95 @@ void Player::AstralBodyBehaviorAttackUpdate()
 }
 void Player::Animation() {
 
+	if (animationBehaviorNext_ != AnimationBehavior::kUnknown) {
+		animationBehavior_ = animationBehaviorNext_;
+		animationBehaviorNext_ = AnimationBehavior::kUnknown;
+		animationCount = 0;
+		animationTimer = 0;
+		switch (animationBehavior_)
+		{
+		case Player::AnimationBehavior::kRoot:
+			animationBehavior_ = Player::AnimationBehavior::kRoot;
+			animationMax = 4; // アニメーションの最大数を設定
+			break;
+		case Player::AnimationBehavior::kMove:
+			animationBehavior_ = Player::AnimationBehavior::kMove;
+			animationMax = 4;
+			break;
+		case Player::AnimationBehavior::kJumpUp:
+			animationBehavior_ = Player::AnimationBehavior::kJumpUp;
+			animationMax = 2;
+			break;
+		case Player::AnimationBehavior::kJumpDown:
+			animationBehavior_ = Player::AnimationBehavior::kJumpDown;
+			animationMax = 2;
+			break;
 
+		}
+
+	}
+	switch (animationBehavior_)
+	{
+	case Player::AnimationBehavior::kRoot:
+
+		animationTimer++;
+		if (!onGround)
+		{
+			if (vel_.y > 0.f)
+			{
+				animationBehaviorNext_ = Player::AnimationBehavior::kJumpUp;
+			}
+			else
+			{
+				animationBehaviorNext_ = Player::AnimationBehavior::kJumpDown;
+			}
+		}
+		if (Keys::IsPress(DIK_A) || Keys::IsPress(DIK_D))
+		{
+			animationBehaviorNext_ = Player::AnimationBehavior::kMove;
+		}
+		break;
+	case Player::AnimationBehavior::kMove:
+
+		animationTimer++;
+		if (!onGround)
+		{
+			if (vel_.y > 0.f)
+			{
+				animationBehaviorNext_ = Player::AnimationBehavior::kJumpUp;
+			}
+			else
+			{
+				animationBehaviorNext_ = Player::AnimationBehavior::kJumpDown;
+			}
+		}
+		if (!Keys::IsPress(DIK_A) && !Keys::IsPress(DIK_D))
+		{
+			animationBehaviorNext_ = Player::AnimationBehavior::kRoot;
+		}
+		break;
+	case Player::AnimationBehavior::kJumpUp:
+
+		animationTimer++;
+		if (!onGround && vel_.y < 0.f)
+		{
+			animationBehaviorNext_ = Player::AnimationBehavior::kJumpDown;
+		}
+		break;
+	case Player::AnimationBehavior::kJumpDown:
+
+		animationTimer++;
+		if (onGround)
+		{
+			animationBehaviorNext_ = Player::AnimationBehavior::kRoot;
+		}
+		break;
+	default:
+		break;
+	}
+
+	if (animationTimer >= 60 / (animationMax * 2)) {
+		animationTimer = 0;// 60フレームに1回
+		animationCount = (animationCount + 1) % animationMax;
+	}
 }

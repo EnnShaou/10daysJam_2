@@ -30,6 +30,7 @@ public:
 		kMove,
 		kJumpUp,
 		kJumpDown,
+		kUnknown
 	};
 	// --- プレイヤー当たり判定のコーナー ---
 	enum Corner
@@ -150,7 +151,6 @@ private:
 
 	// --- 状態フラグ ---
 	bool onGround = false;  // 地面に接地しているか
-	bool isJumping = false; // ジャンプ中かどうか
 	bool isDead_ = false;   // 死亡状態
 	bool isMove = false;    // 移動中かどうか
 	bool isClear = false;   // ステージクリアしたかどうか
@@ -170,7 +170,6 @@ private:
 	const float kAttackTime = 0.5f;
 	const float frameTime = 1.0f / 60.0f;
 
-	float animationTimer = 0;
 	float legSpeed = 0.05f;
 
 	// --- スプライト ---
@@ -187,5 +186,8 @@ private:
 
 	// --- アニメーション ---
 	AnimationBehavior animationBehavior_ = AnimationBehavior::kRoot;
-	int animationCount = 0;
+	AnimationBehavior animationBehaviorNext_ = AnimationBehavior::kUnknown;
+	int animationCount;
+	int animationTimer;
+	int animationMax = 4;
 };
