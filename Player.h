@@ -19,6 +19,14 @@ public:
 		bool LR = false;           // 左右
 		Vector2 vel; // 移動量
 	};
+
+	enum  class AnimationBehavior
+	{
+		kRoot,
+		kMove,
+		kJumpUP,
+		kJumpDONW,
+	};
 	enum Corner {
 		kRightBottom,
 		kLeftBottom,
@@ -92,8 +100,7 @@ public:
 	// 攻撃の初期化
 	void BehaviorAttackInitialize(); // 攻撃の初期化
 	void BehaviorAttackUpdate();
-	void JumpAnimetion();
-	void MoveAnimation();
+	void Animation();
 	PlayerBullet* playerBullet_ = nullptr; // プレイヤーの弾
 	bool IsClear() const { return isClear; }
 
@@ -103,7 +110,7 @@ private:
 	Vector2 vel_;                         // プレイヤーの移動速度
 	LRDir lrDir_ = LRDir::kRight;                       // プレイヤーの向き
 	static inline const float kPlayerSpeed = 1.0f;    // プレイヤーの移動速度の減少率
-	static inline const float kPlayerSpeedMax = kPlayerSpeed * 4.f;   // プレイヤーの移動速度の最大値
+	static inline const float kPlayerSpeedMax = kPlayerSpeed * 6.f;   // プレイヤーの移動速度の最大値
 	bool onGround = false;                              // 地面にいるかどうか
 	bool isJumping = false;                             // ジャンプ中かどうか
 	static inline const float kGravity = 0.98f;         // 重力
@@ -113,7 +120,7 @@ private:
 	// std::array<KamataEngine::Vector3, kNumCorner> posNew; // コーナーの位置を格納する配列
 	static inline const float kWidth = 60;     // 当たり判定の幅
 	static inline const float kHeight = 60;    // 当たり判定の高さ
-	static inline const float kBlank =4.f;     // 当たり判定の余白
+	static inline const float kBlank = 4.f;     // 当たり判定の余白
 	bool isDead_ = false;                        // プレイヤーが死亡しているかどうか
 	Behavior behavior_ = Behavior::kRoot;        // プレイヤーの行動
 	Behavior behaviorNext_ = Behavior::kUnknown; // 次のプレイヤーの行動
@@ -127,4 +134,6 @@ private:
 	bool slide = false;
 	float legSpeed = 0.05f;
 	bool isClear = false;
+	AnimationBehavior animationBehavior_ = AnimationBehavior::kRoot;
+	int animationCount = 0;
 };
