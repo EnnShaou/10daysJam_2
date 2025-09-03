@@ -81,7 +81,10 @@
       <Filter>source</Filter>
     </ClCompile>
     <ClCompile Include="Enemies.cpp">
-      <Filter>KamataEngine</Filter>
+      <Filter>source</Filter>
+    </ClCompile>
+    <ClCompile Include="EnemyManager.cpp">
+      <Filter>source</Filter>
     </ClCompile>
   </ItemGroup>
   <ItemGroup>
@@ -188,7 +191,12 @@
     <ClInclude Include="keys.h">
       <Filter>include</Filter>
     </ClInclude>
-    <ClInclude Include="Enemies.h" />
+    <ClInclude Include="Enemies.h">
+      <Filter>include</Filter>
+    </ClInclude>
+    <ClInclude Include="EnemyManager.h">
+      <Filter>include</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <None Include=".editorconfig" />

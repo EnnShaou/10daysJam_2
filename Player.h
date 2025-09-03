@@ -145,7 +145,7 @@ private:
 	static inline const float kGravity = 0.98f;                     // 重力加速度
 	static inline const float kLimitFallSpeed = kGravity * 20.f;    // 落下速度制限
 	static inline const float kJumpAcceleration = 15.00f;           // ジャンプの加速度
-	static inline const float kWidth = 60;                          // 当たり判定幅
+	static inline const float kWidth = 30;                          // 当たり判定幅
 	static inline const float kHeight = 60;                         // 当たり判定高さ
 	static inline const float kBlank = 2.f;                         // 当たり判定余白
 

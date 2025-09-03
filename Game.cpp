@@ -35,8 +35,8 @@ void Game::Initialize() {
 	mapChipField_ = new MapChipField();
 	mapChipField_->LoadMapChipCsv("Resources/MapData/map_data1.csv");
 
-	blockSprite_ = new DrawSprite(Novice::LoadTexture("white1x1.png"), {64,64});
-	camera_ = new Camera({0,0 });
+	blockSprite_ = new DrawSprite(Novice::LoadTexture("white1x1.png"), { 64,64 });
+	camera_ = new Camera({ 0,0 });
 	camera_->Initialize(1280, 720);
 
 	// プレイヤーの初期化
@@ -49,6 +49,7 @@ void Game::Initialize() {
 	// フェードの初期化
 	fade_ = new Fade();
 	fade_->Initialize();
+	enemyManager.setPlayer(player_);
 #ifdef _DEBUG
 
 
@@ -69,7 +70,7 @@ void Game::Update() {
 		camera_->Update();
 
 		player_->Update();
-
+		enemyManager.UpDate();
 		// 全ての当たり判定をチェック
 		CheckAllCollisions();
 		for (std::vector<BlockManager*>& wtfby : wTfBlock_) {
@@ -93,7 +94,7 @@ void Game::Update() {
 
 void Game::Draw() {
 
-	player_->Draw();
+
 
 	for (std::vector<BlockManager*>& wtfby : wTfBlock_) {
 		for (BlockManager* wtfb : wtfby) {
@@ -103,6 +104,9 @@ void Game::Draw() {
 
 		}
 	}
+	player_->Draw();
+	enemyManager.Draw();
+
 	fade_->Draw(); // フェードの描画
 }
 
@@ -125,13 +129,25 @@ void Game::GenerateBlocks() {
 
 			MapChipType mapChipType = mapChipField_->GetMapChipTypeIndex(x, y);
 
-			if (mapChipType == MapChipType::kBlock || mapChipType == MapChipType::Thorn || mapChipType == MapChipType::kBlock2 || mapChipType == MapChipType::Clear) {
+			if (mapChipType == MapChipType::kBlock) {
 
 				wTfBlock_[y][x] = new BlockManager();
 				wTfBlock_[y][x]->wtf = new WtF();
 				wTfBlock_[y][x]->wtf->Initialize();
 				wTfBlock_[y][x]->wtf->translation_ = mapChipField_->GetMapChipPositionByIndex(x, y);
 				wTfBlock_[y][x]->mapChipType = mapChipType;
+			}
+		}
+	}
+	//enemyの生成
+	for (uint32_t y = 0; y < numBlockY; y++) {
+		for (uint32_t x = 0; x < numBlockX; x++) {
+
+			MapChipType mapChipType = mapChipField_->GetMapChipTypeIndex(x, y);
+
+			if (mapChipType == MapChipType::EnemyPumpkin) {
+
+				enemyManager.PushEnemyPumpkin(mapChipField_->GetMapChipPositionByIndex(x, y), camera_);
 			}
 		}
 	}

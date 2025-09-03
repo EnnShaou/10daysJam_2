@@ -8,6 +8,7 @@
 #include"WtF.h"
 #include"DrawFunc.h"
 #include"Camera.h"
+#include "EnemyManager.h"
 class Game : public IScene {
 public:
 	Game();
@@ -24,7 +25,7 @@ public:
 	void CheckAllCollisions();
 	enum class Phase { FadeIn, kPlay, kDeath, kFadeOut };
 	void ChangePhase(); // フェーズを変更する
-	
+
 	struct BlockManager {
 		WtF* wtf = nullptr;
 		MapChipType mapChipType;
@@ -36,6 +37,7 @@ private:
 	DrawSprite* blockSprite_ = nullptr; // ブロックのスプライト
 	std::vector<std::vector<BlockManager*>> wTfBlock_;
 	Player* player_ = nullptr;// プレイヤー
+	EnemyManager enemyManager;
 	Phase phase_ = Phase::FadeIn;                             // ゲームのフェーズ
 	Fade* fade_ = nullptr;                       // フェードイン・フェードアウト用のオブジェクト
 

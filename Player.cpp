@@ -210,7 +210,7 @@ void Player::MapCollisionTop(CollisonMapInfo& info) {
 		auto index = mapChipField_->GetMapChipIndexByPosition(posNew[corner]);
 		auto type = mapChipField_->GetMapChipTypeIndex(index.xIndex, index.yIndex);
 		auto typeNext = mapChipField_->GetMapChipTypeIndex(index.xIndex, index.yIndex + 1);
-		if ((type == MapChipType::kBlock || type == MapChipType::kBlock2) && (typeNext != MapChipType::kBlock && typeNext != MapChipType::kBlock2)) {
+		if (type == MapChipType::kBlock && typeNext != MapChipType::kBlock) {
 			index = mapChipField_->GetMapChipIndexByPosition(worldTransform_.translation_ + info.vel + Vector2(0.f, kHeight / 2));
 			auto indexSetNext = mapChipField_->GetMapChipIndexByPosition(worldTransform_.translation_ + Vector2(0.f, kHeight / 2));
 			if (index.yIndex != indexSetNext.yIndex) {
@@ -221,12 +221,7 @@ void Player::MapCollisionTop(CollisonMapInfo& info) {
 				info.Top = true;
 				break;
 			}
-			if (type == MapChipType::Thorn) {
-				isDead_ = true;
-			}
-			if (type == MapChipType::Clear) {
-				isClear = true;
-			}
+			
 		}
 	}
 }
@@ -243,7 +238,7 @@ void Player::MapCollisionBottom(CollisonMapInfo& info) {
 		auto index = mapChipField_->GetMapChipIndexByPosition(posNew[corner]);
 		auto type = mapChipField_->GetMapChipTypeIndex(index.xIndex, index.yIndex);
 		auto typeNext = mapChipField_->GetMapChipTypeIndex(index.xIndex, index.yIndex - 1);
-		if ((type == MapChipType::kBlock || type == MapChipType::kBlock2) && (typeNext != MapChipType::kBlock && typeNext != MapChipType::kBlock2)) {
+		if (type == MapChipType::kBlock && typeNext != MapChipType::kBlock) {
 			index = mapChipField_->GetMapChipIndexByPosition(worldTransform_.translation_ + info.vel - Vector2(0.f, kHeight / 2));
 			auto indexSetNext = mapChipField_->GetMapChipIndexByPosition(worldTransform_.translation_ - Vector2(0.f, kHeight / 2));
 			if (index.yIndex != indexSetNext.yIndex) {
@@ -252,12 +247,7 @@ void Player::MapCollisionBottom(CollisonMapInfo& info) {
 				info.Bottom = true;
 				break;
 			}
-			if (type == MapChipType::Thorn) {
-				isDead_ = true;
-			}
-			if (type == MapChipType::Clear) {
-				isClear = true;
-			}
+		
 		}
 	}
 }
@@ -275,7 +265,7 @@ void Player::MapCollisionLeft(CollisonMapInfo& info) {
 		auto index = mapChipField_->GetMapChipIndexByPosition(posNew[corner]);
 		auto type = mapChipField_->GetMapChipTypeIndex(index.xIndex, index.yIndex);
 		// auto typeNext = mapChipField_->GetMapChipTypeIndex(index.xIndex - 1, index.yIndex);
-		if (type == MapChipType::kBlock || type == MapChipType::kBlock2 /*&& typeNext != MapChipType::kBlock*/) {
+		if (type == MapChipType::kBlock) {
 			index = mapChipField_->GetMapChipIndexByPosition(worldTransform_.translation_ + info.vel - Vector2(kWidth / 2, 0.f));
 			auto indexSetNext = mapChipField_->GetMapChipIndexByPosition(worldTransform_.translation_ - Vector2(kWidth / 2, 0.f));
 			if (index.xIndex != indexSetNext.xIndex) {
@@ -286,12 +276,7 @@ void Player::MapCollisionLeft(CollisonMapInfo& info) {
 				break;
 			}
 		}
-		if (type == MapChipType::Thorn) {
-			isDead_ = true;
-		}
-		if (type == MapChipType::Clear) {
-			isClear = true;
-		}
+		
 	}
 }
 void Player::MapCollisionRight(CollisonMapInfo& info) {
@@ -308,7 +293,7 @@ void Player::MapCollisionRight(CollisonMapInfo& info) {
 		auto index = mapChipField_->GetMapChipIndexByPosition(posNew[corner]);
 		auto type = mapChipField_->GetMapChipTypeIndex(index.xIndex, index.yIndex);
 		// auto typeNext = mapChipField_->GetMapChipTypeIndex(index.xIndex + 1, index.yIndex);
-		if (type == MapChipType::kBlock || type == MapChipType::kBlock2 /*&& typeNext != MapChipType::kBlock*/) {
+		if (type == MapChipType::kBlock) {
 			index = mapChipField_->GetMapChipIndexByPosition(worldTransform_.translation_ + info.vel + Vector2(kWidth / 2, 0.f));
 			auto indexSetNext = mapChipField_->GetMapChipIndexByPosition(worldTransform_.translation_ + Vector2(kWidth / 2, 0.f));
 			if (index.xIndex != indexSetNext.xIndex) {
@@ -319,12 +304,7 @@ void Player::MapCollisionRight(CollisonMapInfo& info) {
 				break;
 			}
 		}
-		if (type == MapChipType::Thorn) {
-			isDead_ = true;
-		}
-		if (type == MapChipType::Clear) {
-			isClear = true;
-		}
+		
 	}
 }
 Vector2 Player::CornerPos(const Vector2 center, Corner corner) {
@@ -363,7 +343,7 @@ void Player::GroundStates(const CollisonMapInfo& info) {
 			for (auto corner : checkCorners) {
 				auto index = mapChipField_->GetMapChipIndexByPosition(posNew[corner] + Vector2(0.f, -(kBlank + 1.f)));
 				auto type = mapChipField_->GetMapChipTypeIndex(index.xIndex, index.yIndex);
-				if (type == MapChipType::kBlock || type == MapChipType::kBlock2) {
+				if (type == MapChipType::kBlock ) {
 					isHit = true;
 					break;
 				}
