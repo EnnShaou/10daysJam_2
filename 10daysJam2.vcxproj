@@ -118,6 +118,7 @@ xcopy C:\KamataEngine\DirectXGame\Resources "$(OutDirFullPath)NoviceResources" /
     <ClCompile Include="Camera.cpp" />
     <ClCompile Include="DrawFunc.cpp" />
     <ClCompile Include="Enemies.cpp" />
+    <ClCompile Include="EnemyManager.cpp" />
     <ClCompile Include="Fade.cpp" />
     <ClCompile Include="Game.cpp" />
     <ClCompile Include="keys.cpp" />
@@ -159,6 +160,7 @@ xcopy C:\KamataEngine\DirectXGame\Resources "$(OutDirFullPath)NoviceResources" /
     <ClInclude Include="Camera.h" />
     <ClInclude Include="DrawFunc.h" />
     <ClInclude Include="Enemies.h" />
+    <ClInclude Include="EnemyManager.h" />
     <ClInclude Include="Fade.h" />
     <ClInclude Include="Game.h" />
     <ClInclude Include="keys.h" />

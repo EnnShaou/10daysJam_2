@@ -3,7 +3,7 @@
 #include <vector>
 #include "Vector2.h"
 
-enum class MapChipType { kBlank = -1, kBlock, kBlock2, Enemy, Thorn, Tree, Clear };
+enum class MapChipType { kBlank = -1, kBlock, EnemyPumpkin = 9 };
 
 struct MapChipData {
 	std::vector<std::vector<MapChipType>> data;

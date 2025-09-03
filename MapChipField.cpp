@@ -8,7 +8,7 @@ namespace {
 	std::map<std::string, MapChipType> mapChipTable = {
 		{"-1", MapChipType::kBlank },
 		{"0", MapChipType::kBlock },
-		{"1", MapChipType::kBlock2},
+		{"9", MapChipType::EnemyPumpkin},
 
 	};
 }
