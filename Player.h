@@ -117,6 +117,7 @@ public:
 
 	// --- ゲッター ---
 	Vector2 GetPos() const { Vector2 worldPos = worldTransform_.translation_; return worldPos; }
+	Vector2 GetTentativePos() const { Vector2 worldPos = tentativeWorldTransform_.translation_; return worldPos; }
 	Vector2 GetScale() const { Vector2 worldScale = worldTransform_.scale_; return worldScale; }
 	float getRotation() const { float worldRotation = worldTransform_.rotation_; return worldRotation; }
 	Vector2& GetVel() { return vel_; }

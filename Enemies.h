@@ -146,3 +146,21 @@ private:
 
 	float lightRadius_ = 280.0f;
 };
+
+// ------------------ コウモリ（派生） ------------------
+class EnemyBat : public Enemies {
+public:
+	EnemyBat();
+	~EnemyBat();
+
+	// 初期化（カメラ、初期位置）
+	void Initialize(Camera* camera, Vector2& pos, MapChipField* mapChipField) override;
+
+	// 更新処理
+	void Update() override;
+
+	// 描画処理
+	void Draw() override;
+
+private:
+};

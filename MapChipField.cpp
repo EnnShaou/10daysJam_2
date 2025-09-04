@@ -10,6 +10,7 @@ namespace {
 		{"0", MapChipType::kBlock },
 		{"9", MapChipType::EnemyPumpkin},
 		{"10", MapChipType::EnemyLamp},
+		{"11", MapChipType::EnemyBat},
 
 	};
 }

@@ -367,6 +367,9 @@ void Enemies::InputGravity(const CollisonMapInfo& info)
 	}
 }
 
+/// <summary>
+/// Enemy Lamp
+/// </summary>
 EnemyLamp::EnemyLamp()
 {
 }
@@ -432,4 +435,80 @@ void EnemyLamp::Draw()
 	DrawCircle(wtf, camera_, int(lightRadius_), RED);
 	sprite->Draw(wtf, camera_, 0, 0, 64, 64);
 	
+}
+
+/// <summary>
+///  Enemy Bat
+/// </summary>
+EnemyBat::EnemyBat() {
+
+}
+
+EnemyBat::~EnemyBat()
+{
+}
+
+void EnemyBat::Initialize(Camera* camera, Vector2& pos, MapChipField* mapChipField)
+{
+	sprite = new DrawSprite(Novice::LoadTexture("white1x1.png"), { 32,32 });
+	sprite->SetColor(0x4f4f4dff);
+	camera_ = camera;
+	wtf.Initialize();
+	wtf.translation_ = pos;
+	mapChipField_ = mapChipField;
+
+	kSpeed = { 1.2f, 1.0f };
+	kAtkRange = 500.0f; //攻撃範囲
+
+	// 当たり判定
+	kWidth = 24.0f;
+	kHeight = 24.0f;
+}
+
+void EnemyBat::Update()
+{
+	Vector2 playerPos;
+	// コウモリをプレイヤーの本体のみに動かす
+	if (player_->GetBehavior() == Player::Behavior::kAstral) {
+		playerPos = player_->GetTentativePos();
+	}	else {
+		playerPos = player_->GetPos();
+	}
+	
+	//　プレイヤーが敵の攻撃範囲にいるかどうかを計算
+	Vector2 pumpkinPos = wtf.translation_;
+	Vector2 enemyToPlayer = { playerPos.x - pumpkinPos.x, playerPos.y - pumpkinPos.y };
+	float distanceToPlayer = sqrtf(enemyToPlayer.x * enemyToPlayer.x + enemyToPlayer.y * enemyToPlayer.y);
+
+	// プレイヤーの方向に動く
+	if (distanceToPlayer <= kAtkRange) {
+		if (playerPos.x >= pumpkinPos.x) {
+			vel_.x = +kSpeed.x;
+		}
+		else {
+			vel_.x = -kSpeed.x;
+		}
+
+		if (playerPos.y >= pumpkinPos.y) {
+			vel_.y = +kSpeed.y;
+		}
+		else {
+			vel_.y = -kSpeed.y;
+		}
+	}
+	else {
+		//止まる
+		vel_ = { 0.0f, 0.0f };
+	}
+
+
+
+	// 移動更新
+	wtf.translation_ += vel_;
+	wtf.Update();
+}
+
+void EnemyBat::Draw()
+{
+	sprite->Draw(wtf, camera_, 0, 0, 32, 32);
 }
