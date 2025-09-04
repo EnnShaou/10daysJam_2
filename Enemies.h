@@ -4,6 +4,7 @@
 #include"WtF.h"
 #include"Camera.h"
 #include"MapChipField.h"
+#include"Player.h"
 
 // ------------------ 敵の基底クラス ------------------
 class Enemies
@@ -32,37 +33,51 @@ public:
     };
 
     // 初期化（カメラ、初期位置）
-    virtual void Initialize(Camera* camera, Vector2& pos) = 0;
+    virtual void Initialize(Camera* camera, Vector2& pos, MapChipField* mapChipField) = 0;
 
     // 更新処理
-    virtual void Update() = 0;
+    virtual void Update(Player* player) = 0;
 
     // 描画処理
     virtual void Draw() = 0;
-
+  
     // --- 衝突判定関連 ---
-    void MapColdlision(CollisonMapInfo& info);   // マップ全体との衝突判定
+    void MapCollision(CollisonMapInfo& info);   // マップ全体との衝突判定
+
+    //void SetMapChipField(MapChipField* mapChipField) { mapChipField_ = mapChipField; }
+    void SetPlayer(Player* player) { player_ = player; }
 
 protected:
+    MapChipField* mapChipField_; // マップフィールドポインタ
     DrawSprite* sprite = nullptr;   // 敵スプライト
-    WtF wtf;                        // 変換行列？（詳細不明）
+    WtF wtf;                        // 座標など
     Camera* camera_ = nullptr;      // カメラ参照
+    Player* player_ = nullptr;
 
+    
     // 当たり判定のサイズ
     float kWidth = 60;              // 当たり判定の幅
     float kHeight = 60;             // 当たり判定の高さ
     float kBlank = 2.f;             // 当たり判定の余白（境界ずれ防止）
 
-private:
-    // 以下は詳細な方向別の衝突判定処理（現状コメントアウト）
-    //void MapCollisionTop(CollisonMapInfo& info);         // 上方向の衝突判定
-    //void MapCollisionBottom(CollisonMapInfo& info);      // 下方向の衝突判定
-    //void MapCollisionLeft(CollisonMapInfo& info);        // 左方向の衝突判定
-    //void MapCollisionRight(CollisonMapInfo& info);       // 右方向の衝突判定
-    //void MapWallCollision(CollisonMapInfo& info);        // 壁との衝突判定
-    //void MapCollisionMove(const CollisonMapInfo& info);  // 衝突後の移動処理
-    //void MapAfterCollision(const CollisonMapInfo& info); // 衝突後の状態処理
+    Vector2 vel_;                                   //　速度
+    const float kGravity = 0.98f;                   //　重力
+    const float kLimitFallSpeed = kGravity * 20.f;  //　落下速度制限
+
+    virtual void GroundStates(const CollisonMapInfo& info);      // 地面との接地状態の更新
     //void GroundStates(const CollisonMapInfo& info);      // 地面との接地状態更新
+    // --- マップ ---
+    // 以下は詳細な方向別の衝突判定処理（現状コメントアウト）
+    void MapCollisionTop(CollisonMapInfo& info);         // 上方向の衝突判定
+    void MapCollisionBottom(CollisonMapInfo& info);      // 下方向の衝突判定
+    void MapCollisionLeft(CollisonMapInfo& info);        // 左方向の衝突判定
+    void MapCollisionRight(CollisonMapInfo& info);       // 右方向の衝突判定
+
+    void MapWallCollision(CollisonMapInfo& info);        // 壁との衝突判定
+    void MapAfterCollision(const CollisonMapInfo& info); // 衝突後の状態処理
+    // --- 当たり判定のコーナー位置取得 ---
+    Vector2 CornerPos(const Vector2 center, Corner corner);
+    bool onGround = false;  // 地面に接地しているか
 };
 
 
@@ -74,14 +89,21 @@ public:
     ~EnemyPumpkin();
 
     // 初期化（カメラ、初期位置）
-    void Initialize(Camera* camera, Vector2& pos) override;
+    void Initialize(Camera* camera, Vector2& pos, MapChipField* mapChipField) override;
 
     // 更新処理
-    void Update() override;
+    void Update(Player* player) override;
 
     // 描画処理
     void Draw() override;
 
+    Vector2 GetPos() { return wtf.translation_; }
+    
+    void GroundStates(const CollisonMapInfo& info) override;      // 地面との接地状態の更新
+
 private:
     // ここにかぼちゃ敵固有の変数や処理を追加できる
+    const Vector2 kSpeed = { 2.0f, 2.0f };  //かぼちゃの速さ
+    const float kAtkRange = 240.0f;         //プレイヤーがこの範囲にいると動く
+       
 };

@@ -118,6 +118,7 @@ public:
 	Vector2 GetScale() const { Vector2 worldScale = worldTransform_.scale_; return worldScale; }
 	float getRotation() const { float worldRotation = worldTransform_.rotation_; return worldRotation; }
 	Vector2& GetVel() { return vel_; }
+	Behavior& GetBehavior()  { return behavior_; }
 
 	bool IsDead() const { return isDead_; }
 	bool IsClear() const { return isClear; }
