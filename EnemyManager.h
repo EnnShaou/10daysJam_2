@@ -14,6 +14,7 @@ public:
 
     // 新しいかぼちゃ敵を生成してリストに追加
     void PushEnemyPumpkin(Vector2 pos, Camera* camera, MapChipField* mapChipField);
+    void PushEnemyLamp(Vector2 pos, Camera* camera, MapChipField* mapChipField);
 
     // 敵の更新処理（全ての敵に対してUpdateを呼ぶ）
     void UpDate();

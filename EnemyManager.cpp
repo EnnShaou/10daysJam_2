@@ -18,6 +18,14 @@ void EnemyManager::PushEnemyPumpkin(Vector2 pos, Camera* camera, MapChipField* m
 
 }
 
+void EnemyManager::PushEnemyLamp(Vector2 pos, Camera* camera, MapChipField* mapChipField)
+{
+	EnemyLamp* newEnemy = new EnemyLamp();
+	newEnemy->Initialize(camera, pos, mapChipField);
+	newEnemy->SetPlayer(player_);
+	enemies_.push_back(newEnemy);
+}
+
 void EnemyManager::UpDate()
 {
 	for (Enemies* enemy : enemies_) {

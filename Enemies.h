@@ -78,6 +78,24 @@ protected:
 	// --- 当たり判定のコーナー位置取得 ---
 	Vector2 CornerPos(const Vector2 center, Corner corner);
 	bool onGround = false;  // 地面に接地しているか
+
+	// ビヘイビア管理用の関数
+	enum class Behavior {
+		kStop,
+		kAstral,
+		kUnknown,
+	};
+
+	virtual void AstralBehavior();
+	virtual void AstralBehaviorInitialize();
+	virtual void StopBehavior();
+	virtual void StopBehaviorInitialize();
+
+	Vector2 kSpeed = { 2.0f, 2.0f };  //かぼちゃの速さ
+	float kAtkRange = 240.0f;         //プレイヤーがこの範囲にいると動く
+
+	Behavior behavior_ = Behavior::kStop;
+	Behavior behaviorNext_ = Behavior::kUnknown;
 };
 
 
@@ -99,25 +117,32 @@ public:
 
 	Vector2 GetPos() { return wtf.translation_; }
 
-	enum class Behavior {
-		kStop,
-		kAstral,
-		kUnknown,
-	};
 
 private:
 	// ここにかぼちゃ敵固有の変数や処理を追加できる
-
-	void AstralBehavior();
-	void AstralBehaviorInitialize();
-	void StopBehavior();
-	void StopBehaviorInitialize();
 	void InputGravity(const CollisonMapInfo& info)override;
-
-	const Vector2 kSpeed = { 2.0f, 2.0f };  //かぼちゃの速さ
-	const float kAtkRange = 240.0f;         //プレイヤーがこの範囲にいると動く
+};
 
 
-	Behavior behavior_ = Behavior::kStop;
-	Behavior behaviorNext_ = Behavior::kUnknown;
+// ------------------ 灯敵クラス（派生） ------------------
+class EnemyLamp : public Enemies
+{
+public:
+	EnemyLamp();
+	~EnemyLamp();
+
+	// 初期化（カメラ、初期位置）
+	void Initialize(Camera* camera, Vector2& pos, MapChipField* mapChipField) override;
+
+	// 更新処理
+	void Update() override;
+
+	// 描画処理
+	void Draw() override;
+
+	Vector2 GetPos() { return wtf.translation_; }
+
+private:
+
+	float lightRadius_ = 280.0f;
 };

@@ -31,9 +31,11 @@ void EnemyPumpkin::Initialize(Camera* camera, Vector2& pos, MapChipField* mapChi
 	wtf.translation_ = pos;
 	mapChipField_ = mapChipField;
 
+	kSpeed = { 2.0f, 2.0f };  //かぼちゃの速さ
+	kAtkRange = 240.0f;         //プレイヤーがこの範囲にいると動く
 }
 
-void EnemyPumpkin::AstralBehavior() {
+void Enemies::AstralBehavior() {
 	//　プレイヤーが敵の攻撃範囲にいるかどうかを計算
 	Vector2 playerPos = player_->GetPos();
 	Vector2 pumpkinPos = wtf.translation_;
@@ -67,19 +69,19 @@ void EnemyPumpkin::AstralBehavior() {
 	}
 }
 
-void EnemyPumpkin::AstralBehaviorInitialize() {
+void Enemies::AstralBehaviorInitialize() {
 	// プレイヤーが幽霊状態の時の処理
 	behavior_ = Behavior::kAstral;
 
 }
 
-void EnemyPumpkin::StopBehavior() {
+void Enemies::StopBehavior() {
 	if (player_->GetBehavior() == Player::Behavior::kAstral) {
 		behaviorNext_ = Behavior::kAstral;
 	}
 }
 
-void EnemyPumpkin::StopBehaviorInitialize() {
+void Enemies::StopBehaviorInitialize() {
 	// プレイヤーが本体状態の時の処理
 
 	behavior_ = Behavior::kStop;
@@ -92,22 +94,6 @@ void EnemyPumpkin::InputGravity(const CollisonMapInfo& info)
 	{
 		return;
 	}
-	if (onGround)
-	{
-		return;
-	}
-	float Gravity = kGravity;
-	vel_ += Vector2(0, -Gravity);
-	vel_.y = max(vel_.y, -kLimitFallSpeed);
-	if (info.Bottom) {
-
-		onGround = true;
-		vel_.y = 0.0f;
-	}
-}
-
-void Enemies::InputGravity(const CollisonMapInfo& info)
-{
 	if (onGround)
 	{
 		return;
@@ -177,6 +163,12 @@ void EnemyPumpkin::Draw()
 }
 
 
+
+///////////////////////////////////////////////////////////////////////////////
+//    																		 //
+//    					マップチップの当たり判定生成クラスの関数	 			     //
+//    					                                         		     //
+///////////////////////////////////////////////////////////////////////////////
 Vector2 Enemies::CornerPos(const Vector2 center, Corner corner) {
 
 	Vector2 offsetTable[kNumCorner] = {
@@ -357,4 +349,87 @@ void Enemies::GroundStates(const CollisonMapInfo& info) {
 
 	InputGravity(info);
 
+}
+
+void Enemies::InputGravity(const CollisonMapInfo& info)
+{
+	if (onGround)
+	{
+		return;
+	}
+	float Gravity = kGravity;
+	vel_ += Vector2(0, -Gravity);
+	vel_.y = max(vel_.y, -kLimitFallSpeed);
+	if (info.Bottom) {
+
+		onGround = true;
+		vel_.y = 0.0f;
+	}
+}
+
+EnemyLamp::EnemyLamp()
+{
+}
+
+EnemyLamp::~EnemyLamp()
+{
+	delete sprite;
+	sprite = nullptr;
+
+	delete camera_;
+	camera_ = nullptr;
+}
+
+void EnemyLamp::Initialize(Camera* camera, Vector2& pos, MapChipField* mapChipField)
+{
+	sprite = new DrawSprite(Novice::LoadTexture("white1x1.png"), { 64,64 });
+	sprite->SetColor(0xdfeb3dff);
+	camera_ = camera;
+	wtf.Initialize();
+	wtf.translation_ = pos;
+	mapChipField_ = mapChipField;
+
+	kSpeed = { 1.2f, 1.2f };
+	kAtkRange = 320.0f;
+}
+
+void EnemyLamp::Update()
+{
+	if (behaviorNext_ != Behavior::kUnknown) {
+		behavior_ = behaviorNext_;
+		behaviorNext_ = Behavior::kUnknown;
+
+		// 初期化処理
+		switch (behavior_) {
+		case Behavior::kStop:
+			StopBehaviorInitialize();
+			break;
+		case Behavior::kAstral:
+			AstralBehaviorInitialize();
+			break;
+		default:
+			break;
+		}
+	}
+
+	switch (behavior_) {
+	case Behavior::kStop:
+		StopBehavior();
+		break;
+	case Behavior::kAstral:
+		AstralBehavior();
+		break;
+	default:
+		break;
+	}
+
+	wtf.translation_ += vel_;
+	wtf.Update();
+}
+
+void EnemyLamp::Draw()
+{
+	DrawCircle(wtf, camera_, int(lightRadius_), RED);
+	sprite->Draw(wtf, camera_, 0, 0, 64, 64);
+	
 }
