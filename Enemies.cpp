@@ -8,13 +8,9 @@ Enemies::~Enemies()
 {
 }
 
-
-
-
-
 EnemyPumpkin::EnemyPumpkin()
 {
-	
+
 }
 
 EnemyPumpkin::~EnemyPumpkin()
@@ -37,82 +33,137 @@ void EnemyPumpkin::Initialize(Camera* camera, Vector2& pos, MapChipField* mapChi
 
 }
 
-//void Enemies::GroundStates(const CollisonMapInfo& info) {
-//
-//	if (onGround) {
-//		if (vel_.y > 0.0f) {
-//			onGround = false;
-//		}
-//		else {
-//			bool isHit = false;
-//			std::array<Vector2, kNumCorner> posNew;
-//			for (uint32_t i = 0; i < posNew.size(); ++i) {
-//				posNew[i] = CornerPos(wtf.translation_ + info.vel, static_cast<Corner>(i));
-//			}
-//			std::array<Corner, 2> checkCorners = { kLeftBottom, kRightBottom };
-//			for (auto corner : checkCorners) {
-//				auto index = mapChipField_->GetMapChipIndexByPosition(posNew[corner] + Vector2(0.f, -(kBlank + 1.f)));
-//				auto type = mapChipField_->GetMapChipTypeIndex(index.xIndex, index.yIndex);
-//				if (type == MapChipType::kBlock) {
-//					isHit = true;
-//					break;
-//				}
-//			}
-//			if (!isHit) {
-//				onGround = false;
-//			}
-//		}
-//
-//	}
-//	else {
-//		float Gravity = kGravity;
-//
-//		vel_ += Vector2(0, -Gravity);
-//		vel_.y = max(vel_.y, -kLimitFallSpeed);
-//		if (info.Bottom) {
-//
-//			onGround = true;
-//			vel_.y = 0.0f;
-//		}
-//	}
-//}
+void EnemyPumpkin::AstralBehavior() {
+	//　プレイヤーが敵の攻撃範囲にいるかどうかを計算
+	Vector2 playerPos = player_->GetPos();
+	Vector2 pumpkinPos = wtf.translation_;
+	Vector2 enemyToPlayer = { playerPos.x - pumpkinPos.x, playerPos.y - pumpkinPos.y };
+	float distanceToPlayer = sqrtf(enemyToPlayer.x * enemyToPlayer.x + enemyToPlayer.y * enemyToPlayer.y);
 
-void EnemyPumpkin::Update(Player* player)
-{
-	// プレイヤーが幽霊状態の時の処理
-	if (player->GetBehavior() == Player::Behavior::kAstral) {
-		
-		//　プレイヤーが敵の攻撃範囲にいるかどうかを計算
-		Vector2 playerPos = player->GetPos();
-		Vector2 pumpkinPos = wtf.translation_;
-		Vector2 enemyToPlayer = { playerPos.x - pumpkinPos.x, playerPos.y - pumpkinPos.y };
-		float distanceToPlayer = sqrtf(enemyToPlayer.x * enemyToPlayer.x + enemyToPlayer.y * enemyToPlayer.y);
-		
-		// プレイヤーの方向に動く
-		if (distanceToPlayer <= kAtkRange) {
-			if (playerPos.x >= pumpkinPos.x) {
-				vel_.x = +kSpeed.x;
-			} else {
-				vel_.x = -kSpeed.x;
-			}
-
-			if (playerPos.y >= pumpkinPos.y) {
-				vel_.y = +kSpeed.y;
-			} else {
-				vel_.y = -kSpeed.y;
-			}
-		} else {
-			//止まる
-			vel_ = { 0.0f, 0.0f };
+	// プレイヤーの方向に動く
+	if (distanceToPlayer <= kAtkRange) {
+		if (playerPos.x >= pumpkinPos.x) {
+			vel_.x = +kSpeed.x;
+		}
+		else {
+			vel_.x = -kSpeed.x;
 		}
 
-	} 
+		if (playerPos.y >= pumpkinPos.y) {
+			vel_.y = +kSpeed.y;
+		}
+		else {
+			vel_.y = -kSpeed.y;
+		}
+	}
+	else {
+		//止まる
+		vel_ = { 0.0f, 0.0f };
+	}
+
+
+	if (player_->GetBehavior() == Player::Behavior::kRoot) {
+		behaviorNext_ = Behavior::kStop;
+	}
+}
+
+void EnemyPumpkin::AstralBehaviorInitialize() {
+	// プレイヤーが幽霊状態の時の処理
+	behavior_ = Behavior::kAstral;
+
+}
+
+void EnemyPumpkin::StopBehavior() {
+	if (player_->GetBehavior() == Player::Behavior::kAstral) {
+		behaviorNext_ = Behavior::kAstral;
+	}
+}
+
+void EnemyPumpkin::StopBehaviorInitialize() {
+	// プレイヤーが本体状態の時の処理
+
+	behavior_ = Behavior::kStop;
+	vel_ = { 0.0f, 0.0f };
+}
+
+void EnemyPumpkin::InputGravity(const CollisonMapInfo& info)
+{
+	if (behavior_ == Behavior::kAstral)
+	{
+		return;
+	}
+	if (onGround)
+	{
+		return;
+	}
+	float Gravity = kGravity;
+	vel_ += Vector2(0, -Gravity);
+	vel_.y = max(vel_.y, -kLimitFallSpeed);
+	if (info.Bottom) {
+
+		onGround = true;
+		vel_.y = 0.0f;
+	}
+}
+
+void Enemies::InputGravity(const CollisonMapInfo& info)
+{
+	if (onGround)
+	{
+		return;
+	}
+	float Gravity = kGravity;
+	vel_ += Vector2(0, -Gravity);
+	vel_.y = max(vel_.y, -kLimitFallSpeed);
+	if (info.Bottom) {
+
+		onGround = true;
+		vel_.y = 0.0f;
+	}
+}
+
+void EnemyPumpkin::Update() {
+
+
+	if (behaviorNext_ != Behavior::kUnknown) {
+		behavior_ = behaviorNext_;
+		behaviorNext_ = Behavior::kUnknown;
+
+		// 初期化処理
+		switch (behavior_) {
+		case Behavior::kStop:
+			StopBehaviorInitialize();
+			break;
+		case Behavior::kAstral:
+			AstralBehaviorInitialize();
+			break;
+		default:
+			break;
+		}
+	}
+
+	switch (behavior_) {
+	case Behavior::kStop:
+		StopBehavior();
+		break;
+	case Behavior::kAstral:
+		AstralBehavior();
+		break;
+	default:
+		break;
+	}
+
+
 
 	// マップチップの当たり判定
 	CollisonMapInfo info;
 	info.vel = vel_;
 	MapCollision(info);
-	
+	MapAfterCollision(info);
+	MapWallCollision(info);
+	GroundStates(info);
+	InputGravity(info);
+
 
 	// 移動更新
 	wtf.translation_ += info.vel;
@@ -125,48 +176,6 @@ void EnemyPumpkin::Draw()
 	sprite->Draw(wtf, camera_, 0, 0, 64, 64);
 }
 
-void EnemyPumpkin::GroundStates(const CollisonMapInfo& info)
-{
-	// プレイヤーが本体になったら落下させる
-	if (player_->GetBehavior() == Player::Behavior::kRoot) {
-		if (onGround) {
-			if (vel_.y > 0.0f) {
-				onGround = false;
-			}
-			else {
-				bool isHit = false;
-				std::array<Vector2, kNumCorner> posNew;
-				for (uint32_t i = 0; i < posNew.size(); ++i) {
-					posNew[i] = CornerPos(wtf.translation_ + info.vel, static_cast<Corner>(i));
-				}
-				std::array<Corner, 2> checkCorners = { kLeftBottom, kRightBottom };
-				for (auto corner : checkCorners) {
-					auto index = mapChipField_->GetMapChipIndexByPosition(posNew[corner] + Vector2(0.f, -(kBlank + 1.f)));
-					auto type = mapChipField_->GetMapChipTypeIndex(index.xIndex, index.yIndex);
-					if (type == MapChipType::kBlock) {
-						isHit = true;
-						break;
-					}
-				}
-				if (!isHit) {
-					onGround = false;
-				}
-			}
-
-		}
-		else {
-			float Gravity = kGravity;
-
-			vel_ += Vector2(0, -Gravity);
-			vel_.y = max(vel_.y, -kLimitFallSpeed);
-			if (info.Bottom) {
-
-				onGround = true;
-				vel_.y = 0.0f;
-			}
-		}
-	}
-}
 
 Vector2 Enemies::CornerPos(const Vector2 center, Corner corner) {
 
@@ -185,7 +194,6 @@ void Enemies::MapCollision(CollisonMapInfo& info)
 	MapCollisionRight(info);
 	MapCollisionTop(info);
 	MapCollisionBottom(info);
-
 	MapAfterCollision(info);
 	MapWallCollision(info);
 	GroundStates(info);
@@ -320,7 +328,7 @@ void Enemies::MapAfterCollision(const CollisonMapInfo& info) {
 
 void Enemies::GroundStates(const CollisonMapInfo& info) {
 
-	
+
 	if (onGround) {
 		if (vel_.y > 0.0f) {
 			onGround = false;
@@ -346,15 +354,7 @@ void Enemies::GroundStates(const CollisonMapInfo& info) {
 		}
 
 	}
-	else {
-		float Gravity = kGravity;
 
-		vel_ += Vector2(0, -Gravity);
-		vel_.y = max(vel_.y, -kLimitFallSpeed);
-		if (info.Bottom) {
+	InputGravity(info);
 
-			onGround = true;
-			vel_.y = 0.0f;
-		}
-	}
 }
