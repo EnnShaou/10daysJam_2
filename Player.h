@@ -3,10 +3,10 @@
 #include "Vector2.h"
 #include "DrawFunc.h"
 #include "Wtf.h"
+#include "PlayerBulletManager.h"
 
 class Enemies;
 class MapChipField;
-class PlayerBullet;
 class Player
 {
 public:
@@ -24,6 +24,8 @@ public:
 		bool LR = false;           // 左右方向の衝突
 		Vector2 vel;               // 移動量（速度ベクトル）
 	};
+
+	// --- アニメーションの行動パターン ---
 	enum class AnimationBehavior
 	{
 		kRoot,
@@ -32,6 +34,7 @@ public:
 		kJumpDown,
 		kUnknown
 	};
+
 	// --- プレイヤー当たり判定のコーナー ---
 	enum Corner
 	{
@@ -110,7 +113,6 @@ public:
 	void AstralBodyBehaviorAttackUpdate();
 
 	// --- アニメーション関連 ---
-
 	void Animation();
 
 	// --- ゲッター ---
@@ -118,8 +120,8 @@ public:
 	Vector2 GetScale() const { Vector2 worldScale = worldTransform_.scale_; return worldScale; }
 	float getRotation() const { float worldRotation = worldTransform_.rotation_; return worldRotation; }
 	Vector2& GetVel() { return vel_; }
+	Vector2 GetDir() const { return lrDir_ == LRDir::kRight ? Vector2(1, 0) : Vector2(-1, 0); }
 	Behavior& GetBehavior()  { return behavior_; }
-
 	bool IsDead() const { return isDead_; }
 	bool IsClear() const { return isClear; }
 
@@ -128,7 +130,9 @@ public:
 
 private:
 	// --- 弾関連 ---
-	PlayerBullet* playerBullet_ = nullptr; // プレイヤーの弾
+	PlayerBulletManager playerBullets_; // プレイヤーの弾
+	int currentBullets_ = 0;            // 現在撃っている弾の数
+	const int maxBullets_ = 5;          // 1度に撃てる弾の最大数
 
 	// --- トランスフォーム・カメラ ---
 	WtF worldTransform_;          // ワールドトランスフォーム
@@ -137,7 +141,6 @@ private:
 
 	// --- 速度・向き ---
 	Vector2 vel_;                 // 移動速度
-	Vector2 astralVel_;           // 幽体状態の移動速度
 	LRDir lrDir_ = LRDir::kRight; // 向き
 
 	// --- 定数 ---
@@ -149,6 +152,7 @@ private:
 	static inline const float kWidth = 30;                          // 当たり判定幅
 	static inline const float kHeight = 60;                         // 当たり判定高さ
 	static inline const float kBlank = 2.f;                         // 当たり判定余白
+	static inline const float kAstralBodyMaxDistance_ = 500.0f;     // 幽体状態の最大移動距離
 
 	// --- 状態フラグ ---
 	bool onGround = false;  // 地面に接地しているか
