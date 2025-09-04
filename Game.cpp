@@ -44,12 +44,12 @@ void Game::Initialize() {
 	Vector2 playerPos = mapChipField_->GetMapChipPositionByIndex(2, 20);
 	player_->Initialize(camera_, playerPos);
 	player_->SetMapChipField(mapChipField_);
-	GenerateBlocks();
 	camera_->setTarget(player_);
 	// フェードの初期化
 	fade_ = new Fade();
 	fade_->Initialize();
 	enemyManager.setPlayer(player_);
+	GenerateBlocks();
 #ifdef _DEBUG
 
 
@@ -147,7 +147,11 @@ void Game::GenerateBlocks() {
 
 			if (mapChipType == MapChipType::EnemyPumpkin) {
 
-				enemyManager.PushEnemyPumpkin(mapChipField_->GetMapChipPositionByIndex(x, y), camera_);
+				enemyManager.PushEnemyPumpkin(mapChipField_->GetMapChipPositionByIndex(x, y), camera_, mapChipField_);
+			}
+
+			if (mapChipType == MapChipType::EnemyLamp) {
+				enemyManager.PushEnemyLamp(mapChipField_->GetMapChipPositionByIndex(x, y), camera_, mapChipField_);
 			}
 		}
 	}
@@ -156,7 +160,7 @@ void Game::GenerateBlocks() {
 
 void Game::CheckAllCollisions() {
 #pragma region "playerとenemiesの当たり判定"
-
+	
 #pragma endregion
 }
 

@@ -13,7 +13,8 @@ public:
     ~EnemyManager();
 
     // 新しいかぼちゃ敵を生成してリストに追加
-    void PushEnemyPumpkin(Vector2 pos, Camera* camera);
+    void PushEnemyPumpkin(Vector2 pos, Camera* camera, MapChipField* mapChipField);
+    void PushEnemyLamp(Vector2 pos, Camera* camera, MapChipField* mapChipField);
 
     // 敵の更新処理（全ての敵に対してUpdateを呼ぶ）
     void UpDate();
@@ -24,9 +25,12 @@ public:
     // プレイヤーの参照をセット（敵AIなどで利用する可能性あり）
     void setPlayer(Player* player);
 
+
+
 private:
     std::list<Enemies*> enemies_;   // 敵のリスト（全ての敵を格納）
     Player* player_;                // プレイヤーの参照（敵がプレイヤーを追跡するため）
+   
 };
 
 

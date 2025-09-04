@@ -121,7 +121,7 @@ public:
 	float getRotation() const { float worldRotation = worldTransform_.rotation_; return worldRotation; }
 	Vector2& GetVel() { return vel_; }
 	Vector2 GetDir() const { return lrDir_ == LRDir::kRight ? Vector2(1, 0) : Vector2(-1, 0); }
-
+	Behavior& GetBehavior()  { return behavior_; }
 	bool IsDead() const { return isDead_; }
 	bool IsClear() const { return isClear; }
 
