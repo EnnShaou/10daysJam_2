@@ -10,10 +10,11 @@ public:
 	void Draw(WtF& wt,               // 物体変換
 		Camera* camera,        // カメラ
 		int srcX, int srcY, int srcW, int srcH);
-
+	
 private:
 	int texture_ = 0;
 	Vector2 textureSize_;
 	unsigned int color_;
 };
 
+void DrawCircle(WtF& wt,	Camera* camera, int radius, unsigned int color);

@@ -41,3 +41,15 @@ void DrawSprite::Draw(WtF& wt, Camera* camera, int srcX, int srcY, int srcW, int
 		texture_, color_
 	);
 }
+
+
+void DrawCircle(WtF& wt, Camera* camera, int radius, unsigned int color)
+{
+	
+	// --- 2. ワールド座標 → スクリーン座標
+	Matrix3x3 vpMatrix = camera->matView * camera->matProjection * camera->viewPort;
+	Vector2 screenPos;
+	screenPos = Transform(wt.translation_, vpMatrix);
+	
+	Novice::DrawEllipse(int(screenPos.x), int(screenPos.y), radius, radius, 0.0f, color, kFillModeWireFrame);
+}
