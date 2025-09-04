@@ -18,7 +18,7 @@ void EnemyManager::PushEnemyPumpkin(Vector2 pos, Camera* camera, MapChipField* m
 
 }
 
-void EnemyManager::UpDate(Player* player)
+void EnemyManager::UpDate()
 {
 	for (Enemies* enemy : enemies_) {
 		if (!enemy) {

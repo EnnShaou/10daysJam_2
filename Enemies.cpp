@@ -8,10 +8,6 @@ Enemies::~Enemies()
 {
 }
 
-
-
-
-
 EnemyPumpkin::EnemyPumpkin()
 {
 
@@ -36,46 +32,6 @@ void EnemyPumpkin::Initialize(Camera* camera, Vector2& pos, MapChipField* mapChi
 	mapChipField_ = mapChipField;
 
 }
-
-//void Enemies::GroundStates(const CollisonMapInfo& info) {
-//
-//	if (onGround) {
-//		if (vel_.y > 0.0f) {
-//			onGround = false;
-//		}
-//		else {
-//			bool isHit = false;
-//			std::array<Vector2, kNumCorner> posNew;
-//			for (uint32_t i = 0; i < posNew.size(); ++i) {
-//				posNew[i] = CornerPos(wtf.translation_ + info.vel, static_cast<Corner>(i));
-//			}
-//			std::array<Corner, 2> checkCorners = { kLeftBottom, kRightBottom };
-//			for (auto corner : checkCorners) {
-//				auto index = mapChipField_->GetMapChipIndexByPosition(posNew[corner] + Vector2(0.f, -(kBlank + 1.f)));
-//				auto type = mapChipField_->GetMapChipTypeIndex(index.xIndex, index.yIndex);
-//				if (type == MapChipType::kBlock) {
-//					isHit = true;
-//					break;
-//				}
-//			}
-//			if (!isHit) {
-//				onGround = false;
-//			}
-//		}
-//
-//	}
-//	else {
-//		float Gravity = kGravity;
-//
-//		vel_ += Vector2(0, -Gravity);
-//		vel_.y = max(vel_.y, -kLimitFallSpeed);
-//		if (info.Bottom) {
-//
-//			onGround = true;
-//			vel_.y = 0.0f;
-//		}
-//	}
-//}
 
 void EnemyPumpkin::AstralBehavior() {
 	//　プレイヤーが敵の攻撃範囲にいるかどうかを計算
@@ -136,6 +92,26 @@ void EnemyPumpkin::InputGravity(const CollisonMapInfo& info)
 	{
 		return;
 	}
+	if (onGround)
+	{
+		return;
+	}
+	float Gravity = kGravity;
+	vel_ += Vector2(0, -Gravity);
+	vel_.y = max(vel_.y, -kLimitFallSpeed);
+	if (info.Bottom) {
+
+		onGround = true;
+		vel_.y = 0.0f;
+	}
+}
+
+void Enemies::InputGravity(const CollisonMapInfo& info)
+{
+	if (onGround)
+	{
+		return;
+	}
 	float Gravity = kGravity;
 	vel_ += Vector2(0, -Gravity);
 	vel_.y = max(vel_.y, -kLimitFallSpeed);
@@ -148,7 +124,7 @@ void EnemyPumpkin::InputGravity(const CollisonMapInfo& info)
 
 void EnemyPumpkin::Update() {
 
-	
+
 	if (behaviorNext_ != Behavior::kUnknown) {
 		behavior_ = behaviorNext_;
 		behaviorNext_ = Behavior::kUnknown;
@@ -183,6 +159,9 @@ void EnemyPumpkin::Update() {
 	CollisonMapInfo info;
 	info.vel = vel_;
 	MapCollision(info);
+	MapAfterCollision(info);
+	MapWallCollision(info);
+	GroundStates(info);
 	InputGravity(info);
 
 
@@ -197,37 +176,6 @@ void EnemyPumpkin::Draw()
 	sprite->Draw(wtf, camera_, 0, 0, 64, 64);
 }
 
-void EnemyPumpkin::GroundStates(const CollisonMapInfo& info)
-{
-	// プレイヤーが本体になったら落下させる
-	if (behavior_ == Behavior::kStop) {
-		if (onGround) {
-			if (vel_.y > 0.0f) {
-				onGround = false;
-			}
-			else {
-				bool isHit = false;
-				std::array<Vector2, kNumCorner> posNew;
-				for (uint32_t i = 0; i < posNew.size(); ++i) {
-					posNew[i] = CornerPos(wtf.translation_ + info.vel, static_cast<Corner>(i));
-				}
-				std::array<Corner, 2> checkCorners = { kLeftBottom, kRightBottom };
-				for (auto corner : checkCorners) {
-					auto index = mapChipField_->GetMapChipIndexByPosition(posNew[corner] + Vector2(0.f, -(kBlank + 1.f)));
-					auto type = mapChipField_->GetMapChipTypeIndex(index.xIndex, index.yIndex);
-					if (type == MapChipType::kBlock) {
-						isHit = true;
-						break;
-					}
-				}
-				if (!isHit) {
-					onGround = false;
-				}
-			}
-
-		}
-	}
-}
 
 Vector2 Enemies::CornerPos(const Vector2 center, Corner corner) {
 
@@ -406,15 +354,7 @@ void Enemies::GroundStates(const CollisonMapInfo& info) {
 		}
 
 	}
-	else {
-		float Gravity = kGravity;
 
-		vel_ += Vector2(0, -Gravity);
-		vel_.y = max(vel_.y, -kLimitFallSpeed);
-		if (info.Bottom) {
+	InputGravity(info);
 
-			onGround = true;
-			vel_.y = 0.0f;
-		}
-	}
 }

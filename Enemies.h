@@ -64,7 +64,6 @@ protected:
 	const float kGravity = 0.98f;                   //　重力
 	const float kLimitFallSpeed = kGravity * 20.f;  //　落下速度制限
 
-	virtual void GroundStates(const CollisonMapInfo& info);      // 地面との接地状態の更新
 	//void GroundStates(const CollisonMapInfo& info);      // 地面との接地状態更新
 	// --- マップ ---
 	// 以下は詳細な方向別の衝突判定処理（現状コメントアウト）
@@ -72,9 +71,10 @@ protected:
 	void MapCollisionBottom(CollisonMapInfo& info);      // 下方向の衝突判定
 	void MapCollisionLeft(CollisonMapInfo& info);        // 左方向の衝突判定
 	void MapCollisionRight(CollisonMapInfo& info);       // 右方向の衝突判定
-
+	void GroundStates(const CollisonMapInfo& info);      // 地面との接地状態の更新
 	void MapWallCollision(CollisonMapInfo& info);        // 壁との衝突判定
 	void MapAfterCollision(const CollisonMapInfo& info); // 衝突後の状態処理
+	virtual void InputGravity(const CollisonMapInfo& info);
 	// --- 当たり判定のコーナー位置取得 ---
 	Vector2 CornerPos(const Vector2 center, Corner corner);
 	bool onGround = false;  // 地面に接地しているか
@@ -99,8 +99,6 @@ public:
 
 	Vector2 GetPos() { return wtf.translation_; }
 
-	void GroundStates(const CollisonMapInfo& info) override;      // 地面との接地状態の更新
-
 	enum class Behavior {
 		kStop,
 		kAstral,
@@ -114,8 +112,7 @@ private:
 	void AstralBehaviorInitialize();
 	void StopBehavior();
 	void StopBehaviorInitialize();
-
-	void InputGravity(const CollisonMapInfo& info);
+	void InputGravity(const CollisonMapInfo& info)override;
 
 	const Vector2 kSpeed = { 2.0f, 2.0f };  //かぼちゃの速さ
 	const float kAtkRange = 240.0f;         //プレイヤーがこの範囲にいると動く

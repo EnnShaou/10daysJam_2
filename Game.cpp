@@ -70,7 +70,7 @@ void Game::Update() {
 		camera_->Update();
 
 		player_->Update();
-		enemyManager.UpDate(player_);
+		enemyManager.UpDate();
 		// 全ての当たり判定をチェック
 		CheckAllCollisions();
 		for (std::vector<BlockManager*>& wtfby : wTfBlock_) {
