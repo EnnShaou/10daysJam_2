@@ -24,7 +24,7 @@ void EnemyManager::UpDate(Player* player)
 		if (!enemy) {
 			continue;
 		}
-		enemy->Update(player);
+		enemy->Update();
 	}
 }
 
