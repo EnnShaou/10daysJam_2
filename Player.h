@@ -110,7 +110,6 @@ public:
 	void AstralBodyBehaviorAttackUpdate();
 
 	// --- アニメーション関連 ---
-
 	void Animation();
 
 	// --- ゲッター ---
@@ -136,7 +135,6 @@ private:
 
 	// --- 速度・向き ---
 	Vector2 vel_;                 // 移動速度
-	Vector2 astralVel_;           // 幽体状態の移動速度
 	LRDir lrDir_ = LRDir::kRight; // 向き
 
 	// --- 定数 ---
@@ -148,6 +146,7 @@ private:
 	static inline const float kWidth = 30;                          // 当たり判定幅
 	static inline const float kHeight = 60;                         // 当たり判定高さ
 	static inline const float kBlank = 2.f;                         // 当たり判定余白
+	static inline const float kAstralBodyMaxDistance_ = 500.0f;     // 幽体状態の最大移動距離
 
 	// --- 状態フラグ ---
 	bool onGround = false;  // 地面に接地しているか

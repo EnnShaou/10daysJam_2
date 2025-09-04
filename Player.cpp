@@ -146,49 +146,96 @@ void Player::AstralMove()
 	if (Keys::IsPress(DIK_D) || Keys::IsPress(DIK_A) || Keys::IsPress(DIK_W) || Keys::IsPress(DIK_S))
 	{
 		Vector2 acc = Vector2();
+		isMove = true;
 
-		if (Keys::IsPress(DIK_D))
+		if (Keys::IsPress(DIK_D)) 
 		{
-			if (astralVel_.x < 0.0f)
+			if (vel_.x < 0.0f)
 			{
-				astralVel_.x = kPlayerSpeed;
+				vel_.x = 0.0f;
 			}
+
+			if (lrDir_ != kRight)
+			{
+				lrDir_ = kRight;
+			}
+
 			acc.x += kPlayerSpeed;
 		}
-		else if (Keys::IsPress(DIK_A))
+
+		if (Keys::IsPress(DIK_A)) 
 		{
-			if (astralVel_.x > 0.0f) {
-				astralVel_.x = kPlayerSpeed;
+			if (vel_.x > 0.0f)
+			{
+				vel_.x = 0.0f;
+			}
+
+			if (lrDir_ != kLeft) 
+			{
+				lrDir_ = kLeft;
 			}
 
 			acc.x -= kPlayerSpeed;
 		}
-		else if (Keys::IsPress(DIK_W))
+
+		if (Keys::IsPress(DIK_W))
 		{
-			if (astralVel_.y < 0.0f)
+			if (vel_.y < 0.0f)
 			{
-				astralVel_.y = kPlayerSpeed;
+				vel_.y = 0.0f;
 			}
+
 			acc.y += kPlayerSpeed;
 		}
-		else if (Keys::IsPress(DIK_S))
+
+		if (Keys::IsPress(DIK_S))
 		{
-			if (astralVel_.y > 0.0f)
+			if (vel_.y > 0.0f)
 			{
-				astralVel_.y = kPlayerSpeed;
+				vel_.y = 0.0f;
 			}
+
 			acc.y -= kPlayerSpeed;
 		}
-		astralVel_ += acc;
-		astralVel_.x = std::clamp(astralVel_.x, -kPlayerSpeedMax, kPlayerSpeedMax);
-		astralVel_.y = std::clamp(astralVel_.y, -kPlayerSpeedMax, kPlayerSpeedMax);
-		worldTransform_.translation_ += astralVel_;
+
+		// 加速度を加える
+		vel_ += acc;
+
+		// 最大速度を制限
+		vel_.x = std::clamp(vel_.x, -kPlayerSpeedMax, kPlayerSpeedMax);
+		vel_.y = std::clamp(vel_.y, -kPlayerSpeedMax, kPlayerSpeedMax);
+		
+		// 移動
+		worldTransform_.translation_ += vel_;
 	}
 	else
 	{
-		astralVel_ = Vector2(0, 0);
+		isMove = false;
+		vel_ = Vector2(0, 0);
 	}
+
+	// マップ端と本体からの距離制限
+	worldTransform_.translation_.x = std::clamp(
+		worldTransform_.translation_.x,
+		mapChipField_->kBlockWidth,
+		mapChipField_->blockCountX_ * mapChipField_->kBlockWidth - mapChipField_->kBlockWidth * 2);
+
+	worldTransform_.translation_.y = std::clamp(
+		worldTransform_.translation_.y,
+		mapChipField_->kBlockHeight,
+		mapChipField_->blockCountY_ * mapChipField_->kBlockHeight - mapChipField_->kBlockHeight * 2);
+
+	worldTransform_.translation_.x = std::clamp(
+		worldTransform_.translation_.x,
+		tentativeWorldTransform_.translation_.x - kAstralBodyMaxDistance_,
+		tentativeWorldTransform_.translation_.x + kAstralBodyMaxDistance_);
+
+	worldTransform_.translation_.y = std::clamp(
+		worldTransform_.translation_.y,
+		tentativeWorldTransform_.translation_.y - kAstralBodyMaxDistance_,
+		tentativeWorldTransform_.translation_.y + kAstralBodyMaxDistance_);
 }
+
 
 void Player::MapCollision(CollisonMapInfo& info) {
 	MapCollisionTop(info);
@@ -397,7 +444,7 @@ void Player::BehaviorRootInitialize()
 {
 	{
 		behavior_ = Behavior::kRoot;
-		astralVel_ = Vector2(0, 0);
+		vel_ = Vector2(0, 0);
 		worldTransform_.scale_ = Vector2(1.0f, 1.0f);
 
 	}
