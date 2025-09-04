@@ -3,10 +3,10 @@
 #include "Vector2.h"
 #include "DrawFunc.h"
 #include "Wtf.h"
+#include "PlayerBulletManager.h"
 
 class Enemies;
 class MapChipField;
-class PlayerBullet;
 class Player
 {
 public:
@@ -24,6 +24,8 @@ public:
 		bool LR = false;           // 左右方向の衝突
 		Vector2 vel;               // 移動量（速度ベクトル）
 	};
+
+	// --- アニメーションの行動パターン ---
 	enum class AnimationBehavior
 	{
 		kRoot,
@@ -32,6 +34,7 @@ public:
 		kJumpDown,
 		kUnknown
 	};
+
 	// --- プレイヤー当たり判定のコーナー ---
 	enum Corner
 	{
@@ -117,6 +120,7 @@ public:
 	Vector2 GetScale() const { Vector2 worldScale = worldTransform_.scale_; return worldScale; }
 	float getRotation() const { float worldRotation = worldTransform_.rotation_; return worldRotation; }
 	Vector2& GetVel() { return vel_; }
+	Vector2 GetDir() const { return lrDir_ == LRDir::kRight ? Vector2(1, 0) : Vector2(-1, 0); }
 
 	bool IsDead() const { return isDead_; }
 	bool IsClear() const { return isClear; }
@@ -126,7 +130,9 @@ public:
 
 private:
 	// --- 弾関連 ---
-	PlayerBullet* playerBullet_ = nullptr; // プレイヤーの弾
+	PlayerBulletManager playerBullets_; // プレイヤーの弾
+	int currentBullets_ = 0;            // 現在撃っている弾の数
+	const int maxBullets_ = 5;          // 1度に撃てる弾の最大数
 
 	// --- トランスフォーム・カメラ ---
 	WtF worldTransform_;          // ワールドトランスフォーム

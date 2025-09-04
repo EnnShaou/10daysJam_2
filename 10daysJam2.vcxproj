@@ -125,6 +125,8 @@ xcopy C:\KamataEngine\DirectXGame\Resources "$(OutDirFullPath)NoviceResources" /
     <ClCompile Include="main.cpp" />
     <ClCompile Include="MapChipField.cpp" />
     <ClCompile Include="Player.cpp" />
+    <ClCompile Include="PlayerBulletManager.cpp" />
+    <ClCompile Include="PlayerBullets.cpp" />
     <ClCompile Include="SceneManager.cpp" />
     <ClCompile Include="Title.cpp" />
     <ClCompile Include="WtF.cpp" />
@@ -166,6 +168,8 @@ xcopy C:\KamataEngine\DirectXGame\Resources "$(OutDirFullPath)NoviceResources" /
     <ClInclude Include="keys.h" />
     <ClInclude Include="MapChipField.h" />
     <ClInclude Include="Player.h" />
+    <ClInclude Include="PlayerBulletManager.h" />
+    <ClInclude Include="PlayerBullets.h" />
     <ClInclude Include="SceneManager.h" />
     <ClInclude Include="Title.h" />
     <ClInclude Include="WtF.h" />

@@ -76,8 +76,9 @@ void Player::Update()
 		GroundStates(info);
 	}
 
-
+	playerBullets_.Update();
 	Animation();
+
 	worldTransform_.Update();
 }
 
@@ -92,6 +93,8 @@ void Player::Draw() {
 		dathSprite_->Draw(tentativeWorldTransform_, camera_, 0, 0, 68, 72); // プレイヤーを描画
 		astralBodySprite_->Draw(worldTransform_, camera_, 0, 0, 68, 72);
 	}
+
+	playerBullets_.Draw();
 
 	Novice::ScreenPrintf(30, 50, "behavior_: %d", behavior_);
 	Novice::ScreenPrintf(30, 70, "behaviorNext_: %d", behaviorNext_);
@@ -484,7 +487,7 @@ void Player::BehaviorAstralInitialize()
 	coolTime_ = 5.f;
 	astralBodyTimer_ = 0.0f;
 	behavior_ = Behavior::kAstral;
-
+	currentBullets_ = 0;
 }
 
 void Player::BehaviorAstralUpdate()
@@ -538,6 +541,7 @@ void Player::SwitchBody()
 void Player::AstralBodyBehaviorRootInitialize()
 {
 	Astralbehavior_ = AstralBehavior::kRoot;
+	attackTimer = kAttackTime;
 }
 
 void Player::AstralBodyBehaviorRootUpdate()
@@ -550,7 +554,29 @@ void Player::AstralBodyBehaviorRootUpdate()
 	{
 		behaviorNext_ = Behavior::kRoot;
 		worldTransform_ = tentativeWorldTransform_;
-		
+	}
+
+	// 本体に戻る
+	if (Keys::IsTrigger(DIK_F))
+	{
+		behaviorNext_ = Behavior::kRoot;
+		worldTransform_ = tentativeWorldTransform_;
+	}
+
+	// 攻撃クールタイム更新
+	attackTimer -= frameTime;
+
+	// クールタイムが0未満にならないように制限
+	if(attackTimer < 0.0f)
+	{
+		attackTimer = 0.0f;
+	}
+
+	// 弾発射
+	if(Keys::IsPress(DIK_SPACE) && attackTimer <= 0)
+	{
+		attackTimer = kAttackTime; // クールタイムリセット
+		AstralbehaviorNext_ = AstralBehavior::kAttack;
 	}
 }
 
@@ -559,19 +585,39 @@ void Player::AstralBodyBehaviorAttackInitialize()
 
 	Astralbehavior_ = AstralBehavior::kAttack;
 	attackTimer = 0.0f;
-
 }
 
 void Player::AstralBodyBehaviorAttackUpdate()
 {
-}
-void Player::Animation() {
+	// 弾の発射カウント
+	currentBullets_++;
 
-	if (animationBehaviorNext_ != AnimationBehavior::kUnknown) {
+	// 最大数以下なら弾を発射
+	if(currentBullets_ <= maxBullets_)
+	{
+		// 弾の速度
+		Vector2 dir = { lrDir_ == LRDir::kRight ? 1.0f : -1.0f , 0.0f };
+
+		// 速度ベクトルを自キャラの向きに合わせて変更
+		dir = TransformNormal(dir, worldTransform_.matWorld_);
+
+		// 弾生成
+		playerBullets_.PushBullet(worldTransform_.translation_, camera_, dir);
+	}
+
+	// 攻撃後は通常状態に戻る
+	AstralbehaviorNext_ = AstralBehavior::kRoot;
+}
+
+void Player::Animation() 
+{
+	if (animationBehaviorNext_ != AnimationBehavior::kUnknown) 
+	{
 		animationBehavior_ = animationBehaviorNext_;
 		animationBehaviorNext_ = AnimationBehavior::kUnknown;
 		animationCount = 0;
 		animationTimer = 0;
+
 		switch (animationBehavior_)
 		{
 		case Player::AnimationBehavior::kRoot:
@@ -590,10 +636,9 @@ void Player::Animation() {
 			animationBehavior_ = Player::AnimationBehavior::kJumpDown;
 			animationMax = 2;
 			break;
-
 		}
-
 	}
+
 	switch (animationBehavior_)
 	{
 	case Player::AnimationBehavior::kRoot:

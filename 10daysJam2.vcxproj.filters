@@ -86,6 +86,12 @@
     <ClCompile Include="EnemyManager.cpp">
       <Filter>source</Filter>
     </ClCompile>
+    <ClCompile Include="PlayerBullets.cpp">
+      <Filter>source</Filter>
+    </ClCompile>
+    <ClCompile Include="PlayerBulletManager.cpp">
+      <Filter>KamataEngine</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="C:\KamataEngine\DirectXGame\audio\Audio.h">
@@ -197,6 +203,10 @@
     <ClInclude Include="EnemyManager.h">
       <Filter>include</Filter>
     </ClInclude>
+    <ClInclude Include="PlayerBullets.h">
+      <Filter>include</Filter>
+    </ClInclude>
+    <ClInclude Include="PlayerBulletManager.h" />
   </ItemGroup>
   <ItemGroup>
     <None Include=".editorconfig" />
