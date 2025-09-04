@@ -153,6 +153,10 @@ void Game::GenerateBlocks() {
 			if (mapChipType == MapChipType::EnemyLamp) {
 				enemyManager.PushEnemyLamp(mapChipField_->GetMapChipPositionByIndex(x, y), camera_, mapChipField_);
 			}
+
+			if (mapChipType == MapChipType::EnemyBat) {
+				enemyManager.PushEnemyBat(mapChipField_->GetMapChipPositionByIndex(x, y), camera_, mapChipField_);
+			}
 		}
 	}
 

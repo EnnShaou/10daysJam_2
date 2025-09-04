@@ -26,6 +26,14 @@ void EnemyManager::PushEnemyLamp(Vector2 pos, Camera* camera, MapChipField* mapC
 	enemies_.push_back(newEnemy);
 }
 
+void EnemyManager::PushEnemyBat(Vector2 pos, Camera* camera, MapChipField* mapChipField)
+{
+	EnemyBat* newEnemy = new EnemyBat();
+	newEnemy->Initialize(camera, pos, mapChipField);
+	newEnemy->SetPlayer(player_);
+	enemies_.push_back(newEnemy);
+}
+
 void EnemyManager::UpDate()
 {
 	for (Enemies* enemy : enemies_) {
