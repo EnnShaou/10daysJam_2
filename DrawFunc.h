@@ -4,12 +4,18 @@
 class DrawSprite
 {
 public:
+	enum LRDirection {
+		kRight,
+		kLeft,
+	};
+	LRDirection lrDirection_ = LRDirection::kRight;
+
 	DrawSprite(int texture, Vector2 textureSize);
 	~DrawSprite();
 	void SetColor(unsigned int color) { color_ = color; }
 	void Draw(WtF& wt,               // 物体変換
 		Camera* camera,        // カメラ
-		int srcX, int srcY, int srcW, int srcH);
+		int srcX, int srcY, int srcW, int srcH, LRDirection lrDir = kRight);
 	
 private:
 	int texture_ = 0;
