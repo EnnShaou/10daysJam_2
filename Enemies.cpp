@@ -446,6 +446,11 @@ EnemyBat::EnemyBat() {
 
 EnemyBat::~EnemyBat()
 {
+	delete sprite;
+	sprite = nullptr;
+
+	delete camera_;
+	camera_ = nullptr;
 }
 
 void EnemyBat::Initialize(Camera* camera, Vector2& pos, MapChipField* mapChipField)
@@ -458,7 +463,7 @@ void EnemyBat::Initialize(Camera* camera, Vector2& pos, MapChipField* mapChipFie
 	mapChipField_ = mapChipField;
 
 	kSpeed = { 1.2f, 1.0f };
-	kAtkRange = 500.0f; //攻撃範囲
+	kAtkRange = 200.0f; //攻撃範囲 500
 
 	// 当たり判定
 	kWidth = 24.0f;
@@ -512,3 +517,137 @@ void EnemyBat::Draw()
 {
 	sprite->Draw(wtf, camera_, 0, 0, 32, 32);
 }
+
+/// <summary>
+/// Enemy Mummy
+/// </summary>
+EnemyMummy::EnemyMummy()
+{
+}
+
+EnemyMummy::~EnemyMummy() {
+	delete sprite;
+	sprite = nullptr;
+
+	delete camera_;
+	camera_ = nullptr;
+}
+
+void EnemyMummy::Initialize(Camera* camera, Vector2& pos, MapChipField* mapChipField)
+{
+	sprite = new DrawSprite(Novice::LoadTexture("white1x1.png"), { 32,64 });
+	sprite->SetColor(0x078f3dff);
+	camera_ = camera;
+	wtf.Initialize();
+	wtf.translation_ = pos;
+	mapChipField_ = mapChipField;
+
+	kSpeed = { 0.67f, 0.0f };
+	kAtkRange = 0.0f; //攻撃範囲
+
+	// 当たり判定
+	kWidth = 32.0f;
+	kHeight = 64.0f;
+}
+
+void EnemyMummy::Update()
+{
+
+	vel_.x = +kSpeed.x;
+
+	// マップチップの当たり判定 (上下当たり判定なし)
+	CollisonMapInfo info;
+	info.vel = vel_;
+	MapCollisionRight(info);
+	MapCollisionLeft(info);
+	MapWallCollision(info);
+
+	// 移動更新
+	wtf.translation_.x +=  info.vel.x;
+	wtf.Update();
+}
+
+void EnemyMummy::Draw()
+{
+	sprite->Draw(wtf, camera_, 0, 0, 128, 128);
+}
+
+void EnemyMummy::MapWallCollision(CollisonMapInfo& info)
+{
+	// 左右の壁に当たると反射
+	if (info.LR) {
+		kSpeed.x = -kSpeed.x;
+	}
+}
+
+void EnemyMummy::MapCollisionRight(CollisonMapInfo& info)
+{
+	if (info.vel.x <= 0) {
+		return;
+	}
+	std::array<Vector2, kNumCorner> posNew;
+	for (uint32_t i = 0; i < posNew.size(); ++i) {
+		posNew[i] = CornerPos(wtf.translation_ + info.vel, static_cast<Corner>(i));
+	}
+
+	auto indexRT = mapChipField_->GetMapChipIndexByPosition(posNew[kRightTop]);
+	auto indexRB = mapChipField_->GetMapChipIndexByPosition(posNew[kRightBottom]);
+
+	auto typeRT = mapChipField_->GetMapChipTypeIndex(indexRT.xIndex, indexRT.yIndex);
+	auto typeRB = mapChipField_->GetMapChipTypeIndex(indexRB.xIndex, indexRB.yIndex + 1);
+
+	// --- 右上にブロックがあったら
+	if (typeRT == MapChipType::kBlock) {
+		auto index = mapChipField_->GetMapChipIndexByPosition(
+			wtf.translation_ + info.vel + Vector2(kWidth / 2, 0.f));
+		auto indexSetNext = mapChipField_->GetMapChipIndexByPosition(
+			wtf.translation_ + Vector2(kWidth / 2, 0.f));
+
+		if (index.xIndex != indexSetNext.xIndex) {
+			auto rect = mapChipField_->GetRectByIndex(index.xIndex, index.yIndex);
+			info.vel.x = min(0.0f, rect.left - wtf.translation_.x + (kWidth / 2) + kBlank);
+			info.LR = true; 
+		}
+	}
+	// --- 右下にブロックがなかったら
+	else if (typeRB != MapChipType::kBlock) {
+		info.LR = true; 
+	}
+
+	
+}
+
+void EnemyMummy::MapCollisionLeft(CollisonMapInfo& info)
+{
+	if (info.vel.x >= 0) {
+		return;
+	}
+	std::array<Vector2, kNumCorner> posNew;
+	for (uint32_t i = 0; i < posNew.size(); ++i) {
+		posNew[i] = CornerPos(wtf.translation_ + info.vel, static_cast<Corner>(i));
+	}
+	
+	auto indexLT = mapChipField_->GetMapChipIndexByPosition(posNew[kLeftTop]);
+	auto indexLB = mapChipField_->GetMapChipIndexByPosition(posNew[kLeftBottom]);
+
+	auto typeLT = mapChipField_->GetMapChipTypeIndex(indexLT.xIndex, indexLT.yIndex);
+	auto typeLB = mapChipField_->GetMapChipTypeIndex(indexLB.xIndex, indexLB.yIndex + 1);
+
+	// --- 左上にブロックがあったら
+	if (typeLT == MapChipType::kBlock) {
+		auto index = mapChipField_->GetMapChipIndexByPosition(wtf.translation_ + info.vel - Vector2(kWidth / 2, 0.f));
+		auto indexSetNext = mapChipField_->GetMapChipIndexByPosition(wtf.translation_ - Vector2(kWidth / 2, 0.f));
+
+		if (index.xIndex != indexSetNext.xIndex) {
+			auto rect = mapChipField_->GetRectByIndex(index.xIndex, index.yIndex);
+			info.vel.x = max(0.0f, rect.right - wtf.translation_.x - (kWidth / 2) + kBlank);
+			info.LR = true;
+		}
+	}
+	// --- 左下にブロックがなかったら
+	else if (typeLB != MapChipType::kBlock) {
+		info.LR = true;
+	}
+}
+
+
