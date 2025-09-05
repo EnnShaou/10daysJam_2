@@ -1,6 +1,7 @@
 #include "Game.h"
 #include "ImGui.h"
 #include"keys.h"
+#include "Collision.h"
 
 Game::Game() : mapChipField_(), camera_() {
 
@@ -162,9 +163,60 @@ void Game::GenerateBlocks() {
 
 }
 
-void Game::CheckAllCollisions() {
-#pragma region "playerとenemiesの当たり判定"
-	
+void Game::CheckAllCollisions()
+{
+	// プレイヤーの情報を取得
+	Rect playerRect = { player_->GetPos().x,player_->GetPos().y,player_->GetSize().x,player_->GetSize().y };
+
+#pragma region "playerとpumpkinの当たり判定"
+	for (const auto& enemy : enemyManager.GetEnemies())
+	{
+		if (EnemyPumpkin* pumpkin = dynamic_cast<EnemyPumpkin*>(enemy))
+		{
+			// 敵の情報を取得
+			Rect enemyRect = { pumpkin->GetPos().x, pumpkin->GetPos().y, pumpkin->GetSize().x, pumpkin->GetSize().y };
+
+			// 当たり判定のチェック
+			if (playerRect.IsCollision(enemyRect))
+			{
+				Novice::ScreenPrintf(30, 180, "HitPumpkin!)");
+			}
+		}
+	}
+#pragma endregion
+
+#pragma region "playerとLampの当たり判定"
+	for (const auto& enemy : enemyManager.GetEnemies())
+	{
+		if (EnemyLamp* lamp = dynamic_cast<EnemyLamp*>(enemy))
+		{
+			// 敵の情報を取得
+			Rect enemyRect = { lamp->GetPos().x, lamp->GetPos().y, lamp->GetSize().x, lamp->GetSize().y };
+
+			// 当たり判定のチェック
+			if (playerRect.IsCollision(enemyRect))
+			{
+				Novice::ScreenPrintf(30, 200, "HitLamp!)");
+			}
+		}
+	}
+#pragma endregion
+
+#pragma region "playerとbatの当たり判定"
+	for (const auto& enemy : enemyManager.GetEnemies())
+	{
+		if (EnemyBat* bat = dynamic_cast<EnemyBat*>(enemy))
+		{
+			// 敵の情報を取得
+			Rect enemyRect = { bat->GetPos().x, bat->GetPos().y, bat->GetSize().x, bat->GetSize().y };
+
+			// 当たり判定のチェック
+			if (playerRect.IsCollision(enemyRect))
+			{
+				Novice::ScreenPrintf(30, 220, "HitBat!)");
+			}
+		}
+	}
 #pragma endregion
 }
 

@@ -5,7 +5,6 @@
 #include "keys.h"
 #include <array>
 
-
 Player::Player() : vel_(0, 0) {}
 
 Player::~Player() {}
@@ -107,28 +106,41 @@ void Player::Move() {
 	if (isDead_) {
 		return;
 	}
-	if (Keys::IsPress(DIK_D) || Keys::IsPress(DIK_A)) {
+	if (Keys::IsPress(DIK_D) || Keys::IsPress(DIK_A) || Keys::IsPress(DIK_RIGHT) || Keys::IsPress(DIK_LEFT))
+	{
 		Vector2 acc = Vector2();
 		isMove = true;
-		if (Keys::IsPress(DIK_D)) {
-			if (vel_.x < 0.0f) {
-				vel_.x = kPlayerSpeed;
+
+		if (Keys::IsPress(DIK_D) || Keys::IsPress(DIK_RIGHT))
+		{
+			if (vel_.x < 0.0f)
+			{
+				vel_.x = 0.0f;
 			}
-			if (lrDir_ != kRight) {
+
+			if (lrDir_ != kRight)
+			{
 				lrDir_ = kRight;
 			}
+
 			acc.x += kPlayerSpeed;
 		}
-		else if (Keys::IsPress(DIK_A)) {
-			if (vel_.x > 0.0f) {
-				vel_.x = kPlayerSpeed;
+
+		if (Keys::IsPress(DIK_A) || Keys::IsPress(DIK_LEFT))
+		{
+			if (vel_.x > 0.0f)
+			{
+				vel_.x = 0.0f;
 			}
-			if (lrDir_ != kLeft) {
+
+			if (lrDir_ != kLeft)
+			{
 				lrDir_ = kLeft;
 			}
 
 			acc.x -= kPlayerSpeed;
 		}
+
 		vel_ += acc;
 		vel_.x = std::clamp(vel_.x, -kPlayerSpeedMax, kPlayerSpeedMax);
 	}
@@ -146,12 +158,13 @@ void Player::Move() {
 
 void Player::AstralMove()
 {
-	if (Keys::IsPress(DIK_D) || Keys::IsPress(DIK_A) || Keys::IsPress(DIK_W) || Keys::IsPress(DIK_S))
+	if (Keys::IsPress(DIK_D) || Keys::IsPress(DIK_A) || Keys::IsPress(DIK_W) || Keys::IsPress(DIK_S) || 
+		Keys::IsPress(DIK_RIGHT) || Keys::IsPress(DIK_LEFT) || Keys::IsPress(DIK_UP) || Keys::IsPress(DIK_DOWN))
 	{
 		Vector2 acc = Vector2();
 		isMove = true;
 
-		if (Keys::IsPress(DIK_D)) 
+		if (Keys::IsPress(DIK_D) || Keys::IsPress(DIK_RIGHT))
 		{
 			if (vel_.x < 0.0f)
 			{
@@ -166,7 +179,7 @@ void Player::AstralMove()
 			acc.x += kPlayerSpeed;
 		}
 
-		if (Keys::IsPress(DIK_A)) 
+		if (Keys::IsPress(DIK_A) || Keys::IsPress(DIK_LEFT))
 		{
 			if (vel_.x > 0.0f)
 			{
@@ -181,7 +194,7 @@ void Player::AstralMove()
 			acc.x -= kPlayerSpeed;
 		}
 
-		if (Keys::IsPress(DIK_W))
+		if (Keys::IsPress(DIK_W) || Keys::IsPress(DIK_UP))
 		{
 			if (vel_.y < 0.0f)
 			{
@@ -191,7 +204,7 @@ void Player::AstralMove()
 			acc.y += kPlayerSpeed;
 		}
 
-		if (Keys::IsPress(DIK_S))
+		if (Keys::IsPress(DIK_S) || Keys::IsPress(DIK_DOWN))
 		{
 			if (vel_.y > 0.0f)
 			{

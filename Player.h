@@ -125,6 +125,7 @@ public:
 	Behavior& GetBehavior()  { return behavior_; }
 	bool IsDead() const { return isDead_; }
 	bool IsClear() const { return isClear; }
+	Vector2 GetSize() const { return Vector2(kWidth, kHeight); }
 
 	// --- セッター ---
 	void SetMapChipField(MapChipField* mapChipField) { mapChipField_ = mapChipField; }
