@@ -146,7 +146,6 @@ void Game::GenerateBlocks() {
 			MapChipType mapChipType = mapChipField_->GetMapChipTypeIndex(x, y);
 
 			if (mapChipType == MapChipType::EnemyPumpkin) {
-
 				enemyManager.PushEnemyPumpkin(mapChipField_->GetMapChipPositionByIndex(x, y), camera_, mapChipField_);
 			}
 
@@ -156,6 +155,10 @@ void Game::GenerateBlocks() {
 
 			if (mapChipType == MapChipType::EnemyBat) {
 				enemyManager.PushEnemyBat(mapChipField_->GetMapChipPositionByIndex(x, y), camera_, mapChipField_);
+			}
+
+			if (mapChipType == MapChipType::EnemyMummy) {
+				enemyManager.PushEnemyMummy(mapChipField_->GetMapChipPositionByIndex(x, y), camera_, mapChipField_);
 			}
 		}
 	}

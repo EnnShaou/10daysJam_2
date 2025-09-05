@@ -11,6 +11,7 @@ namespace {
 		{"9", MapChipType::EnemyPumpkin},
 		{"10", MapChipType::EnemyLamp},
 		{"11", MapChipType::EnemyBat},
+		{"12", MapChipType::EnemyMummy},
 
 	};
 }
