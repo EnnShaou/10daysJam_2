@@ -22,6 +22,8 @@ void Player::Initialize(Camera* camera, Vector2& pos) {
 	astralBodySprite_->SetColor(BLUE);
 	dathSprite_ = new DrawSprite(Novice::LoadTexture("white1x1.png"), { 68,72 });
 	dathSprite_->SetColor(BLACK);
+	astralBodyHP = maxAstralBodyHP;
+	nomalBodyHP = maxNomalBodyHP;
 }
 
 void Player::Update()
@@ -441,7 +443,7 @@ void Player::MapWallCollision(CollisonMapInfo& info) {
 //	aabb.max = Vector3(center.x + kWidth / 2 - kBlank, center.y + kHeight / 2 - kBlank, center.z);
 //	return aabb;
 //}
-void Player::OnCollision(const Enemies* enemies) {
+void Player::OnCollisionNomal(const Enemies* enemies) {
 	(void)enemies; // プレイヤーとの衝突処理はまだ実装されていない
 	// float enemyPosX = enemies->GetPos().x;
 	/*float attackPosX = 0.2f;
@@ -454,15 +456,31 @@ void Player::OnCollision(const Enemies* enemies) {
 	// if (vel_.x == 0.f && vel_.y == 0.f) {
 	//
 	// }
-	isDead_ = true; // プレイヤーが死亡
+	nomalBodyHP--;
+	if(nomalBodyHP <= 0) 
+	{
+		isDead_ = true;
+	}
 }
+void Player::OnCollisionAstral(const Enemies* enemies)
+{
+	(void)enemies;
+	astralBodyHP--;
+	if (astralBodyHP <= 0)
+	{
+		behaviorNext_ = Behavior::kRoot;
+		worldTransform_ = tentativeWorldTransform_;
+	}
+}
+
 void Player::BehaviorRootInitialize()
 {
 	{
 		behavior_ = Behavior::kRoot;
 		vel_ = Vector2(0, 0);
 		worldTransform_.scale_ = Vector2(1.0f, 1.0f);
-
+		isAstral = false;
+		astralBodyHP = maxAstralBodyHP;
 	}
 }
 void Player::BehaviorRootUpdate()
@@ -501,6 +519,7 @@ void Player::BehaviorAstralInitialize()
 	astralBodyTimer_ = 0.0f;
 	behavior_ = Behavior::kAstral;
 	currentBullets_ = 0;
+	isAstral = true;
 }
 
 void Player::BehaviorAstralUpdate()
