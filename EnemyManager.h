@@ -27,7 +27,8 @@ public:
     // プレイヤーの参照をセット（敵AIなどで利用する可能性あり）
     void setPlayer(Player* player);
 
-
+    // --- ゲッター ---
+    const std::list<Enemies*>& GetEnemies() const { return enemies_; }
 
 private:
     std::list<Enemies*> enemies_;   // 敵のリスト（全ての敵を格納）

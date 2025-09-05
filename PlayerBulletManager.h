@@ -17,6 +17,9 @@ public:
 	// --- 弾の描画処理 ---
     void Draw();
 
+	// --- ゲッター ---
+	const std::list<std::unique_ptr<PlayerBullets>>& GetPlayerBullets() const { return playerBullets_; }
+
 private:
 	// --- 弾のリスト（全ての弾を格納） ---
     std::list<std::unique_ptr<PlayerBullets>> playerBullets_;

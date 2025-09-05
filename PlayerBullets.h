@@ -20,6 +20,8 @@ public:
 
 	// --- ゲッター ---
 	bool IsDead() const { return isDead_; }
+	Vector2 GetPos() const { Vector2 worldPos = wtf.translation_; return worldPos; }
+	Vector2 GetSize() const { return Vector2(kWidth, kHeight); }
 
 private:
 	// --- トランスフォーム・カメラ・スプライト ---
