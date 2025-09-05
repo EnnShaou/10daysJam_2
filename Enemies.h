@@ -187,7 +187,10 @@ public:
 
 	// サイズのゲッター
 	Vector2 GetSize() const override { return Vector2(kBatWidth, kBatHeight); }
-
+private:
+	// サイズ
+	float kBatWidth = 60.0f;
+	float kBatHeight = 60.0f;
 
 };
 
@@ -206,9 +209,15 @@ public:
 	// 描画処理
 	void Draw() override;
 
+	// サイズのゲッター
+	Vector2 GetSize() const override { return Vector2(kMummyWidth, kMummyHeight); }
 
 private:
 	void MapWallCollision(CollisonMapInfo& info) override;        // 壁との衝突判定
 	void MapCollisionRight(CollisonMapInfo& info) override;
 	void MapCollisionLeft(CollisonMapInfo& info) override;
+
+	// サイズ
+	float kMummyWidth = 60.0f;
+	float kMummyHeight = 60.0f;
 };
