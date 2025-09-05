@@ -75,10 +75,10 @@ protected:
 	// 以下は詳細な方向別の衝突判定処理（現状コメントアウト）
 	void MapCollisionTop(CollisonMapInfo& info);         // 上方向の衝突判定
 	void MapCollisionBottom(CollisonMapInfo& info);      // 下方向の衝突判定
-	void MapCollisionLeft(CollisonMapInfo& info);        // 左方向の衝突判定
-	void MapCollisionRight(CollisonMapInfo& info);       // 右方向の衝突判定
+	virtual void MapCollisionLeft(CollisonMapInfo& info);        // 左方向の衝突判定
+	virtual void MapCollisionRight(CollisonMapInfo& info);       // 右方向の衝突判定
 	void GroundStates(const CollisonMapInfo& info);      // 地面との接地状態の更新
-	void MapWallCollision(CollisonMapInfo& info);        // 壁との衝突判定
+	virtual void MapWallCollision(CollisonMapInfo& info);        // 壁との衝突判定
 	void MapAfterCollision(const CollisonMapInfo& info); // 衝突後の状態処理
 	virtual void InputGravity(const CollisonMapInfo& info);
 	// --- 当たり判定のコーナー位置取得 ---
@@ -102,6 +102,14 @@ protected:
 
 	Behavior behavior_ = Behavior::kStop;
 	Behavior behaviorNext_ = Behavior::kUnknown;
+
+	//左右の方向
+	enum LRDirection {
+		kRight,
+		kLeft,
+	};
+
+	LRDirection lrDirection_ = LRDirection::kRight;
 };
 
 
@@ -180,8 +188,27 @@ public:
 	// サイズのゲッター
 	Vector2 GetSize() const override { return Vector2(kBatWidth, kBatHeight); }
 
+
+};
+
+// ------------------ ミイラ（派生） ------------------
+class EnemyMummy : public Enemies {
+public:
+	EnemyMummy();
+	~EnemyMummy();
+
+	// 初期化（カメラ、初期位置）
+	void Initialize(Camera* camera, Vector2& pos, MapChipField* mapChipField) override;
+
+	// 更新処理
+	void Update() override;
+
+	// 描画処理
+	void Draw() override;
+
+
 private:
-	// サイズ
-	float kBatWidth = 60.0f;
-	float kBatHeight = 60.0f;
+	void MapWallCollision(CollisonMapInfo& info) override;        // 壁との衝突判定
+	void MapCollisionRight(CollisonMapInfo& info) override;
+	void MapCollisionLeft(CollisonMapInfo& info) override;
 };
