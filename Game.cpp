@@ -259,6 +259,53 @@ void Game::CheckAllCollisions()
 		}
 	}
 #pragma endregion
+
+#pragma region "playerとmummyの当たり判定"
+	for (const auto& enemy : enemyManager.GetEnemies())
+	{
+		if (EnemyMummy* mummy = dynamic_cast<EnemyMummy*>(enemy))
+		{
+			// 敵の情報を取得
+			Rect enemyRect = { mummy->GetPos().x, mummy->GetPos().y, mummy->GetSize().x, mummy->GetSize().y };
+
+			// 当たり判定のチェック
+			if (playerRect.IsCollision(enemyRect) && !player_->IsAstral())
+			{
+				Novice::ScreenPrintf(30, 220, "HitMummy!)");
+				player_->OnCollisionNomal(enemy);
+			}
+		}
+	}
+#pragma endregion
+
+#pragma region "playerの弾とmummyの当たり判定"
+	for (const auto& enemy : enemyManager.GetEnemies())
+	{
+		if (EnemyMummy* mummy = dynamic_cast<EnemyMummy*>(enemy))
+		{
+			// 敵の情報を取得
+			Rect enemyRect = { mummy->GetPos().x, mummy->GetPos().y, mummy->GetSize().x, mummy->GetSize().y };
+
+			// 当たり判定のチェック
+			for (const auto& bullet : player_->GetBullets().GetPlayerBullets())
+			{
+				// 弾が存在しない場合はスキップ
+				if (!bullet)
+				{
+					continue;
+				}
+
+				// 弾の情報を取得
+				Rect bulletRect = { bullet->GetPos().x, bullet->GetPos().y, bullet->GetSize().x, bullet->GetSize().y };
+
+				if (bulletRect.IsCollision(enemyRect))
+				{
+					Novice::ScreenPrintf(30, 240, "HitMummyBullet!)");
+				}
+			}
+		}
+	}
+#pragma endregion
 }
 
 void Game::ChangePhase() {
