@@ -2,6 +2,7 @@
 #include "ImGui.h"
 #include"keys.h"
 #include "Collision.h"
+#include "PlayerBulletManager.h"
 
 Game::Game() : mapChipField_(), camera_() {
 
@@ -222,6 +223,35 @@ void Game::CheckAllCollisions()
 			{
 				Novice::ScreenPrintf(30, 220, "HitBat!)");
 				player_->OnCollisionNomal(enemy);
+			}
+		}
+	}
+#pragma endregion
+
+#pragma region "playerの弾とbatの当たり判定"
+	for (const auto& enemy : enemyManager.GetEnemies())
+	{
+		if (EnemyBat* bat = dynamic_cast<EnemyBat*>(enemy))
+		{
+			// 敵の情報を取得
+			Rect enemyRect = { bat->GetPos().x, bat->GetPos().y, bat->GetSize().x, bat->GetSize().y };
+
+			// 当たり判定のチェック
+			for (const auto& bullet : player_->GetBullets().GetPlayerBullets())
+			{
+				// 弾が存在しない場合はスキップ
+				if (!bullet)
+				{
+					continue;
+				}
+
+				// 弾の情報を取得
+				Rect bulletRect = { bullet->GetPos().x, bullet->GetPos().y, bullet->GetSize().x, bullet->GetSize().y };
+
+				if (bulletRect.IsCollision(enemyRect))
+				{
+					Novice::ScreenPrintf(30, 240, "HitBatBullet!)");
+				}
 			}
 		}
 	}

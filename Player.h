@@ -129,6 +129,7 @@ public:
 	bool IsClear() const { return isClear; }
 	Vector2 GetSize() const { return Vector2(kWidth, kHeight); }
 	bool IsAstral() const { return isAstral; }
+	const PlayerBulletManager& GetBullets() const { return playerBullets_; }
 
 	// --- セッター ---
 	void SetMapChipField(MapChipField* mapChipField) { mapChipField_ = mapChipField; }
