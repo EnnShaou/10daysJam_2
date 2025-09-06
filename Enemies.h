@@ -110,14 +110,6 @@ protected:
 	// 左右方向
 	DrawSprite::LRDirection lrDirection_ = DrawSprite::LRDirection::kRight;
 
-	//左右の方向
-	enum LRDirection {
-
-		kRight,
-		kLeft,
-	};
-	LRDirection lrDirection_ = LRDirection::kRight;
-
 	// アニメーション処理
 	virtual void Animation();
 	int animationTimer_ = 0;	// アニメーションのタイマー
@@ -198,8 +190,7 @@ public:
 	void Draw() override;
 	// 当たり判定
 	void OnCollision() override;
-	// サイズのゲッター
-	Vector2 GetSize() const override { return Vector2(kBatWidth, kBatHeight); }
+	
 private:
 
 	// コウモリの行動
@@ -257,7 +248,7 @@ private:
 	// --- フラグ・タイマー ---
 	bool isStan = false;       // 気絶フラグ
 	float stanTimer = 0.0f;    // 気絶タイマー
-	float stanDuration = 2.0f; // 気絶時間
+	float stanDuration = 5.0f; // 気絶時間
 	// --- アニメーションの行動パターン ---
 	enum class AnimationBehavior
 	{

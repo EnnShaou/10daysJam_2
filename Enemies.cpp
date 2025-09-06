@@ -61,85 +61,6 @@ void Enemies::StopBehaviorInitialize() {
 	vel_ = { 0.0f, 0.0f };
 }
 
-
-void EnemyPumpkin::OnCollision()
-{
-  
-}
-
-void EnemyPumpkin::InputGravity(const CollisonMapInfo& info)
-{
-	if (behavior_ == Behavior::kAstral)
-	{
-		return;
-	}
-	if (onGround)
-	{
-		return;
-	}
-	float Gravity = kGravity;
-	vel_ += Vector2(0, -Gravity);
-	vel_.y = max(vel_.y, -kLimitFallSpeed);
-	if (info.Bottom) {
-
-		onGround = true;
-		vel_.y = 0.0f;
-	}
-}
-
-void EnemyPumpkin::Update() {
-
-
-	if (behaviorNext_ != Behavior::kUnknown) {
-		behavior_ = behaviorNext_;
-		behaviorNext_ = Behavior::kUnknown;
-
-		// 初期化処理
-		switch (behavior_) {
-		case Behavior::kStop:
-			StopBehaviorInitialize();
-			break;
-		case Behavior::kAstral:
-			AstralBehaviorInitialize();
-			break;
-		default:
-			break;
-		}
-	}
-
-	switch (behavior_) {
-	case Behavior::kStop:
-		StopBehavior();
-		break;
-	case Behavior::kAstral:
-		AstralBehavior();
-		break;
-	default:
-		break;
-	}
-
-
-
-	// マップチップの当たり判定
-	CollisonMapInfo info;
-	info.vel = vel_;
-	MapCollision(info);
-	MapAfterCollision(info);
-	MapWallCollision(info);
-	GroundStates(info);
-	InputGravity(info);
-
-
-	// 移動更新
-	wtf.translation_ += info.vel;
-
-	wtf.Update();
-}
-
-void EnemyPumpkin::Draw()
-{
-	sprite->Draw(wtf, camera_, 0, 0, 64, 64);
-}
 void Enemies::Animation() {
 
 }
@@ -491,6 +412,11 @@ void EnemyPumpkin::Draw()
 	sprite->Draw(wtf, camera_, animePosX_, animePosY_, imageWidth_, imageHeight_);
 }
 
+void EnemyPumpkin::OnCollision()
+{
+
+}
+
 /// <summary>
 /// Enemy Lamp
 /// </summary>
@@ -691,16 +617,6 @@ void EnemyBat::BehaviorReturn(){
 	//// move toward spawn with some speed
 	//vel_.x = dir.x * kSpeed.x;
 	//vel_.y = dir.y * kSpeed.y;
-}
-
-
-void EnemyBat::Draw()
-{
-	if (isDead_)
-	{
-		return;
-	}
-sprite->Draw(wtf, camera_, 0, 0, 32, 32);
 }
   
 void EnemyBat::Animation()
