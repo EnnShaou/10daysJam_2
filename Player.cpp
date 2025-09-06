@@ -555,11 +555,6 @@ void Player::BehaviorRootUpdate()
 	}
 
 	Move();
-
-	if (Keys::IsTrigger(DIK_SPACE) && !onGround)
-	{
-		behaviorNext_ = Behavior::kAttack; // 攻撃行動に切り替え
-	}
 }
 
 void Player::BehaviorAttackInitialize()
