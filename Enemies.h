@@ -45,7 +45,10 @@ public:
 	virtual Vector2 GetPos() const { Vector2 worldPos = wtf.translation_; return worldPos; }
 
 	// サイズのゲッター
-	virtual Vector2 GetSize() const = 0;
+	virtual Vector2 GetSize() const { return { kWidth, kHeight }; }
+
+	// 当たり判定
+	virtual void OnCollision() = 0;
 
 	// --- 衝突判定関連 ---
 	void MapCollision(CollisonMapInfo& info);   // マップ全体との衝突判定
@@ -54,39 +57,40 @@ public:
 	void SetPlayer(Player* player) { player_ = player; }
 
 protected:
-	MapChipField* mapChipField_; // マップフィールドポインタ
-	DrawSprite* sprite = nullptr;   // 敵スプライト
-	WtF wtf;                        // 座標など
-	Camera* camera_ = nullptr;      // カメラ参照
-	Player* player_ = nullptr;
-
+	MapChipField* mapChipField_;  // マップフィールドポインタ
+	DrawSprite* sprite = nullptr; // 敵スプライト
+	WtF wtf;                      // 座標など
+	Camera* camera_ = nullptr;    // カメラ参照
+	Player* player_ = nullptr;    // プレイヤー
 
 	// 当たり判定のサイズ
-	float kWidth = 60;              // 当たり判定の幅
-	float kHeight = 60;             // 当たり判定の高さ
-	float kBlank = 2.f;             // 当たり判定の余白（境界ずれ防止）
+	float kWidth = 60;  // 当たり判定の幅
+	float kHeight = 60; // 当たり判定の高さ
+	float kBlank = 2.f; // 当たり判定の余白（境界ずれ防止）
 
 	Vector2 vel_;                                   //　速度
 	const float kGravity = 0.98f;                   //　重力
 	const float kLimitFallSpeed = kGravity * 20.f;  //　落下速度制限
 
 	//void GroundStates(const CollisonMapInfo& info);      // 地面との接地状態更新
+	
 	// --- マップ ---
-	// 以下は詳細な方向別の衝突判定処理（現状コメントアウト）
-	void MapCollisionTop(CollisonMapInfo& info);         // 上方向の衝突判定
-	void MapCollisionBottom(CollisonMapInfo& info);      // 下方向の衝突判定
-	virtual void MapCollisionLeft(CollisonMapInfo& info);        // 左方向の衝突判定
-	virtual void MapCollisionRight(CollisonMapInfo& info);       // 右方向の衝突判定
-	void GroundStates(const CollisonMapInfo& info);      // 地面との接地状態の更新
-	virtual void MapWallCollision(CollisonMapInfo& info);        // 壁との衝突判定
-	void MapAfterCollision(const CollisonMapInfo& info); // 衝突後の状態処理
-	virtual void InputGravity(const CollisonMapInfo& info);
+	void MapCollisionTop(CollisonMapInfo& info);            // 上方向の衝突判定
+	void MapCollisionBottom(CollisonMapInfo& info);         // 下方向の衝突判定
+	virtual void MapCollisionLeft(CollisonMapInfo& info);   // 左方向の衝突判定
+	virtual void MapCollisionRight(CollisonMapInfo& info);  // 右方向の衝突判定
+	void GroundStates(const CollisonMapInfo& info);         // 地面との接地状態の更新
+	virtual void MapWallCollision(CollisonMapInfo& info);   // 壁との衝突判定
+	void MapAfterCollision(const CollisonMapInfo& info);    // 衝突後の状態処理
+	virtual void InputGravity(const CollisonMapInfo& info); // 重力処理
+
 	// --- 当たり判定のコーナー位置取得 ---
 	Vector2 CornerPos(const Vector2 center, Corner corner);
 	bool onGround = false;  // 地面に接地しているか
 
 	// ビヘイビア管理用の関数
-	enum class Behavior {
+	enum class Behavior 
+	{
 		kStop,
 		kAstral,
 		kUnknown,
@@ -107,12 +111,12 @@ protected:
 	DrawSprite::LRDirection lrDirection_ = DrawSprite::LRDirection::kRight;
 
 	//左右の方向
-	/*enum LRDirection {
+	enum LRDirection {
+
 		kRight,
 		kLeft,
 	};
-
-	LRDirection lrDirection_ = LRDirection::kRight;*/
+	LRDirection lrDirection_ = LRDirection::kRight;
 
 	// アニメーション処理
 	virtual void Animation();
@@ -143,15 +147,13 @@ public:
 	// 描画処理
 	void Draw() override;
 
-	// サイズのゲッター
-	Vector2 GetSize() const override { return Vector2(kPumpkinWidth, kPumpkinHeight); }
+	// 当たり判定
+	void OnCollision() override;
 
 private:
 	// ここにかぼちゃ敵固有の変数や処理を追加できる
 	void InputGravity(const CollisonMapInfo& info)override;
-
 	void Animation() override;
-=
 };
 
 
@@ -171,20 +173,17 @@ public:
 	// 描画処理
 	void Draw() override;
 
-	// サイズのゲッター
-	Vector2 GetSize() const override { return Vector2(kLampWidth, kLampHeight); }
+	// 当たり判定
+	void OnCollision() override;
 
 private:
 
 	float lightRadius_ = 280.0f;
-
-	// サイズ
-	float kLampWidth = 60.0f;
-	float kLampHeight = 60.0f;
 };
 
 // ------------------ コウモリ（派生） ------------------
-class EnemyBat : public Enemies {
+class EnemyBat : public Enemies
+{
 public:
 	EnemyBat();
 	~EnemyBat();
@@ -197,7 +196,8 @@ public:
 
 	// 描画処理
 	void Draw() override;
-
+	// 当たり判定
+	void OnCollision() override;
 	// サイズのゲッター
 	Vector2 GetSize() const override { return Vector2(kBatWidth, kBatHeight); }
 private:
@@ -224,10 +224,15 @@ private:
 
 	bool isAtk_ = false;
 
+
+private:
+	// 死亡フラグ
+	bool isDead_ = false;
 };
 
 // ------------------ ミイラ（派生） ------------------
-class EnemyMummy : public Enemies {
+class EnemyMummy : public Enemies 
+{
 public:
 	EnemyMummy();
 	~EnemyMummy();
@@ -241,16 +246,18 @@ public:
 	// 描画処理
 	void Draw() override;
 
-	// サイズのゲッター
-	Vector2 GetSize() const override { return Vector2(kMummyWidth, kMummyHeight); }
+	// 当たり判定
+	void OnCollision() override;
 
 
 private:
 	void MapWallCollision(CollisonMapInfo& info) override;        // 壁との衝突判定
 	void MapCollisionRight(CollisonMapInfo& info) override;
 	void MapCollisionLeft(CollisonMapInfo& info) override;
-
-
+	// --- フラグ・タイマー ---
+	bool isStan = false;       // 気絶フラグ
+	float stanTimer = 0.0f;    // 気絶タイマー
+	float stanDuration = 2.0f; // 気絶時間
 	// --- アニメーションの行動パターン ---
 	enum class AnimationBehavior
 	{
@@ -260,7 +267,6 @@ private:
 	};
 
 	AnimationBehavior animationBehavior_ = AnimationBehavior::kMove;
-
 	void Animation() override;
 
 };

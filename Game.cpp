@@ -72,7 +72,7 @@ void Game::Update() {
 		camera_->Update();
 
 		player_->Update();
-		enemyManager.UpDate();
+		enemyManager.Update();
 		// 全ての当たり判定をチェック
 		CheckAllCollisions();
 		for (std::vector<BlockManager*>& wtfby : wTfBlock_) {
@@ -254,6 +254,7 @@ void Game::CheckAllCollisions()
 				if (bulletRect.IsCollision(enemyRect))
 				{
 					Novice::ScreenPrintf(30, 240, "HitBatBullet!)");
+					enemy->OnCollision();
 				}
 			}
 		}
@@ -301,6 +302,7 @@ void Game::CheckAllCollisions()
 				if (bulletRect.IsCollision(enemyRect))
 				{
 					Novice::ScreenPrintf(30, 240, "HitMummyBullet!)");
+					enemy->OnCollision();
 				}
 			}
 		}

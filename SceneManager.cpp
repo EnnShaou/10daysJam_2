@@ -16,7 +16,7 @@ void sceneManage::Initialize() {
 	SceneArr_[static_cast<int>(currentSceneNo_)]->Initialize();
 }
 
-void sceneManage::UpDate() {
+void sceneManage::Update() {
 	preSceneNo_ = currentSceneNo_; // 前のシーン番号を保存
 
 	currentSceneNo_ = SceneArr_[static_cast<int>(preSceneNo_)]->GetSceneNo(); // 現在のシーン番号を取得

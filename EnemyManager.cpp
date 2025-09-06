@@ -42,7 +42,7 @@ void EnemyManager::PushEnemyMummy(Vector2 pos, Camera* camera, MapChipField* map
 	enemies_.push_back(newEnemy);
 }
 
-void EnemyManager::UpDate()
+void EnemyManager::Update()
 {
 	for (Enemies* enemy : enemies_) {
 		if (!enemy) {
