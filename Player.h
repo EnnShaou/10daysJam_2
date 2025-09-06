@@ -32,6 +32,11 @@ public:
 		kMove,
 		kJumpUp,
 		kJumpDown,
+		kDamage,         
+		kAstralBodyIdle,
+		kAstralRoot,     // 幽体通常状態
+		kAstralAttack,   // 幽体攻撃
+		kAstralDeath,    // 幽体死亡
 		kUnknown
 	};
 
@@ -51,6 +56,8 @@ public:
 		kRoot,
 		kAttack,
 		kAstral,
+		kKnockback,
+		kDeadShrink,
 		kUnknown
 	};
 
@@ -59,6 +66,7 @@ public:
 	{
 		kRoot,
 		kAttack,
+		kKnockback,
 		kUnknown
 	};
 
@@ -105,6 +113,9 @@ public:
 	void BehaviorAstralInitialize();
 	void BehaviorAstralUpdate();
 
+	void BehaviorKnockbackInitialize(const Vector2& knockDir);
+	void BehaviorKnockbackUpdate();
+
 	// --- 幽体状態の切り替え処理 ---
 	void SwitchBody();
 
@@ -114,6 +125,9 @@ public:
 
 	void AstralBodyBehaviorAttackInitialize();
 	void AstralBodyBehaviorAttackUpdate();
+
+	void AstralBodyBehaviorKnockbackInitialize(const Vector2& knockDir);
+	void AstralBodyBehaviorKnockbackUpdate();
 
 	// --- アニメーション関連 ---
 	void Animation();
@@ -162,11 +176,12 @@ private:
 	static inline const float kAstralBodyMaxDistance_ = 500.0f;     // 幽体状態の最大移動距離
 
 	// --- 状態フラグ ---
-	bool onGround = false;  // 地面に接地しているか
-	bool isDead_ = false;   // 死亡状態
-	bool isMove = false;    // 移動中かどうか
-	bool isClear = false;   // ステージクリアしたかどうか
-	bool isAstral = false;  // 幽体状態かどうか
+	bool onGround = false;             // 地面に接地しているか
+	bool isDead_ = false;              // 死亡状態
+	bool isMove = false;               // 移動中かどうか
+	bool isClear = false;              // ステージクリアしたかどうか
+	bool isAstral = false;             // 幽体状態かどうか
+	bool pendingAstralDamage_ = false; // ダメージを減らす状態かどうか
 
 	// --- マップ ---
 	MapChipField* mapChipField_ = nullptr; // マップフィールドポインタ
@@ -190,7 +205,6 @@ private:
 	// --- スプライト ---
 	DrawSprite* playerSprite_ = nullptr;
 	DrawSprite* astralBodySprite_ = nullptr;
-	DrawSprite* dathSprite_ = nullptr;
 
 	// --- 幽体状態関連 ---
 	float astralBodyTimer_ = 0.0f;           // 幽体状態の残り時間タイマー
@@ -209,4 +223,9 @@ private:
 	int animationCount;
 	int animationTimer;
 	int animationMax = 4;
+
+	// --- ノックバック ---
+	bool isKnockback_ = false; 
+	float knockbackTimer_ = 0.0f;
+	const float knockbackDuration_ = 0.3f; // ノックバックが続く秒数
 };
