@@ -27,7 +27,7 @@ void Player::Initialize(Camera* camera, Vector2& pos) {
 
 void Player::Update()
 {
-	if (behaviorNext_ != Behavior::kUnknown) 
+	if (behaviorNext_ != Behavior::kUnknown)
 	{
 		behavior_ = behaviorNext_;
 		behaviorNext_ = Behavior::kUnknown;
@@ -82,7 +82,7 @@ void Player::Update()
 }
 
 void Player::Draw() {
-	if (!isDead_ && behavior_ != Behavior::kAstral) 
+	if (!isDead_ && behavior_ != Behavior::kAstral)
 	{
 		playerSprite_->Draw(worldTransform_, camera_, (animationCount * 58) + (lrDir_ == LRDir::kRight ? 0 : 58), static_cast<int>(animationBehavior_) * 72 + 2, (lrDir_ == LRDir::kRight ? 1 : -1) * 58, 72); // プレイヤーを描画
 	}
@@ -221,7 +221,7 @@ void Player::MapCollisionTop(CollisonMapInfo& info) {
 				info.Top = true;
 				break;
 			}
-			
+
 		}
 	}
 }
@@ -247,7 +247,7 @@ void Player::MapCollisionBottom(CollisonMapInfo& info) {
 				info.Bottom = true;
 				break;
 			}
-		
+
 		}
 	}
 }
@@ -276,7 +276,7 @@ void Player::MapCollisionLeft(CollisonMapInfo& info) {
 				break;
 			}
 		}
-		
+
 	}
 }
 void Player::MapCollisionRight(CollisonMapInfo& info) {
@@ -304,7 +304,7 @@ void Player::MapCollisionRight(CollisonMapInfo& info) {
 				break;
 			}
 		}
-		
+
 	}
 }
 Vector2 Player::CornerPos(const Vector2 center, Corner corner) {
@@ -317,9 +317,9 @@ Vector2 Player::CornerPos(const Vector2 center, Corner corner) {
 	};
 	return (center + offsetTable[static_cast<uint32_t>(corner)]);
 }
-void Player::MapCollisionMove(const CollisonMapInfo& info) 
+void Player::MapCollisionMove(const CollisonMapInfo& info)
 {
-	worldTransform_.translation_ += info.vel; 
+	worldTransform_.translation_ += info.vel;
 }
 void Player::MapAfterCollision(const CollisonMapInfo& info) {
 
@@ -343,7 +343,7 @@ void Player::GroundStates(const CollisonMapInfo& info) {
 			for (auto corner : checkCorners) {
 				auto index = mapChipField_->GetMapChipIndexByPosition(posNew[corner] + Vector2(0.f, -(kBlank + 1.f)));
 				auto type = mapChipField_->GetMapChipTypeIndex(index.xIndex, index.yIndex);
-				if (type == MapChipType::kBlock ) {
+				if (type == MapChipType::kBlock) {
 					isHit = true;
 					break;
 				}
@@ -442,13 +442,13 @@ void Player::BehaviorAstralInitialize()
 
 void Player::BehaviorAstralUpdate()
 {
-	if (AstralbehaviorNext_ != AstralBehavior::kUnknown) 
+	if (AstralbehaviorNext_ != AstralBehavior::kUnknown)
 	{
 		Astralbehavior_ = AstralbehaviorNext_;
 		AstralbehaviorNext_ = AstralBehavior::kUnknown;
 
 		// 初期化処理
-		switch (Astralbehavior_) 
+		switch (Astralbehavior_)
 		{
 		case AstralBehavior::kRoot:
 			AstralBodyBehaviorRootInitialize();
@@ -462,7 +462,7 @@ void Player::BehaviorAstralUpdate()
 	}
 
 	// 行動ごとの更新処理
-	switch (Astralbehavior_) 
+	switch (Astralbehavior_)
 	{
 	case AstralBehavior::kRoot:
 		AstralBodyBehaviorRootUpdate();
@@ -503,7 +503,7 @@ void Player::AstralBodyBehaviorRootUpdate()
 	{
 		behaviorNext_ = Behavior::kRoot;
 		worldTransform_ = tentativeWorldTransform_;
-		
+
 	}
 }
 
@@ -611,4 +611,23 @@ void Player::Animation() {
 		animationTimer = 0;// 60フレームに1回
 		animationCount = (animationCount + 1) % animationMax;
 	}
+}
+
+bool Player::isPushButton()
+{
+	std::array<Vector2, kNumCorner> posNew;
+	for (uint32_t i = 0; i < posNew.size(); ++i) {
+		posNew[i] = CornerPos(worldTransform_.translation_, static_cast<Corner>(i));
+	}
+	std::array<Corner, 2> checkCorners = { kLeftBottom, kRightBottom };
+	for (auto corner : checkCorners) {
+		auto index = mapChipField_->GetMapChipIndexByPosition(posNew[corner]);
+		auto type = mapChipField_->GetMapChipTypeIndex(index.xIndex, index.yIndex);
+		if (type == MapChipType::kButton1 || type == MapChipType::kButton2 || type == MapChipType::kButton3)
+		{
+			return true;
+		}
+
+	}
+	return false;
 }

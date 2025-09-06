@@ -113,6 +113,8 @@ public:
 
 	void Animation();
 
+	bool isPushButton();
+
 	// --- ゲッター ---
 	Vector2 GetPos() const { Vector2 worldPos = worldTransform_.translation_; return worldPos; }
 	Vector2 GetScale() const { Vector2 worldScale = worldTransform_.scale_; return worldScale; }

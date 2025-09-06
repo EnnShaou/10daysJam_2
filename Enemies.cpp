@@ -14,7 +14,7 @@ Enemies::~Enemies()
 
 EnemyPumpkin::EnemyPumpkin()
 {
-	
+
 }
 
 EnemyPumpkin::~EnemyPumpkin()
@@ -81,38 +81,41 @@ void EnemyPumpkin::Update(Player* player)
 {
 	// プレイヤーが幽霊状態の時の処理
 	if (player->GetBehavior() == Player::Behavior::kAstral) {
-		
+
 		//　プレイヤーが敵の攻撃範囲にいるかどうかを計算
 		Vector2 playerPos = player->GetPos();
 		Vector2 pumpkinPos = wtf.translation_;
 		Vector2 enemyToPlayer = { playerPos.x - pumpkinPos.x, playerPos.y - pumpkinPos.y };
 		float distanceToPlayer = sqrtf(enemyToPlayer.x * enemyToPlayer.x + enemyToPlayer.y * enemyToPlayer.y);
-		
+
 		// プレイヤーの方向に動く
 		if (distanceToPlayer <= kAtkRange) {
 			if (playerPos.x >= pumpkinPos.x) {
 				vel_.x = +kSpeed.x;
-			} else {
+			}
+			else {
 				vel_.x = -kSpeed.x;
 			}
 
 			if (playerPos.y >= pumpkinPos.y) {
 				vel_.y = +kSpeed.y;
-			} else {
+			}
+			else {
 				vel_.y = -kSpeed.y;
 			}
-		} else {
+		}
+		else {
 			//止まる
 			vel_ = { 0.0f, 0.0f };
 		}
 
-	} 
+	}
 
 	// マップチップの当たり判定
 	CollisonMapInfo info;
 	info.vel = vel_;
 	MapCollision(info);
-	
+
 
 	// 移動更新
 	wtf.translation_ += info.vel;
@@ -168,6 +171,25 @@ void EnemyPumpkin::GroundStates(const CollisonMapInfo& info)
 	}
 }
 
+bool EnemyPumpkin::isPushButton()
+{
+	std::array<Vector2, kNumCorner> posNew;
+	for (uint32_t i = 0; i < posNew.size(); ++i) {
+		posNew[i] = CornerPos(wtf.translation_, static_cast<Corner>(i));
+	}
+	std::array<Corner, 2> checkCorners = { kLeftBottom, kRightBottom };
+	for (auto corner : checkCorners) {
+		auto index = mapChipField_->GetMapChipIndexByPosition(posNew[corner]);
+		auto type = mapChipField_->GetMapChipTypeIndex(index.xIndex, index.yIndex);
+		if (type == MapChipType::kButton1 || type == MapChipType::kButton2 || type == MapChipType::kButton3)
+		{
+			return true;
+		}
+
+	}
+	return false;
+}
+
 Vector2 Enemies::CornerPos(const Vector2 center, Corner corner) {
 
 	Vector2 offsetTable[kNumCorner] = {
@@ -189,6 +211,11 @@ void Enemies::MapCollision(CollisonMapInfo& info)
 	MapAfterCollision(info);
 	MapWallCollision(info);
 	GroundStates(info);
+}
+
+bool Enemies::isPushButton()
+{
+	return false;
 }
 
 void Enemies::MapCollisionLeft(CollisonMapInfo& info) {
@@ -320,7 +347,7 @@ void Enemies::MapAfterCollision(const CollisonMapInfo& info) {
 
 void Enemies::GroundStates(const CollisonMapInfo& info) {
 
-	
+
 	if (onGround) {
 		if (vel_.y > 0.0f) {
 			onGround = false;

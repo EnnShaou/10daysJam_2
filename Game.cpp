@@ -14,15 +14,8 @@ Game::~Game() {
 	delete fade_;
 	fade_ = nullptr;
 
-	delete blockSprite_;
-	blockSprite_ = nullptr;
-	for (auto& row : wTfBlock_) {
-		for (auto& block : row) {
-			delete block;
-			block = nullptr;
-		}
-	}
-	wTfBlock_.clear();
+	delete blockManger;
+	blockManger = nullptr;
 	delete player_;
 	player_ = nullptr;
 	delete camera_;
@@ -34,21 +27,27 @@ void Game::Initialize() {
 	// マップチップフィールドの初期化
 	mapChipField_ = new MapChipField();
 	mapChipField_->LoadMapChipCsv("Resources/MapData/map_data1.csv");
-
-	blockSprite_ = new DrawSprite(Novice::LoadTexture("white1x1.png"), { 64,64 });
 	camera_ = new Camera({ 0,0 });
 	camera_->Initialize(1280, 720);
 
+
+
+
+	blockManger = new MapBlockManager();
+	blockManger->setCamera(camera_);
+	blockManger->setMapChipField(mapChipField_);
 	// プレイヤーの初期化
 	player_ = new Player();
 	Vector2 playerPos = mapChipField_->GetMapChipPositionByIndex(2, 20);
 	player_->Initialize(camera_, playerPos);
 	player_->SetMapChipField(mapChipField_);
+	blockManger->setPlayer(player_);
 	camera_->setTarget(player_);
 	// フェードの初期化
 	fade_ = new Fade();
 	fade_->Initialize();
 	enemyManager.setPlayer(player_);
+	blockManger->setEnemies(&enemyManager);
 	GenerateBlocks();
 #ifdef _DEBUG
 
@@ -73,14 +72,7 @@ void Game::Update() {
 		enemyManager.UpDate(player_);
 		// 全ての当たり判定をチェック
 		CheckAllCollisions();
-		for (std::vector<BlockManager*>& wtfby : wTfBlock_) {
-			for (BlockManager* wtfb : wtfby) {
-				if (wtfb) {
-					wtfb->wtf->Update();
-				}
-
-			}
-		}
+		blockManger->Update();
 		break;
 	case Game::Phase::kDeath:
 
@@ -96,14 +88,7 @@ void Game::Draw() {
 
 
 
-	for (std::vector<BlockManager*>& wtfby : wTfBlock_) {
-		for (BlockManager* wtfb : wtfby) {
-			if (wtfb) {
-				blockSprite_->Draw(*wtfb->wtf, camera_, 0, 0, 32, 32);
-			}
-
-		}
-	}
+	blockManger->Draw();
 	player_->Draw();
 	enemyManager.Draw();
 
@@ -117,25 +102,53 @@ void Game::GenerateBlocks() {
 
 	// 要素数を変更
 	// 列数を設定(縦方向ブロック数)
-	wTfBlock_.resize(numBlockY);
-	// 行数を設定(横方向ブロック数)
-	for (uint32_t i = 0; i < numBlockY; i++) {
-		wTfBlock_[i].resize(numBlockX);
-	}
+	blockManger->setSize(numBlockX, numBlockY);
 
 	// ブロックの生成
 	for (uint32_t y = 0; y < numBlockY; y++) {
 		for (uint32_t x = 0; x < numBlockX; x++) {
 
 			MapChipType mapChipType = mapChipField_->GetMapChipTypeIndex(x, y);
-
+			Vector2 pos = mapChipField_->GetMapChipPositionByIndex(x, y);
 			if (mapChipType == MapChipType::kBlock) {
 
-				wTfBlock_[y][x] = new BlockManager();
-				wTfBlock_[y][x]->wtf = new WtF();
-				wTfBlock_[y][x]->wtf->Initialize();
-				wTfBlock_[y][x]->wtf->translation_ = mapChipField_->GetMapChipPositionByIndex(x, y);
-				wTfBlock_[y][x]->mapChipType = mapChipType;
+				blockManger->pushBlock(new Block(), pos, x, y);
+			}
+			if (mapChipType == MapChipType::kButton1)
+			{
+				auto* button = new BlockButtonAndGate();
+				button->setBindID(1);  
+				blockManger->pushBlock(button, pos, x, y);
+			}
+			if (mapChipType == MapChipType::kGate1)
+			{
+				auto* gate = new Gate();
+				gate->setBindID(1);  
+				blockManger->pushBlock(gate, pos, x, y);
+			}
+			if (mapChipType == MapChipType::kButton2)
+			{
+				auto* button = new BlockButtonAndGate();
+				button->setBindID(2);  
+				blockManger->pushBlock(button, pos, x, y);
+			}
+			if (mapChipType == MapChipType::kGate2)
+			{
+				auto* gate = new Gate();
+				gate->setBindID(2);  
+				blockManger->pushBlock(gate, pos, x, y);
+			}
+			if (mapChipType == MapChipType::kButton3)
+			{
+				auto* button = new BlockButtonAndGate();
+				button->setBindID(3);  
+				blockManger->pushBlock(button, pos, x, y);
+			}
+			if (mapChipType == MapChipType::kGate3)
+			{
+				auto* gate = new Gate();
+				gate->setBindID(3);  
+				blockManger->pushBlock(gate, pos, x, y);
 			}
 		}
 	}
@@ -148,15 +161,19 @@ void Game::GenerateBlocks() {
 			if (mapChipType == MapChipType::EnemyPumpkin) {
 
 				enemyManager.PushEnemyPumpkin(mapChipField_->GetMapChipPositionByIndex(x, y), camera_, mapChipField_);
+				mapChipField_->setMapChipData(MapChipType::kBlank, x, y);
+
 			}
 		}
 	}
+
+	blockManger->BindButtonAndGates();
 
 }
 
 void Game::CheckAllCollisions() {
 #pragma region "playerとenemiesの当たり判定"
-	
+
 #pragma endregion
 }
 
@@ -211,3 +228,5 @@ void Game::ChangePhase() {
 		break;
 	}
 }
+
+

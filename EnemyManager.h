@@ -23,7 +23,7 @@ public:
 
     // プレイヤーの参照をセット（敵AIなどで利用する可能性あり）
     void setPlayer(Player* player);
-
+    bool isPushButton();
 
 
 private:
