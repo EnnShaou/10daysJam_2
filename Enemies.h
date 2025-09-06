@@ -103,13 +103,27 @@ protected:
 	Behavior behavior_ = Behavior::kStop;
 	Behavior behaviorNext_ = Behavior::kUnknown;
 
+	// 左右方向
+	DrawSprite::LRDirection lrDirection_ = DrawSprite::LRDirection::kRight;
+
 	//左右の方向
-	enum LRDirection {
+	/*enum LRDirection {
 		kRight,
 		kLeft,
 	};
 
-	LRDirection lrDirection_ = LRDirection::kRight;
+	LRDirection lrDirection_ = LRDirection::kRight;*/
+
+	// アニメーション処理
+	virtual void Animation();
+	int animationTimer_ = 0;	// アニメーションのタイマー
+	int animationMax_ = 4;		// アニメーションの最大画像枚
+	int imageWidth_ = 64;		// 画像の横幅サイズ
+	int imageHeight_ = 64;		// 画像の縦幅サイズ
+	int animePosX_ = 0;			// 画像アニメーションのx位置
+	int animePosY_ = 0;			// 画像アニメーションのy位置
+
+	int testX = 0;
 };
 
 
@@ -136,9 +150,8 @@ private:
 	// ここにかぼちゃ敵固有の変数や処理を追加できる
 	void InputGravity(const CollisonMapInfo& info)override;
 
-	// サイズ
-	float kPumpkinWidth = 60.0f;
-	float kPumpkinHeight = 60.0f;
+	void Animation() override;
+=
 };
 
 
@@ -188,9 +201,28 @@ public:
 	// サイズのゲッター
 	Vector2 GetSize() const override { return Vector2(kBatWidth, kBatHeight); }
 private:
-	// サイズ
-	float kBatWidth = 60.0f;
-	float kBatHeight = 60.0f;
+
+	// コウモリの行動
+	enum class BatBehavior {
+		kNormal,
+		kAttack,
+		kReturn,
+		kDead,
+		kUnknown,
+	};
+
+	BatBehavior behavior_ = BatBehavior::kNormal;
+
+	Vector2 spawnPos_;					// スポーン位置
+	const float maxMovementX_ = 200.0f; // 待機時の最大移動量
+	void BehaviorNormal();
+	void BehaviorAttack();
+	void BehaviorReturn();
+
+	// アニメーション
+	void Animation() override;
+
+	bool isAtk_ = false;
 
 };
 
@@ -212,12 +244,23 @@ public:
 	// サイズのゲッター
 	Vector2 GetSize() const override { return Vector2(kMummyWidth, kMummyHeight); }
 
+
 private:
 	void MapWallCollision(CollisonMapInfo& info) override;        // 壁との衝突判定
 	void MapCollisionRight(CollisonMapInfo& info) override;
 	void MapCollisionLeft(CollisonMapInfo& info) override;
 
-	// サイズ
-	float kMummyWidth = 60.0f;
-	float kMummyHeight = 60.0f;
+
+	// --- アニメーションの行動パターン ---
+	enum class AnimationBehavior
+	{
+		kMove,		// 歩いているとき
+		kStop,		// スターンされたとき・プレイヤーに攻撃を受けたとき
+		kUnknown
+	};
+
+	AnimationBehavior animationBehavior_ = AnimationBehavior::kMove;
+
+	void Animation() override;
+
 };
