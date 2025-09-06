@@ -103,7 +103,7 @@ void Player::Draw()
 
 	if (!isDead_ && behavior_ != Behavior::kAstral)
 	{
-		playerSprite_->Draw(worldTransform_, camera_, (animationCount * 58) + (lrDir_ == LRDir::kRight ? 0 : 58), static_cast<int>(animationBehavior_) * 72 + 2, (lrDir_ == LRDir::kRight ? 1 : -1) * 58, 72); // プレイヤーを描画
+		playerSprite_->Draw(worldTransform_, camera_, animationCount * 58, static_cast<int>(animationBehavior_) * 72 + 2, 58, 72, lrDirection_); // プレイヤーを描画
 	}
 
 	if (behavior_ == Behavior::kAstral)
@@ -129,7 +129,7 @@ void Player::Move()
 		return;
 	}
 
-	Vector2 acc = InputMove(false, isMove, lrDir_);
+	Vector2 acc = InputMove(false, isMove, lrDirection_);
 
 	if (isMove)
 	{
@@ -152,7 +152,7 @@ void Player::Move()
 
 void Player::AstralMove()
 {
-	Vector2 acc = InputMove(true, isMove, lrDir_);
+	Vector2 acc = InputMove(true, isMove, lrDirection_);
 	if (isMove)
 	{
 		vel_ += acc;
@@ -188,7 +188,7 @@ void Player::AstralMove()
 		tentativeWorldTransform_.translation_.y + kAstralBodyMaxDistance_);
 }
 
-Vector2 Player::InputMove(bool allowVertical, bool& moving, LRDir& direction)
+Vector2 Player::InputMove(bool allowVertical, bool& moving, DrawSprite::LRDirection& direction)
 {
 	Vector2 acc{ 0.0f, 0.0f };
 	moving = false;
@@ -199,9 +199,9 @@ Vector2 Player::InputMove(bool allowVertical, bool& moving, LRDir& direction)
 		{
 			vel_.x = 0.0f;
 		}
-		if (direction != kRight)
+		if (direction != DrawSprite::LRDirection::kRight)
 		{
-			direction = kRight;
+			direction = DrawSprite::LRDirection::kRight;
 		}
 		acc.x += kPlayerSpeed;
 		moving = true;
@@ -213,9 +213,9 @@ Vector2 Player::InputMove(bool allowVertical, bool& moving, LRDir& direction)
 		{
 			vel_.x = 0.0f;
 		}
-		if (direction != kLeft)
+		if (direction != DrawSprite::LRDirection::kLeft)
 		{
-			direction = kLeft;
+			direction = DrawSprite::LRDirection::kLeft;
 		}
 		acc.x -= kPlayerSpeed;
 		moving = true;
@@ -632,7 +632,7 @@ void Player::AstralBodyBehaviorAttackUpdate()
 	if (currentBullets_ <= maxBullets_)
 	{
 		// 弾の速度
-		Vector2 dir = { lrDir_ == LRDir::kRight ? 1.0f : -1.0f , 0.0f };
+		Vector2 dir = GetDir();
 
 		// 速度ベクトルを自キャラの向きに合わせて変更
 		dir = TransformNormal(dir, worldTransform_.matWorld_);

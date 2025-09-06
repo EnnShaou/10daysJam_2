@@ -35,6 +35,29 @@ void MapBlockManager::Draw()
 	}
 }
 
+void MapBlockManager::BindButtonAndGates() {
+	for (auto& row : block_) {
+		for (Block* b : row) {
+			if (auto* button = dynamic_cast<BlockButtonAndGate*>(b)) {
+				int id = button->getBindID();
+				if (id < 0) continue;
+
+				for (auto& row2 : block_) {
+					for (Block* g : row2) {
+						if (auto* gate = dynamic_cast<Gate*>(g)) {
+							if (gate->getBindID() == id) {
+								button->setGate(gate);
+							}
+						}
+					}
+				}
+			}
+		}
+	}
+}
+
+
+
 void Block::Initialize(Vector2 pos)
 {
 
@@ -169,23 +192,61 @@ void BlockButtonAndGate::Draw(Camera* camera) {
 		sprite->Draw(wtf_, camera, 0, 0, 64, 64);
 	}
 }
-void MapBlockManager::BindButtonAndGates() {
-	for (auto& row : block_) {
-		for (Block* b : row) {
-			if (auto* button = dynamic_cast<BlockButtonAndGate*>(b)) {
-				int id = button->getBindID();
-				if (id < 0) continue;
+void HiddenFloor::Initialize(Vector2 pos)
+{
+	sprite = new DrawSprite(Novice::LoadTexture("white1x1.png"), { 64,64 });
+	wtf_.Initialize();
+	wtf_.translation_ = pos;
+	sprite->SetColor(GREEN);
+	auto index = mapChipField_->GetMapChipIndexByPosition(wtf_.translation_);
+	mapChipField_->setMapChipData(MapChipType::kBlock, index.xIndex, index.yIndex);
+}
 
-				for (auto& row2 : block_) {
-					for (Block* g : row2) {
-						if (auto* gate = dynamic_cast<Gate*>(g)) {
-							if (gate->getBindID() == id) {
-								button->setGate(gate);
-							}
-						}
-					}
+void HiddenFloor::Update()
+{
+	isShow = false;
+
+	if (enemies_) {
+		for (auto* enemy : enemies_->GetEnemies()) {
+			if (auto* lamp = dynamic_cast<EnemyLamp*>(enemy)) {
+				float radius = lamp->getRadius();
+
+				Vector2 floorPos = wtf_.translation_;
+				Vector2 lampPos = lamp->GetPos();
+
+				float dx = floorPos.x - lampPos.x;
+				float dy = floorPos.y - lampPos.y;
+				float distSq = sqrtf(dx * dx + dy * dy);
+
+				if (distSq <= radius) {
+					isShow = true;
+					break;
 				}
 			}
 		}
 	}
+
+	auto index = mapChipField_->GetMapChipIndexByPosition(wtf_.translation_);
+	auto type = mapChipField_->GetMapChipTypeIndex(index.xIndex, index.yIndex);
+
+	if (isShow) {
+		if (type == MapChipType::kBlank) {
+			mapChipField_->setMapChipData(MapChipType::kBlock, index.xIndex, index.yIndex);
+			sprite->SetColor(GREEN);
+		}
+	}
+	else {
+		if (type == MapChipType::kBlock) {
+			mapChipField_->setMapChipData(MapChipType::kBlank, index.xIndex, index.yIndex);
+			sprite->SetColor(0x11111144);
+		}
+	}
+	wtf_.Update();
 }
+
+
+void HiddenFloor::Draw(Camera* camera)
+{
+	sprite->Draw(wtf_, camera, 0, 0, 64, 64);
+}
+

@@ -152,6 +152,10 @@ void Game::GenerateBlocks() {
 				gate->setBindID(3);  
 				blockManger->pushBlock(gate, pos, x, y);
 			}
+			if (mapChipType == MapChipType::HiddenFloor)
+			{
+				blockManger->pushBlock(new HiddenFloor(), pos, x, y);
+			}
 		}
 	}
 	//enemyの生成

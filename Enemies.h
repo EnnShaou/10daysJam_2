@@ -74,7 +74,7 @@ protected:
 	const float kLimitFallSpeed = kGravity * 20.f;  //　落下速度制限
 
 	//void GroundStates(const CollisonMapInfo& info);      // 地面との接地状態更新
-	
+
 	// --- マップ ---
 	void MapCollisionTop(CollisonMapInfo& info);            // 上方向の衝突判定
 	void MapCollisionBottom(CollisonMapInfo& info);         // 下方向の衝突判定
@@ -90,7 +90,7 @@ protected:
 	bool onGround = false;  // 地面に接地しているか
 
 	// ビヘイビア管理用の関数
-	enum class Behavior 
+	enum class Behavior
 	{
 		kStop,
 		kAstral,
@@ -168,6 +168,9 @@ public:
 
 	// 当たり判定
 	void OnCollision() override;
+	float getRadius() {
+		return lightRadius_;
+	}
 
 private:
 
@@ -191,7 +194,7 @@ public:
 	void Draw() override;
 	// 当たり判定
 	void OnCollision() override;
-	
+
 private:
 
 	// コウモリの行動
@@ -223,7 +226,7 @@ private:
 };
 
 // ------------------ ミイラ（派生） ------------------
-class EnemyMummy : public Enemies 
+class EnemyMummy : public Enemies
 {
 public:
 	EnemyMummy();

@@ -78,10 +78,23 @@ public:
 
 private:
 
-	Gate* gate_ = nullptr;   // 绑定的门
-	bool isPressed_ = false; // 按钮是否被按下
+	Gate* gate_ = nullptr;   
+	bool isPressed_ = false; 
 
 };
+
+class HiddenFloor : public Block
+{
+public:
+	HiddenFloor() {}
+	~HiddenFloor() {}
+	void Initialize(Vector2 pos) override;
+	void Update() override;
+	void Draw(Camera* camera) override;
+private:
+	bool isShow = false; 
+};
+
 class MapBlockManager
 {
 public:

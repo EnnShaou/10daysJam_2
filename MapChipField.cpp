@@ -14,6 +14,7 @@ namespace {
 		{"4", MapChipType::kGate2 },
 		{"5", MapChipType::kButton3 },
 		{"6", MapChipType::kGate3 },
+		{"7", MapChipType::HiddenFloor },
 		{"9", MapChipType::EnemyPumpkin},
 		{"10", MapChipType::EnemyLamp},
 		{"11", MapChipType::EnemyBat},

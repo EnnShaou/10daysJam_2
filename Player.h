@@ -14,7 +14,6 @@ public:
 	~Player();
 
 	// --- プレイヤーの向き ---
-	enum LRDir { kLeft, kRight };
 
 	// --- マップ衝突情報構造体 ---
 	struct CollisonMapInfo
@@ -74,7 +73,7 @@ public:
 	// --- 移動処理 ---
 	void Move();                                                           // 通常移動
 	void AstralMove();                                                     // 幽体状態の移動
-	Vector2 InputMove(bool allowVertical, bool& moving, LRDir& direction); // 入力検知
+	Vector2 InputMove(bool allowVertical, bool& moving, DrawSprite::LRDirection& direction); // 入力検知
 
 	// --- 衝突判定関連 ---
 	void MapCollision(CollisonMapInfo& info);            // マップ全体の衝突判定
@@ -126,7 +125,7 @@ public:
 	Vector2 GetScale() const { Vector2 worldScale = worldTransform_.scale_; return worldScale; }                   
 	float getRotation() const { float worldRotation = worldTransform_.rotation_; return worldRotation; }           
 	Vector2& GetVel() { return vel_; }                                                                             
-	Vector2 GetDir() const { return lrDir_ == LRDir::kRight ? Vector2(1, 0) : Vector2(-1, 0); }                    
+	Vector2 GetDir() const { return lrDirection_ == DrawSprite::LRDirection::kRight ? Vector2(1, 0) : Vector2(-1, 0); }
 	Behavior& GetBehavior()  { return behavior_; }                                                                 
 	bool IsDead() const { return isDead_; }                                                                        
 	bool IsClear() const { return isClear; }                                                                       
@@ -150,7 +149,7 @@ private:
 
 	// --- 速度・向き ---
 	Vector2 vel_;                 // 移動速度
-	LRDir lrDir_ = LRDir::kRight; // 向き
+	DrawSprite::LRDirection lrDirection_ = DrawSprite::LRDirection::kRight;
 
 	// --- 定数 ---
 	static inline const float kPlayerSpeed = 1.0f;                  // プレイヤーの基本移動速度
