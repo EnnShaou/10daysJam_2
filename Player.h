@@ -72,8 +72,9 @@ public:
 	void Draw();
 
 	// --- 移動処理 ---
-	void Move();
-	void AstralMove();
+	void Move();                                                           // 通常移動
+	void AstralMove();                                                     // 幽体状態の移動
+	Vector2 InputMove(bool allowVertical, bool& moving, LRDir& direction); // 入力検知
 
 	// --- 衝突判定関連 ---
 	void MapCollision(CollisonMapInfo& info);            // マップ全体の衝突判定
@@ -118,18 +119,18 @@ public:
 	void Animation();
 
 	// --- ゲッター ---
-	Vector2 GetPos() const { Vector2 worldPos = worldTransform_.translation_; return worldPos; }
-	Vector2 GetTentativePos() const { Vector2 worldPos = tentativeWorldTransform_.translation_; return worldPos; }
-	Vector2 GetScale() const { Vector2 worldScale = worldTransform_.scale_; return worldScale; }
-	float getRotation() const { float worldRotation = worldTransform_.rotation_; return worldRotation; }
-	Vector2& GetVel() { return vel_; }
-	Vector2 GetDir() const { return lrDir_ == LRDir::kRight ? Vector2(1, 0) : Vector2(-1, 0); }
-	Behavior& GetBehavior()  { return behavior_; }
-	bool IsDead() const { return isDead_; }
-	bool IsClear() const { return isClear; }
-	Vector2 GetSize() const { return Vector2(kWidth, kHeight); }
-	bool IsAstral() const { return isAstral; }
-	const PlayerBulletManager& GetBullets() const { return playerBullets_; }
+	Vector2 GetPos() const { Vector2 worldPos = worldTransform_.translation_; return worldPos; }                   
+	Vector2 GetTentativePos() const { Vector2 worldPos = tentativeWorldTransform_.translation_; return worldPos; } 
+	Vector2 GetScale() const { Vector2 worldScale = worldTransform_.scale_; return worldScale; }                   
+	float getRotation() const { float worldRotation = worldTransform_.rotation_; return worldRotation; }           
+	Vector2& GetVel() { return vel_; }                                                                             
+	Vector2 GetDir() const { return lrDir_ == LRDir::kRight ? Vector2(1, 0) : Vector2(-1, 0); }                    
+	Behavior& GetBehavior()  { return behavior_; }                                                                 
+	bool IsDead() const { return isDead_; }                                                                        
+	bool IsClear() const { return isClear; }                                                                       
+	Vector2 GetSize() const { return Vector2(kWidth, kHeight); }                                                   
+	bool IsAstral() const { return isAstral; }                                                                     
+	const PlayerBulletManager& GetBullets() const { return playerBullets_; }                                       
 
 	// --- セッター ---
 	void SetMapChipField(MapChipField* mapChipField) { mapChipField_ = mapChipField; }
@@ -181,6 +182,8 @@ private:
 	float attackTimer = 0.0f;
 	const float kAttackTime = 0.5f;
 	const float frameTime = 1.0f / 60.0f;
+	int damageCooldown_ = 0;
+	const int damageCooldownMax = 30;
 
 	float legSpeed = 0.05f;
 

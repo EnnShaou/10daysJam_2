@@ -19,7 +19,7 @@ public:
     void PushEnemyMummy(Vector2 pos, Camera* camera, MapChipField* mapChipField);
 
     // 敵の更新処理（全ての敵に対してUpdateを呼ぶ）
-    void UpDate();
+    void Update();
 
     // 敵の描画処理（全ての敵に対してDrawを呼ぶ）
     void Draw();

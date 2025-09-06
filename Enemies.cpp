@@ -88,6 +88,10 @@ void Enemies::StopBehaviorInitialize() {
 	vel_ = { 0.0f, 0.0f };
 }
 
+void EnemyPumpkin::OnCollision()
+{
+}
+
 void EnemyPumpkin::InputGravity(const CollisonMapInfo& info)
 {
 	if (behavior_ == Behavior::kAstral)
@@ -434,7 +438,11 @@ void EnemyLamp::Draw()
 {
 	DrawCircle(wtf, camera_, int(lightRadius_), RED);
 	sprite->Draw(wtf, camera_, 0, 0, 64, 64);
-	
+
+}
+
+void EnemyLamp::OnCollision()
+{
 }
 
 /// <summary>
@@ -472,14 +480,20 @@ void EnemyBat::Initialize(Camera* camera, Vector2& pos, MapChipField* mapChipFie
 
 void EnemyBat::Update()
 {
+	if (isDead_)
+	{
+		return;
+	}
+
 	Vector2 playerPos;
 	// コウモリをプレイヤーの本体のみに動かす
 	if (player_->GetBehavior() == Player::Behavior::kAstral) {
 		playerPos = player_->GetTentativePos();
-	}	else {
+	}
+	else {
 		playerPos = player_->GetPos();
 	}
-	
+
 	//　プレイヤーが敵の攻撃範囲にいるかどうかを計算
 	Vector2 pumpkinPos = wtf.translation_;
 	Vector2 enemyToPlayer = { playerPos.x - pumpkinPos.x, playerPos.y - pumpkinPos.y };
@@ -515,7 +529,17 @@ void EnemyBat::Update()
 
 void EnemyBat::Draw()
 {
+	if (isDead_)
+	{
+		return;
+	}
+
 	sprite->Draw(wtf, camera_, 0, 0, 32, 32);
+}
+
+void EnemyBat::OnCollision()
+{
+	isDead_ = true;
 }
 
 /// <summary>
@@ -552,8 +576,21 @@ void EnemyMummy::Initialize(Camera* camera, Vector2& pos, MapChipField* mapChipF
 
 void EnemyMummy::Update()
 {
+	if (isStan)
+	{
+		vel_.x = 0.0f;
+		stanTimer += 1.0f / 60.0f;
+	}
+	else
+	{
+		vel_.x = +kSpeed.x;
+	}
 
-	vel_.x = +kSpeed.x;
+	if (stanTimer >= stanDuration)
+	{
+		isStan = false;
+		stanTimer = 0.0f;
+	}
 
 	// マップチップの当たり判定 (上下当たり判定なし)
 	CollisonMapInfo info;
@@ -562,14 +599,18 @@ void EnemyMummy::Update()
 	MapCollisionLeft(info);
 	MapWallCollision(info);
 
-	// 移動更新
-	wtf.translation_.x +=  info.vel.x;
+	wtf.translation_.x += info.vel.x;
 	wtf.Update();
 }
 
 void EnemyMummy::Draw()
 {
 	sprite->Draw(wtf, camera_, 0, 0, 128, 128);
+}
+
+void EnemyMummy::OnCollision()
+{
+	isStan = true;
 }
 
 void EnemyMummy::MapWallCollision(CollisonMapInfo& info)
@@ -606,15 +647,15 @@ void EnemyMummy::MapCollisionRight(CollisonMapInfo& info)
 		if (index.xIndex != indexSetNext.xIndex) {
 			auto rect = mapChipField_->GetRectByIndex(index.xIndex, index.yIndex);
 			info.vel.x = min(0.0f, rect.left - wtf.translation_.x + (kWidth / 2) + kBlank);
-			info.LR = true; 
+			info.LR = true;
 		}
 	}
 	// --- 右下にブロックがなかったら
 	else if (typeRB != MapChipType::kBlock) {
-		info.LR = true; 
+		info.LR = true;
 	}
 
-	
+
 }
 
 void EnemyMummy::MapCollisionLeft(CollisonMapInfo& info)
@@ -626,7 +667,7 @@ void EnemyMummy::MapCollisionLeft(CollisonMapInfo& info)
 	for (uint32_t i = 0; i < posNew.size(); ++i) {
 		posNew[i] = CornerPos(wtf.translation_ + info.vel, static_cast<Corner>(i));
 	}
-	
+
 	auto indexLT = mapChipField_->GetMapChipIndexByPosition(posNew[kLeftTop]);
 	auto indexLB = mapChipField_->GetMapChipIndexByPosition(posNew[kLeftBottom]);
 

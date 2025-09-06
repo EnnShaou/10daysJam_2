@@ -22,7 +22,7 @@ public:
 	sceneManage();
 	~sceneManage();
 	void Initialize();
-	void UpDate();
+	void Update();
 	void Draw();
 
 private:

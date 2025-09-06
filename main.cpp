@@ -1,14 +1,13 @@
 #include <Novice.h>
 #include"SceneManager.h"
 #include"keys.h"
-const char kWindowTitle[] = "GC1B_04_エン_シャオウ_";
+const char kWindowTitle[] = "6004_幽世の狐巫女";
 const int kWindowWidth = 1280;//画面の横幅
 const int kWindowHeight = 720;//画面の縦幅
 
-
 // Windowsアプリでのエントリーポイント(main関数)
-int WINAPI WinMain(HINSTANCE, HINSTANCE, LPSTR, int) {
-
+int WINAPI WinMain(HINSTANCE, HINSTANCE, LPSTR, int)
+{
 	// ライブラリの初期化
 	Novice::Initialize(kWindowTitle, kWindowWidth, kWindowHeight);
 
@@ -16,8 +15,10 @@ int WINAPI WinMain(HINSTANCE, HINSTANCE, LPSTR, int) {
 	char keys[256] = {0};
 	char preKeys[256] = {0};
 	Keys::Initialize(keys, preKeys);
+
 	sceneManage* gameManager = new sceneManage();
 	gameManager->Initialize();
+
 	// ウィンドウの×ボタンが押されるまでループ
 	while (Novice::ProcessMessage() == 0) {
 		// フレームの開始
@@ -30,8 +31,8 @@ int WINAPI WinMain(HINSTANCE, HINSTANCE, LPSTR, int) {
 		///
 		/// ↓更新処理ここから
 		///
-		gameManager->UpDate();
-
+		
+		gameManager->Update();
 
 		///
 		/// ↑更新処理ここまで
@@ -40,7 +41,9 @@ int WINAPI WinMain(HINSTANCE, HINSTANCE, LPSTR, int) {
 		///
 		/// ↓描画処理ここから
 		///
+		
 		gameManager->Draw();
+
 		///
 		/// ↑描画処理ここまで
 		///

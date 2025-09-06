@@ -9,8 +9,8 @@ Player::Player() : vel_(0, 0) {}
 
 Player::~Player() {}
 
-void Player::Initialize(Camera* camera, Vector2& pos) {
-
+void Player::Initialize(Camera* camera, Vector2& pos) 
+{
 	assert(camera);
 	camera_ = camera;
 	worldTransform_.Initialize();
@@ -24,11 +24,22 @@ void Player::Initialize(Camera* camera, Vector2& pos) {
 	dathSprite_->SetColor(BLACK);
 	astralBodyHP = maxAstralBodyHP;
 	nomalBodyHP = maxNomalBodyHP;
+	damageCooldown_ = 0;
 }
 
 void Player::Update()
 {
-	if (behaviorNext_ != Behavior::kUnknown) 
+	if (isDead_)
+	{
+		return;
+	}
+
+	if (damageCooldown_ > 0)
+	{
+		damageCooldown_--;
+	}
+
+	if (behaviorNext_ != Behavior::kUnknown)
 	{
 		behavior_ = behaviorNext_;
 		behaviorNext_ = Behavior::kUnknown;
@@ -83,8 +94,14 @@ void Player::Update()
 	worldTransform_.Update();
 }
 
-void Player::Draw() {
-	if (!isDead_ && behavior_ != Behavior::kAstral) 
+void Player::Draw()
+{
+	if (isDead_)
+	{
+		return;
+	}
+
+	if (!isDead_ && behavior_ != Behavior::kAstral)
 	{
 		playerSprite_->Draw(worldTransform_, camera_, (animationCount * 58) + (lrDir_ == LRDir::kRight ? 0 : 58), static_cast<int>(animationBehavior_) * 72 + 2, (lrDir_ == LRDir::kRight ? 1 : -1) * 58, 72); // プレイヤーを描画
 	}
@@ -95,6 +112,7 @@ void Player::Draw() {
 		astralBodySprite_->Draw(worldTransform_, camera_, 0, 0, 68, 72);
 	}
 
+	// 弾の描画
 	playerBullets_.Draw();
 
 	Novice::ScreenPrintf(30, 50, "behavior_: %d", behavior_);
@@ -104,55 +122,29 @@ void Player::Draw() {
 	Novice::ScreenPrintf(30, 130, "AstralbehaviorNext_: %d", AstralbehaviorNext_);
 	Novice::ScreenPrintf(30, 150, "astralBodyTimer: %f", astralBodyTimer_);
 }
-void Player::Move() {
-	if (isDead_) {
+void Player::Move()
+{
+	if (isDead_) 
+	{
 		return;
 	}
-	if (Keys::IsPress(DIK_D) || Keys::IsPress(DIK_A) || Keys::IsPress(DIK_RIGHT) || Keys::IsPress(DIK_LEFT))
+
+	Vector2 acc = InputMove(false, isMove, lrDir_);
+
+	if (isMove)
 	{
-		Vector2 acc = Vector2();
-		isMove = true;
-
-		if (Keys::IsPress(DIK_D) || Keys::IsPress(DIK_RIGHT))
-		{
-			if (vel_.x < 0.0f)
-			{
-				vel_.x = 0.0f;
-			}
-
-			if (lrDir_ != kRight)
-			{
-				lrDir_ = kRight;
-			}
-
-			acc.x += kPlayerSpeed;
-		}
-
-		if (Keys::IsPress(DIK_A) || Keys::IsPress(DIK_LEFT))
-		{
-			if (vel_.x > 0.0f)
-			{
-				vel_.x = 0.0f;
-			}
-
-			if (lrDir_ != kLeft)
-			{
-				lrDir_ = kLeft;
-			}
-
-			acc.x -= kPlayerSpeed;
-		}
-
 		vel_ += acc;
 		vel_.x = std::clamp(vel_.x, -kPlayerSpeedMax, kPlayerSpeedMax);
 	}
-	else {
-		isMove = false;
-		vel_.x = 0;
+	else 
+	{
+		vel_.x = 0.0f;
 	}
 
-	if (onGround) {
-		if (Keys::IsTrigger(DIK_SPACE)) {
+	if (onGround) 
+	{
+		if (Keys::IsTrigger(DIK_SPACE)) 
+		{
 			vel_.y = kJumpAcceleration; // ジャンプの加速度を設定
 		}
 	}
@@ -160,76 +152,18 @@ void Player::Move() {
 
 void Player::AstralMove()
 {
-	if (Keys::IsPress(DIK_D) || Keys::IsPress(DIK_A) || Keys::IsPress(DIK_W) || Keys::IsPress(DIK_S) || 
-		Keys::IsPress(DIK_RIGHT) || Keys::IsPress(DIK_LEFT) || Keys::IsPress(DIK_UP) || Keys::IsPress(DIK_DOWN))
+	Vector2 acc = InputMove(true, isMove, lrDir_);
+	if (isMove)
 	{
-		Vector2 acc = Vector2();
-		isMove = true;
-
-		if (Keys::IsPress(DIK_D) || Keys::IsPress(DIK_RIGHT))
-		{
-			if (vel_.x < 0.0f)
-			{
-				vel_.x = 0.0f;
-			}
-
-			if (lrDir_ != kRight)
-			{
-				lrDir_ = kRight;
-			}
-
-			acc.x += kPlayerSpeed;
-		}
-
-		if (Keys::IsPress(DIK_A) || Keys::IsPress(DIK_LEFT))
-		{
-			if (vel_.x > 0.0f)
-			{
-				vel_.x = 0.0f;
-			}
-
-			if (lrDir_ != kLeft) 
-			{
-				lrDir_ = kLeft;
-			}
-
-			acc.x -= kPlayerSpeed;
-		}
-
-		if (Keys::IsPress(DIK_W) || Keys::IsPress(DIK_UP))
-		{
-			if (vel_.y < 0.0f)
-			{
-				vel_.y = 0.0f;
-			}
-
-			acc.y += kPlayerSpeed;
-		}
-
-		if (Keys::IsPress(DIK_S) || Keys::IsPress(DIK_DOWN))
-		{
-			if (vel_.y > 0.0f)
-			{
-				vel_.y = 0.0f;
-			}
-
-			acc.y -= kPlayerSpeed;
-		}
-
-		// 加速度を加える
 		vel_ += acc;
-
-		// 最大速度を制限
 		vel_.x = std::clamp(vel_.x, -kPlayerSpeedMax, kPlayerSpeedMax);
 		vel_.y = std::clamp(vel_.y, -kPlayerSpeedMax, kPlayerSpeedMax);
-		
-		// 移動
+
 		worldTransform_.translation_ += vel_;
 	}
-	else
+	else 
 	{
-		isMove = false;
-		vel_ = Vector2(0, 0);
+		vel_ = Vector2(0.0f, 0.0f);
 	}
 
 	// マップ端と本体からの距離制限
@@ -254,6 +188,72 @@ void Player::AstralMove()
 		tentativeWorldTransform_.translation_.y + kAstralBodyMaxDistance_);
 }
 
+Vector2 Player::InputMove(bool allowVertical, bool& moving, LRDir& direction)
+{
+	Vector2 acc{ 0.0f, 0.0f };
+	moving = false;
+
+	if (Keys::IsPress(DIK_D) || Keys::IsPress(DIK_RIGHT)) 
+	{
+		if (vel_.x < 0.0f)
+		{
+			vel_.x = 0.0f;
+		}
+		if (direction != kRight)
+		{
+			direction = kRight;
+		}
+		acc.x += kPlayerSpeed;
+		moving = true;
+	}
+
+	if (Keys::IsPress(DIK_A) || Keys::IsPress(DIK_LEFT)) 
+	{
+		if (vel_.x > 0.0f)
+		{
+			vel_.x = 0.0f;
+		}
+		if (direction != kLeft)
+		{
+			direction = kLeft;
+		}
+		acc.x -= kPlayerSpeed;
+		moving = true;
+	}
+
+	if (allowVertical) 
+	{
+		if (Keys::IsPress(DIK_W) || Keys::IsPress(DIK_UP)) 
+		{
+			if (vel_.y < 0.0f)
+			{
+				vel_.y = 0.0f;
+			}
+			acc.y += kPlayerSpeed;
+			moving = true;
+		}
+
+		if (Keys::IsPress(DIK_S) || Keys::IsPress(DIK_DOWN)) 
+		{
+			if (vel_.y > 0.0f)
+			{
+				vel_.y = 0.0f;
+			}
+			acc.y -= kPlayerSpeed;
+			moving = true;
+		}
+	}
+
+	// 斜め移動の速度を調整
+	if (moving) 
+	{
+		acc = acc.normalize();
+		acc.x *= kPlayerSpeed;
+		acc.y *= kPlayerSpeed;
+	}
+
+	return acc;
+}
 
 void Player::MapCollision(CollisonMapInfo& info) {
 	MapCollisionTop(info);
@@ -286,7 +286,7 @@ void Player::MapCollisionTop(CollisonMapInfo& info) {
 				info.Top = true;
 				break;
 			}
-			
+
 		}
 	}
 }
@@ -312,7 +312,7 @@ void Player::MapCollisionBottom(CollisonMapInfo& info) {
 				info.Bottom = true;
 				break;
 			}
-		
+
 		}
 	}
 }
@@ -341,7 +341,7 @@ void Player::MapCollisionLeft(CollisonMapInfo& info) {
 				break;
 			}
 		}
-		
+
 	}
 }
 void Player::MapCollisionRight(CollisonMapInfo& info) {
@@ -369,7 +369,7 @@ void Player::MapCollisionRight(CollisonMapInfo& info) {
 				break;
 			}
 		}
-		
+
 	}
 }
 Vector2 Player::CornerPos(const Vector2 center, Corner corner) {
@@ -382,9 +382,9 @@ Vector2 Player::CornerPos(const Vector2 center, Corner corner) {
 	};
 	return (center + offsetTable[static_cast<uint32_t>(corner)]);
 }
-void Player::MapCollisionMove(const CollisonMapInfo& info) 
+void Player::MapCollisionMove(const CollisonMapInfo& info)
 {
-	worldTransform_.translation_ += info.vel; 
+	worldTransform_.translation_ += info.vel;
 }
 void Player::MapAfterCollision(const CollisonMapInfo& info) {
 
@@ -408,7 +408,7 @@ void Player::GroundStates(const CollisonMapInfo& info) {
 			for (auto corner : checkCorners) {
 				auto index = mapChipField_->GetMapChipIndexByPosition(posNew[corner] + Vector2(0.f, -(kBlank + 1.f)));
 				auto type = mapChipField_->GetMapChipTypeIndex(index.xIndex, index.yIndex);
-				if (type == MapChipType::kBlock ) {
+				if (type == MapChipType::kBlock) {
 					isHit = true;
 					break;
 				}
@@ -443,25 +443,29 @@ void Player::MapWallCollision(CollisonMapInfo& info) {
 //	aabb.max = Vector3(center.x + kWidth / 2 - kBlank, center.y + kHeight / 2 - kBlank, center.z);
 //	return aabb;
 //}
-void Player::OnCollisionNomal(const Enemies* enemies) {
-	(void)enemies; // プレイヤーとの衝突処理はまだ実装されていない
-	// float enemyPosX = enemies->GetPos().x;
-	/*float attackPosX = 0.2f;
-	float attackPosY = 0.1f;*/
-	// if (enemyPosX - GetPos().x > 0) {
-	//	attackPosX = -attackPosX; // 敵が左側にいる場合は攻撃位置を反転
-	// }
-	// Vector3 collisionPos = {attackPosX, attackPosY, 0.f};
-	// vel_ += collisionPos;
-	// if (vel_.x == 0.f && vel_.y == 0.f) {
-	//
-	// }
+void Player::OnCollisionNomal(const Enemies* enemies) 
+{
+	(void)enemies; 
+
+	// ダメージ無敵時間中はダメージを受けない
+	if (damageCooldown_ > 0)
+	{
+		return;
+	}
+
+	// ダメージ処理
 	nomalBodyHP--;
-	if(nomalBodyHP <= 0) 
+
+	// ダメージ無敵時間をリセット
+	damageCooldown_ = damageCooldownMax;
+
+	// HPが0以下になったら死亡フラグを立てる
+	if (nomalBodyHP <= 0) 
 	{
 		isDead_ = true;
 	}
 }
+
 void Player::OnCollisionAstral(const Enemies* enemies)
 {
 	(void)enemies;
@@ -496,7 +500,9 @@ void Player::BehaviorRootUpdate()
 	}
 
 	Move();
-	if (Keys::IsTrigger(DIK_SPACE) && !onGround) {
+
+	if (Keys::IsTrigger(DIK_SPACE) && !onGround)
+	{
 		behaviorNext_ = Behavior::kAttack; // 攻撃行動に切り替え
 	}
 }
@@ -506,11 +512,9 @@ void Player::BehaviorAttackInitialize()
 
 }
 
-void Player::BehaviorAttackUpdate() {
-
-
+void Player::BehaviorAttackUpdate() 
+{
 	behaviorNext_ = Behavior::kRoot; // 攻撃行動が終了したらルートに戻る
-
 }
 
 void Player::BehaviorAstralInitialize()
@@ -524,13 +528,13 @@ void Player::BehaviorAstralInitialize()
 
 void Player::BehaviorAstralUpdate()
 {
-	if (AstralbehaviorNext_ != AstralBehavior::kUnknown) 
+	if (AstralbehaviorNext_ != AstralBehavior::kUnknown)
 	{
 		Astralbehavior_ = AstralbehaviorNext_;
 		AstralbehaviorNext_ = AstralBehavior::kUnknown;
 
 		// 初期化処理
-		switch (Astralbehavior_) 
+		switch (Astralbehavior_)
 		{
 		case AstralBehavior::kRoot:
 			AstralBodyBehaviorRootInitialize();
@@ -544,7 +548,7 @@ void Player::BehaviorAstralUpdate()
 	}
 
 	// 行動ごとの更新処理
-	switch (Astralbehavior_) 
+	switch (Astralbehavior_)
 	{
 	case AstralBehavior::kRoot:
 		AstralBodyBehaviorRootUpdate();
@@ -599,13 +603,13 @@ void Player::AstralBodyBehaviorRootUpdate()
 	attackTimer -= frameTime;
 
 	// クールタイムが0未満にならないように制限
-	if(attackTimer < 0.0f)
+	if (attackTimer < 0.0f)
 	{
 		attackTimer = 0.0f;
 	}
 
 	// 弾発射
-	if(Keys::IsPress(DIK_SPACE) && attackTimer <= 0)
+	if (Keys::IsPress(DIK_SPACE) && attackTimer <= 0)
 	{
 		attackTimer = kAttackTime; // クールタイムリセット
 		AstralbehaviorNext_ = AstralBehavior::kAttack;
@@ -625,7 +629,7 @@ void Player::AstralBodyBehaviorAttackUpdate()
 	currentBullets_++;
 
 	// 最大数以下なら弾を発射
-	if(currentBullets_ <= maxBullets_)
+	if (currentBullets_ <= maxBullets_)
 	{
 		// 弾の速度
 		Vector2 dir = { lrDir_ == LRDir::kRight ? 1.0f : -1.0f , 0.0f };
@@ -641,9 +645,9 @@ void Player::AstralBodyBehaviorAttackUpdate()
 	AstralbehaviorNext_ = AstralBehavior::kRoot;
 }
 
-void Player::Animation() 
+void Player::Animation()
 {
-	if (animationBehaviorNext_ != AnimationBehavior::kUnknown) 
+	if (animationBehaviorNext_ != AnimationBehavior::kUnknown)
 	{
 		animationBehavior_ = animationBehaviorNext_;
 		animationBehaviorNext_ = AnimationBehavior::kUnknown;
