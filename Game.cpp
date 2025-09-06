@@ -1,6 +1,8 @@
 #include "Game.h"
 #include "ImGui.h"
 #include"keys.h"
+#include "Collision.h"
+#include "PlayerBulletManager.h"
 
 Game::Game() : mapChipField_(), camera_() {
 
@@ -165,9 +167,144 @@ void Game::GenerateBlocks() {
 
 }
 
-void Game::CheckAllCollisions() {
-#pragma region "playerとenemiesの当たり判定"
-	
+void Game::CheckAllCollisions()
+{
+	// プレイヤーの情報を取得
+	Rect playerRect = { player_->GetPos().x,player_->GetPos().y,player_->GetSize().x,player_->GetSize().y };
+
+#pragma region "playerとpumpkinの当たり判定"
+	for (const auto& enemy : enemyManager.GetEnemies())
+	{
+		if (EnemyPumpkin* pumpkin = dynamic_cast<EnemyPumpkin*>(enemy))
+		{
+			// 敵の情報を取得
+			Rect enemyRect = { pumpkin->GetPos().x, pumpkin->GetPos().y, pumpkin->GetSize().x, pumpkin->GetSize().y };
+
+			// 当たり判定のチェック
+			if (playerRect.IsCollision(enemyRect) && player_->IsAstral())
+			{
+				Novice::ScreenPrintf(30, 180, "HitPumpkin!)");
+				player_->OnCollisionAstral(enemy);
+			}
+			else if (playerRect.IsCollision(enemyRect) && !player_->IsAstral())
+			{
+				Novice::ScreenPrintf(30, 180, "HitPumpkin!)");
+				player_->OnCollisionNomal(enemy);
+			}
+		}
+	}
+#pragma endregion
+
+#pragma region "playerとLampの当たり判定"
+	for (const auto& enemy : enemyManager.GetEnemies())
+	{
+		if (EnemyLamp* lamp = dynamic_cast<EnemyLamp*>(enemy))
+		{
+			// 敵の情報を取得
+			Rect enemyRect = { lamp->GetPos().x, lamp->GetPos().y, lamp->GetSize().x, lamp->GetSize().y };
+
+			// 当たり判定のチェック
+			if (playerRect.IsCollision(enemyRect) && player_->IsAstral())
+			{
+				Novice::ScreenPrintf(30, 200, "HitLamp!)");
+				player_->OnCollisionAstral(enemy);
+			}
+		}
+	}
+#pragma endregion
+
+#pragma region "playerとbatの当たり判定"
+	for (const auto& enemy : enemyManager.GetEnemies())
+	{
+		if (EnemyBat* bat = dynamic_cast<EnemyBat*>(enemy))
+		{
+			// 敵の情報を取得
+			Rect enemyRect = { bat->GetPos().x, bat->GetPos().y, bat->GetSize().x, bat->GetSize().y };
+
+			// 当たり判定のチェック
+			if (playerRect.IsCollision(enemyRect) && !player_->IsAstral())
+			{
+				Novice::ScreenPrintf(30, 220, "HitBat!)");
+				player_->OnCollisionNomal(enemy);
+			}
+		}
+	}
+#pragma endregion
+
+#pragma region "playerの弾とbatの当たり判定"
+	for (const auto& enemy : enemyManager.GetEnemies())
+	{
+		if (EnemyBat* bat = dynamic_cast<EnemyBat*>(enemy))
+		{
+			// 敵の情報を取得
+			Rect enemyRect = { bat->GetPos().x, bat->GetPos().y, bat->GetSize().x, bat->GetSize().y };
+
+			// 当たり判定のチェック
+			for (const auto& bullet : player_->GetBullets().GetPlayerBullets())
+			{
+				// 弾が存在しない場合はスキップ
+				if (!bullet)
+				{
+					continue;
+				}
+
+				// 弾の情報を取得
+				Rect bulletRect = { bullet->GetPos().x, bullet->GetPos().y, bullet->GetSize().x, bullet->GetSize().y };
+
+				if (bulletRect.IsCollision(enemyRect))
+				{
+					Novice::ScreenPrintf(30, 240, "HitBatBullet!)");
+				}
+			}
+		}
+	}
+#pragma endregion
+
+#pragma region "playerとmummyの当たり判定"
+	for (const auto& enemy : enemyManager.GetEnemies())
+	{
+		if (EnemyMummy* mummy = dynamic_cast<EnemyMummy*>(enemy))
+		{
+			// 敵の情報を取得
+			Rect enemyRect = { mummy->GetPos().x, mummy->GetPos().y, mummy->GetSize().x, mummy->GetSize().y };
+
+			// 当たり判定のチェック
+			if (playerRect.IsCollision(enemyRect) && !player_->IsAstral())
+			{
+				Novice::ScreenPrintf(30, 220, "HitMummy!)");
+				player_->OnCollisionNomal(enemy);
+			}
+		}
+	}
+#pragma endregion
+
+#pragma region "playerの弾とmummyの当たり判定"
+	for (const auto& enemy : enemyManager.GetEnemies())
+	{
+		if (EnemyMummy* mummy = dynamic_cast<EnemyMummy*>(enemy))
+		{
+			// 敵の情報を取得
+			Rect enemyRect = { mummy->GetPos().x, mummy->GetPos().y, mummy->GetSize().x, mummy->GetSize().y };
+
+			// 当たり判定のチェック
+			for (const auto& bullet : player_->GetBullets().GetPlayerBullets())
+			{
+				// 弾が存在しない場合はスキップ
+				if (!bullet)
+				{
+					continue;
+				}
+
+				// 弾の情報を取得
+				Rect bulletRect = { bullet->GetPos().x, bullet->GetPos().y, bullet->GetSize().x, bullet->GetSize().y };
+
+				if (bulletRect.IsCollision(enemyRect))
+				{
+					Novice::ScreenPrintf(30, 240, "HitMummyBullet!)");
+				}
+			}
+		}
+	}
 #pragma endregion
 }
 

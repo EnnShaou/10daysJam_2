@@ -90,7 +90,9 @@ public:
 	Vector2 CornerPos(const Vector2 center, Corner corner);
 
 	// --- 敵との衝突判定 ---
-	void OnCollision(const Enemies* enemies);
+	void OnCollisionNomal(const Enemies* enemies);
+
+	void OnCollisionAstral(const Enemies* enemies);
 
 	// --- 行動パターン初期化・更新 ---
 	void BehaviorRootInitialize();
@@ -125,6 +127,9 @@ public:
 	Behavior& GetBehavior()  { return behavior_; }
 	bool IsDead() const { return isDead_; }
 	bool IsClear() const { return isClear; }
+	Vector2 GetSize() const { return Vector2(kWidth, kHeight); }
+	bool IsAstral() const { return isAstral; }
+	const PlayerBulletManager& GetBullets() const { return playerBullets_; }
 
 	// --- セッター ---
 	void SetMapChipField(MapChipField* mapChipField) { mapChipField_ = mapChipField; }
@@ -160,6 +165,7 @@ private:
 	bool isDead_ = false;   // 死亡状態
 	bool isMove = false;    // 移動中かどうか
 	bool isClear = false;   // ステージクリアしたかどうか
+	bool isAstral = false;  // 幽体状態かどうか
 
 	// --- マップ ---
 	MapChipField* mapChipField_ = nullptr; // マップフィールドポインタ
@@ -189,8 +195,10 @@ private:
 	float coolTime_ = 3.0f;                  // 幽体状態になるまでのクールタイム
 
 	// --- 体力 ---
-	const float nomalBodyHP = 3.0f;  // 通常状態の体力
-	const float astralBodyHP = 1.0f; // 幽体状態の体力
+	static inline const int maxNomalBodyHP = 3;  // 通常状態の最大体力
+	static inline const int maxAstralBodyHP = 1; // 幽体状態の最大体力
+	int nomalBodyHP = maxNomalBodyHP;            // 通常状態の体力
+	int astralBodyHP = maxAstralBodyHP;          // 幽体状態の体力
 
 	// --- アニメーション ---
 	AnimationBehavior animationBehavior_ = AnimationBehavior::kRoot;

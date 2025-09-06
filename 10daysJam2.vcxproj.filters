@@ -207,6 +207,9 @@
       <Filter>include</Filter>
     </ClInclude>
     <ClInclude Include="PlayerBulletManager.h" />
+    <ClInclude Include="Collision.h">
+      <Filter>Tool</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <None Include=".editorconfig" />

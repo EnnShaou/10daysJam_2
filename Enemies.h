@@ -41,6 +41,12 @@ public:
 	// 描画処理
 	virtual void Draw() = 0;
 
+	// ワールドトランスフォームのゲッター
+	virtual Vector2 GetPos() const { Vector2 worldPos = wtf.translation_; return worldPos; }
+
+	// サイズのゲッター
+	virtual Vector2 GetSize() const = 0;
+
 	// --- 衝突判定関連 ---
 	void MapCollision(CollisonMapInfo& info);   // マップ全体との衝突判定
 
@@ -137,14 +143,15 @@ public:
 	// 描画処理
 	void Draw() override;
 
-	Vector2 GetPos() { return wtf.translation_; }
-
+	// サイズのゲッター
+	Vector2 GetSize() const override { return Vector2(kPumpkinWidth, kPumpkinHeight); }
 
 private:
 	// ここにかぼちゃ敵固有の変数や処理を追加できる
 	void InputGravity(const CollisonMapInfo& info)override;
 
 	void Animation() override;
+=
 };
 
 
@@ -164,11 +171,16 @@ public:
 	// 描画処理
 	void Draw() override;
 
-	Vector2 GetPos() { return wtf.translation_; }
+	// サイズのゲッター
+	Vector2 GetSize() const override { return Vector2(kLampWidth, kLampHeight); }
 
 private:
 
 	float lightRadius_ = 280.0f;
+
+	// サイズ
+	float kLampWidth = 60.0f;
+	float kLampHeight = 60.0f;
 };
 
 // ------------------ コウモリ（派生） ------------------
@@ -186,6 +198,8 @@ public:
 	// 描画処理
 	void Draw() override;
 
+	// サイズのゲッター
+	Vector2 GetSize() const override { return Vector2(kBatWidth, kBatHeight); }
 private:
 
 	// コウモリの行動
@@ -227,12 +241,15 @@ public:
 	// 描画処理
 	void Draw() override;
 
+	// サイズのゲッター
+	Vector2 GetSize() const override { return Vector2(kMummyWidth, kMummyHeight); }
 
 
 private:
 	void MapWallCollision(CollisonMapInfo& info) override;        // 壁との衝突判定
 	void MapCollisionRight(CollisonMapInfo& info) override;
 	void MapCollisionLeft(CollisonMapInfo& info) override;
+
 
 	// --- アニメーションの行動パターン ---
 	enum class AnimationBehavior
@@ -246,5 +263,4 @@ private:
 
 	void Animation() override;
 
-	
 };

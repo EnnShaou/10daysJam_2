@@ -5,7 +5,6 @@
 #include "keys.h"
 #include <array>
 
-
 Player::Player() : vel_(0, 0) {}
 
 Player::~Player() {}
@@ -23,6 +22,8 @@ void Player::Initialize(Camera* camera, Vector2& pos) {
 	astralBodySprite_->SetColor(BLUE);
 	dathSprite_ = new DrawSprite(Novice::LoadTexture("white1x1.png"), { 68,72 });
 	dathSprite_->SetColor(BLACK);
+	astralBodyHP = maxAstralBodyHP;
+	nomalBodyHP = maxNomalBodyHP;
 }
 
 void Player::Update()
@@ -107,28 +108,41 @@ void Player::Move() {
 	if (isDead_) {
 		return;
 	}
-	if (Keys::IsPress(DIK_D) || Keys::IsPress(DIK_A)) {
+	if (Keys::IsPress(DIK_D) || Keys::IsPress(DIK_A) || Keys::IsPress(DIK_RIGHT) || Keys::IsPress(DIK_LEFT))
+	{
 		Vector2 acc = Vector2();
 		isMove = true;
-		if (Keys::IsPress(DIK_D)) {
-			if (vel_.x < 0.0f) {
-				vel_.x = kPlayerSpeed;
+
+		if (Keys::IsPress(DIK_D) || Keys::IsPress(DIK_RIGHT))
+		{
+			if (vel_.x < 0.0f)
+			{
+				vel_.x = 0.0f;
 			}
-			if (lrDir_ != kRight) {
+
+			if (lrDir_ != kRight)
+			{
 				lrDir_ = kRight;
 			}
+
 			acc.x += kPlayerSpeed;
 		}
-		else if (Keys::IsPress(DIK_A)) {
-			if (vel_.x > 0.0f) {
-				vel_.x = kPlayerSpeed;
+
+		if (Keys::IsPress(DIK_A) || Keys::IsPress(DIK_LEFT))
+		{
+			if (vel_.x > 0.0f)
+			{
+				vel_.x = 0.0f;
 			}
-			if (lrDir_ != kLeft) {
+
+			if (lrDir_ != kLeft)
+			{
 				lrDir_ = kLeft;
 			}
 
 			acc.x -= kPlayerSpeed;
 		}
+
 		vel_ += acc;
 		vel_.x = std::clamp(vel_.x, -kPlayerSpeedMax, kPlayerSpeedMax);
 	}
@@ -146,12 +160,13 @@ void Player::Move() {
 
 void Player::AstralMove()
 {
-	if (Keys::IsPress(DIK_D) || Keys::IsPress(DIK_A) || Keys::IsPress(DIK_W) || Keys::IsPress(DIK_S))
+	if (Keys::IsPress(DIK_D) || Keys::IsPress(DIK_A) || Keys::IsPress(DIK_W) || Keys::IsPress(DIK_S) || 
+		Keys::IsPress(DIK_RIGHT) || Keys::IsPress(DIK_LEFT) || Keys::IsPress(DIK_UP) || Keys::IsPress(DIK_DOWN))
 	{
 		Vector2 acc = Vector2();
 		isMove = true;
 
-		if (Keys::IsPress(DIK_D)) 
+		if (Keys::IsPress(DIK_D) || Keys::IsPress(DIK_RIGHT))
 		{
 			if (vel_.x < 0.0f)
 			{
@@ -166,7 +181,7 @@ void Player::AstralMove()
 			acc.x += kPlayerSpeed;
 		}
 
-		if (Keys::IsPress(DIK_A)) 
+		if (Keys::IsPress(DIK_A) || Keys::IsPress(DIK_LEFT))
 		{
 			if (vel_.x > 0.0f)
 			{
@@ -181,7 +196,7 @@ void Player::AstralMove()
 			acc.x -= kPlayerSpeed;
 		}
 
-		if (Keys::IsPress(DIK_W))
+		if (Keys::IsPress(DIK_W) || Keys::IsPress(DIK_UP))
 		{
 			if (vel_.y < 0.0f)
 			{
@@ -191,7 +206,7 @@ void Player::AstralMove()
 			acc.y += kPlayerSpeed;
 		}
 
-		if (Keys::IsPress(DIK_S))
+		if (Keys::IsPress(DIK_S) || Keys::IsPress(DIK_DOWN))
 		{
 			if (vel_.y > 0.0f)
 			{
@@ -428,7 +443,7 @@ void Player::MapWallCollision(CollisonMapInfo& info) {
 //	aabb.max = Vector3(center.x + kWidth / 2 - kBlank, center.y + kHeight / 2 - kBlank, center.z);
 //	return aabb;
 //}
-void Player::OnCollision(const Enemies* enemies) {
+void Player::OnCollisionNomal(const Enemies* enemies) {
 	(void)enemies; // プレイヤーとの衝突処理はまだ実装されていない
 	// float enemyPosX = enemies->GetPos().x;
 	/*float attackPosX = 0.2f;
@@ -441,15 +456,31 @@ void Player::OnCollision(const Enemies* enemies) {
 	// if (vel_.x == 0.f && vel_.y == 0.f) {
 	//
 	// }
-	isDead_ = true; // プレイヤーが死亡
+	nomalBodyHP--;
+	if(nomalBodyHP <= 0) 
+	{
+		isDead_ = true;
+	}
 }
+void Player::OnCollisionAstral(const Enemies* enemies)
+{
+	(void)enemies;
+	astralBodyHP--;
+	if (astralBodyHP <= 0)
+	{
+		behaviorNext_ = Behavior::kRoot;
+		worldTransform_ = tentativeWorldTransform_;
+	}
+}
+
 void Player::BehaviorRootInitialize()
 {
 	{
 		behavior_ = Behavior::kRoot;
 		vel_ = Vector2(0, 0);
 		worldTransform_.scale_ = Vector2(1.0f, 1.0f);
-
+		isAstral = false;
+		astralBodyHP = maxAstralBodyHP;
 	}
 }
 void Player::BehaviorRootUpdate()
@@ -488,6 +519,7 @@ void Player::BehaviorAstralInitialize()
 	astralBodyTimer_ = 0.0f;
 	behavior_ = Behavior::kAstral;
 	currentBullets_ = 0;
+	isAstral = true;
 }
 
 void Player::BehaviorAstralUpdate()

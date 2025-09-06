@@ -9,7 +9,9 @@
 #include"DrawFunc.h"
 #include"Camera.h"
 #include "EnemyManager.h"
-class Game : public IScene {
+
+class Game : public IScene 
+{
 public:
 	Game();
 	~Game() override;
@@ -40,6 +42,5 @@ private:
 	EnemyManager enemyManager;
 	Phase phase_ = Phase::FadeIn;                             // ゲームのフェーズ
 	Fade* fade_ = nullptr;                       // フェードイン・フェードアウト用のオブジェクト
-
 };
 
