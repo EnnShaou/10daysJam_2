@@ -8,33 +8,6 @@ Enemies::~Enemies()
 {
 }
 
-EnemyPumpkin::EnemyPumpkin()
-{
-
-}
-
-EnemyPumpkin::~EnemyPumpkin()
-{
-	delete sprite;
-	sprite = nullptr;
-
-	delete camera_;
-	camera_ = nullptr;
-}
-
-void EnemyPumpkin::Initialize(Camera* camera, Vector2& pos, MapChipField* mapChipField)
-{
-	sprite = new DrawSprite(Novice::LoadTexture("white1x1.png"), { 64,64 });
-	sprite->SetColor(0xff7d00ff);
-	camera_ = camera;
-	wtf.Initialize();
-	wtf.translation_ = pos;
-	mapChipField_ = mapChipField;
-
-	kSpeed = { 2.0f, 2.0f };  //かぼちゃの速さ
-	kAtkRange = 240.0f;         //プレイヤーがこの範囲にいると動く
-}
-
 void Enemies::AstralBehavior() {
 	//　プレイヤーが敵の攻撃範囲にいるかどうかを計算
 	Vector2 playerPos = player_->GetPos();
@@ -88,8 +61,10 @@ void Enemies::StopBehaviorInitialize() {
 	vel_ = { 0.0f, 0.0f };
 }
 
+
 void EnemyPumpkin::OnCollision()
 {
+  
 }
 
 void EnemyPumpkin::InputGravity(const CollisonMapInfo& info)
@@ -165,7 +140,9 @@ void EnemyPumpkin::Draw()
 {
 	sprite->Draw(wtf, camera_, 0, 0, 64, 64);
 }
+void Enemies::Animation() {
 
+}
 
 
 ///////////////////////////////////////////////////////////////////////////////
@@ -372,6 +349,149 @@ void Enemies::InputGravity(const CollisonMapInfo& info)
 }
 
 /// <summary>
+/// Enemy Pumpkin
+/// </summary>
+EnemyPumpkin::EnemyPumpkin()
+{
+
+}
+
+EnemyPumpkin::~EnemyPumpkin()
+{
+	delete sprite;
+	sprite = nullptr;
+
+	delete camera_;
+	camera_ = nullptr;
+}
+
+void EnemyPumpkin::Initialize(Camera* camera, Vector2& pos, MapChipField* mapChipField)
+{
+	sprite = new DrawSprite(Novice::LoadTexture("./Resources/Enemies/pumpkin.png"), { 64,64 });
+	sprite->SetColor(0xffffffff);
+	camera_ = camera;
+	wtf.Initialize();
+	wtf.translation_ = pos;
+	mapChipField_ = mapChipField;
+
+	kSpeed = { 2.0f, 2.0f };  //かぼちゃの速さ
+	kAtkRange = 240.0f;         //プレイヤーがこの範囲にいると動く
+
+	kWidth = 60;              // 当たり判定の幅
+	kHeight = 30;             // 当たり判定の高さ
+
+	// アニメーション用の幅と縦サイズ
+	imageWidth_ = 64;
+	imageHeight_ = 64;
+}
+
+void EnemyPumpkin::InputGravity(const CollisonMapInfo& info)
+{
+	if (behavior_ == Behavior::kAstral)
+	{
+		return;
+	}
+	if (onGround)
+	{
+		return;
+	}
+	float Gravity = kGravity;
+	vel_ += Vector2(0, -Gravity);
+	vel_.y = max(vel_.y, -kLimitFallSpeed);
+	if (info.Bottom) {
+
+		onGround = true;
+		vel_.y = 0.0f;
+	}
+}
+
+void EnemyPumpkin::Animation() {
+
+	animationTimer_++;
+	switch (behavior_) {
+	case Behavior::kStop:
+		animePosY_ = imageHeight_;
+		animePosX_ = 0;
+		animationMax_ = 1;
+
+		break;
+	case Behavior::kAstral:
+
+		animePosY_ = 0;
+		animationMax_ = 4;
+		if (animationTimer_ % 12 == 0) {
+			animePosX_ += imageWidth_;
+
+		}
+		if (animePosX_ >= imageWidth_ * animationMax_) {
+			animePosX_ = 0;
+		}
+
+		break;
+	default:
+		break;
+
+	}
+
+
+}
+
+void EnemyPumpkin::Update() {
+
+
+	if (behaviorNext_ != Behavior::kUnknown) {
+		behavior_ = behaviorNext_;
+		behaviorNext_ = Behavior::kUnknown;
+
+		// 初期化処理
+		switch (behavior_) {
+		case Behavior::kStop:
+			StopBehaviorInitialize();
+			break;
+		case Behavior::kAstral:
+			AstralBehaviorInitialize();
+			break;
+		default:
+			break;
+		}
+	}
+
+	switch (behavior_) {
+	case Behavior::kStop:
+		StopBehavior();
+		break;
+	case Behavior::kAstral:
+		AstralBehavior();
+		break;
+	default:
+		break;
+	}
+
+
+
+	// マップチップの当たり判定
+	CollisonMapInfo info;
+	info.vel = vel_;
+	MapCollision(info);
+	MapAfterCollision(info);
+	MapWallCollision(info);
+	GroundStates(info);
+	InputGravity(info);
+
+	Animation();
+
+	// 移動更新
+	wtf.translation_ += info.vel;
+
+	wtf.Update();
+}
+
+void EnemyPumpkin::Draw()
+{
+	sprite->Draw(wtf, camera_, animePosX_, animePosY_, imageWidth_, imageHeight_);
+}
+
+/// <summary>
 /// Enemy Lamp
 /// </summary>
 EnemyLamp::EnemyLamp()
@@ -446,7 +566,7 @@ void EnemyLamp::OnCollision()
 }
 
 /// <summary>
-///  Enemy Bat
+/// Enemy Bat
 /// </summary>
 EnemyBat::EnemyBat() {
 
@@ -463,34 +583,61 @@ EnemyBat::~EnemyBat()
 
 void EnemyBat::Initialize(Camera* camera, Vector2& pos, MapChipField* mapChipField)
 {
-	sprite = new DrawSprite(Novice::LoadTexture("white1x1.png"), { 32,32 });
-	sprite->SetColor(0x4f4f4dff);
+	sprite = new DrawSprite(Novice::LoadTexture("./Resources/Enemies/bat.png"), { 32,32 });
+	sprite->SetColor(0xffffffff);
 	camera_ = camera;
 	wtf.Initialize();
-	wtf.translation_ = pos;
+	spawnPos_ = pos;
+	wtf.translation_ = spawnPos_;
 	mapChipField_ = mapChipField;
 
-	kSpeed = { 1.2f, 1.0f };
-	kAtkRange = 200.0f; //攻撃範囲 500
+	kSpeed = { 1.6f, 1.0f };
+	kAtkRange = 480.0f; //攻撃範囲 500
 
 	// 当たり判定
 	kWidth = 24.0f;
 	kHeight = 24.0f;
+
+	// 画像サイズ
+	imageWidth_ = 32;
+	imageHeight_ = 32;
 }
 
 void EnemyBat::Update()
 {
-	if (isDead_)
-	{
-		return;
+
+	BehaviorNormal();
+	
+	Animation();
+	// 移動更新
+	wtf.translation_ += vel_;
+	wtf.Update();
+}
+
+void EnemyBat::Draw()
+{
+	sprite->Draw(wtf, camera_, animePosX_, animePosY_, imageWidth_, imageHeight_, lrDirection_);
+}
+
+void EnemyBat::BehaviorNormal(){
+	// 左右の動き
+	if (wtf.translation_.x >= spawnPos_.x + maxMovementX_ ||
+		wtf.translation_.x <= spawnPos_.x - maxMovementX_) {
+		kSpeed.x = -kSpeed.x;
 	}
+	vel_.x = +kSpeed.x;
+
+}
+
+void EnemyBat::BehaviorAttack(){
 
 	Vector2 playerPos;
 	// コウモリをプレイヤーの本体のみに動かす
 	if (player_->GetBehavior() == Player::Behavior::kAstral) {
 		playerPos = player_->GetTentativePos();
+
 	}
-	else {
+	 else {
 		playerPos = player_->GetPos();
 	}
 
@@ -501,6 +648,7 @@ void EnemyBat::Update()
 
 	// プレイヤーの方向に動く
 	if (distanceToPlayer <= kAtkRange) {
+		behavior_ = BatBehavior::kAttack;
 		if (playerPos.x >= pumpkinPos.x) {
 			vel_.x = +kSpeed.x;
 		}
@@ -514,18 +662,37 @@ void EnemyBat::Update()
 		else {
 			vel_.y = -kSpeed.y;
 		}
+	} else {
+		BehaviorReturn();
 	}
-	else {
-		//止まる
-		vel_ = { 0.0f, 0.0f };
-	}
-
-
-
-	// 移動更新
-	wtf.translation_ += vel_;
-	wtf.Update();
 }
+
+void EnemyBat::BehaviorReturn(){
+	//// vector from enemy to spawn
+	//Vector2 enemyToSpawn = { spawnPos_.x - wtf.translation_.x,
+	//						 spawnPos_.y - wtf.translation_.y };
+
+	//// distance to spawn
+	//float distanceToSpawn = sqrtf(enemyToSpawn.x * enemyToSpawn.x +
+	//	enemyToSpawn.y * enemyToSpawn.y);
+
+	//// if close enough, stop and switch back to Normal
+	//if (distanceToSpawn < 1.0f) { // tolerance so it doesn’t jitter
+	//	vel_ = { 0.0f, 0.0f };
+
+	//	behavior_ = BatBehavior::kNormal;
+	//	return;
+	//}
+
+	//// normalize direction
+	//Vector2 dir = { enemyToSpawn.x / distanceToSpawn,
+	//				enemyToSpawn.y / distanceToSpawn };
+
+	//// move toward spawn with some speed
+	//vel_.x = dir.x * kSpeed.x;
+	//vel_.y = dir.y * kSpeed.y;
+}
+
 
 void EnemyBat::Draw()
 {
@@ -533,8 +700,46 @@ void EnemyBat::Draw()
 	{
 		return;
 	}
+sprite->Draw(wtf, camera_, 0, 0, 32, 32);
+}
+  
+void EnemyBat::Animation()
+{
+	//　アニメーションの更新
+	animationTimer_++;
+	switch (behavior_) {
+	case BatBehavior::kNormal:
+	case BatBehavior::kAttack:
 
-	sprite->Draw(wtf, camera_, 0, 0, 32, 32);
+		animePosY_ = 0;
+		animationMax_ = 3;
+		if (animationTimer_ % 12 == 0) {
+			animePosX_ += imageWidth_;
+
+		}
+		if (animePosX_ >= imageWidth_ * animationMax_) {
+			animePosX_ = 0;
+		}
+
+		break;
+	case BatBehavior::kDead:
+
+		animePosY_ = imageHeight_;
+		animePosX_ = 0;
+		animationMax_ = 1;
+
+		break;
+	default:
+		break;
+	}
+
+	// ミイラの方向を取得
+	if (kSpeed.x >= 0.0f) {
+		lrDirection_ = DrawSprite::LRDirection::kRight;
+	}
+	else {
+		lrDirection_ = DrawSprite::LRDirection::kLeft;
+	}
 }
 
 void EnemyBat::OnCollision()
@@ -559,19 +764,23 @@ EnemyMummy::~EnemyMummy() {
 
 void EnemyMummy::Initialize(Camera* camera, Vector2& pos, MapChipField* mapChipField)
 {
-	sprite = new DrawSprite(Novice::LoadTexture("white1x1.png"), { 32,64 });
-	sprite->SetColor(0x078f3dff);
+	sprite = new DrawSprite(Novice::LoadTexture("./Resources/Enemies/mummy.png"), { 58,72 });
+	sprite->SetColor(0xffffffff);
 	camera_ = camera;
 	wtf.Initialize();
 	wtf.translation_ = pos;
 	mapChipField_ = mapChipField;
 
-	kSpeed = { 0.67f, 0.0f };
+	kSpeed = { 0.52f, 0.0f };
 	kAtkRange = 0.0f; //攻撃範囲
 
 	// 当たり判定
 	kWidth = 32.0f;
 	kHeight = 64.0f;
+
+	// アニメーション用の幅と縦サイズ
+	imageWidth_ = 58;
+	imageHeight_ = 72;
 }
 
 void EnemyMummy::Update()
@@ -599,13 +808,16 @@ void EnemyMummy::Update()
 	MapCollisionLeft(info);
 	MapWallCollision(info);
 
-	wtf.translation_.x += info.vel.x;
+	Animation();
+	// 移動更新
+	wtf.translation_.x +=  info.vel.x;
+
 	wtf.Update();
 }
 
 void EnemyMummy::Draw()
 {
-	sprite->Draw(wtf, camera_, 0, 0, 128, 128);
+	sprite->Draw(wtf, camera_, animePosX_, animePosY_, imageWidth_, imageHeight_, lrDirection_);
 }
 
 void EnemyMummy::OnCollision()
@@ -618,6 +830,7 @@ void EnemyMummy::MapWallCollision(CollisonMapInfo& info)
 	// 左右の壁に当たると反射
 	if (info.LR) {
 		kSpeed.x = -kSpeed.x;
+		
 	}
 }
 
@@ -689,6 +902,44 @@ void EnemyMummy::MapCollisionLeft(CollisonMapInfo& info)
 	else if (typeLB != MapChipType::kBlock) {
 		info.LR = true;
 	}
+}
+
+void EnemyMummy::Animation()
+{
+	//　アニメーションの更新
+	animationTimer_++;
+	switch (animationBehavior_) {
+	case AnimationBehavior::kMove:
+		
+		animePosY_ = 0;
+		animationMax_ = 3;
+		if (animationTimer_ % 24 == 0) {
+			animePosX_ += imageWidth_;
+
+		}
+		if (animePosX_ >= imageWidth_ * animationMax_) {
+			animePosX_ = 0;
+		}
+
+		break;
+	case AnimationBehavior::kStop:
+
+		animePosY_ = imageHeight_;
+		animePosX_ = 0;
+		animationMax_ = 1;
+
+		break;
+	default:
+		break;
+	}
+
+	// ミイラの方向を取得
+	if (kSpeed.x >= 0.0f) {		
+		lrDirection_ = DrawSprite::LRDirection::kRight;
+	} else {
+		lrDirection_ = DrawSprite::LRDirection::kLeft;
+	}
+	
 }
 
 

@@ -8,7 +8,7 @@ DrawSprite::~DrawSprite()
 {
 }
 
-void DrawSprite::Draw(WtF& wt, Camera* camera, int srcX, int srcY, int srcW, int srcH)
+void DrawSprite::Draw(WtF& wt, Camera* camera, int srcX, int srcY, int srcW, int srcH, LRDirection lrDir)
 {
 
 	// --- 1. ローカル座標 → ワールド座標
@@ -31,15 +31,27 @@ void DrawSprite::Draw(WtF& wt, Camera* camera, int srcX, int srcY, int srcW, int
 	}
 
 	// --- 3. Novice::DrawQuadで描画
-	Novice::DrawQuad(
-		static_cast<int>(screenPos[0].x), static_cast<int>(screenPos[0].y),
-		static_cast<int>(screenPos[1].x), static_cast<int>(screenPos[1].y),
-		static_cast<int>(screenPos[2].x), static_cast<int>(screenPos[2].y),
-		static_cast<int>(screenPos[3].x), static_cast<int>(screenPos[3].y),
-		srcX, srcY,
-		srcW, srcH,
-		texture_, color_
-	);
+	if (lrDir == kRight) {
+		Novice::DrawQuad(
+			static_cast<int>(screenPos[0].x), static_cast<int>(screenPos[0].y),
+			static_cast<int>(screenPos[1].x), static_cast<int>(screenPos[1].y),
+			static_cast<int>(screenPos[2].x), static_cast<int>(screenPos[2].y),
+			static_cast<int>(screenPos[3].x), static_cast<int>(screenPos[3].y),
+			srcX, srcY,
+			srcW, srcH,
+			texture_, color_
+		);
+	} else {
+		Novice::DrawQuad(
+			static_cast<int>(screenPos[1].x), static_cast<int>(screenPos[1].y),
+			static_cast<int>(screenPos[0].x), static_cast<int>(screenPos[0].y),
+			static_cast<int>(screenPos[3].x), static_cast<int>(screenPos[3].y),
+			static_cast<int>(screenPos[2].x), static_cast<int>(screenPos[2].y),
+			srcX, srcY,
+			srcW, srcH,
+			texture_, color_
+		);
+	}
 }
 
 
