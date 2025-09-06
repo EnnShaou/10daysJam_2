@@ -5,7 +5,7 @@
 #include"Camera.h"
 #include"MapChipField.h"
 #include"Player.h"
-
+#include"MapBlockManager.h"
 // ------------------ 敵の基底クラス ------------------
 class Enemies
 {
@@ -56,6 +56,7 @@ public:
 	//void SetMapChipField(MapChipField* mapChipField) { mapChipField_ = mapChipField; }
 	void SetPlayer(Player* player) { player_ = player; }
 
+	virtual bool isPushButton(BlockButtonAndGate* button);
 protected:
 	MapChipField* mapChipField_;  // マップフィールドポインタ
 	DrawSprite* sprite = nullptr; // 敵スプライト
@@ -141,7 +142,7 @@ public:
 
 	// 当たり判定
 	void OnCollision() override;
-
+	bool isPushButton(BlockButtonAndGate* button)override;
 private:
 	// ここにかぼちゃ敵固有の変数や処理を追加できる
 	void InputGravity(const CollisonMapInfo& info)override;

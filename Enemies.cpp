@@ -65,6 +65,28 @@ void Enemies::Animation() {
 
 }
 
+bool EnemyPumpkin::isPushButton(BlockButtonAndGate* button)
+{
+	std::array<Vector2, kNumCorner> posNew;
+	for (uint32_t i = 0; i < posNew.size(); ++i) {
+		posNew[i] = CornerPos(wtf.translation_, static_cast<Corner>(i));
+	}
+
+	std::array<Corner, 2> checkCorners = { kLeftBottom, kRightBottom };
+
+	Vector2 btnPos = button->getPos();
+	float halfSize = 32.0f;
+
+	for (auto corner : checkCorners) {
+		Vector2 c = posNew[corner];
+		if (c.x >= btnPos.x - halfSize && c.x <= btnPos.x + halfSize &&
+			c.y >= btnPos.y - halfSize && c.y <= btnPos.y + halfSize) {
+			return true;
+		}
+	}
+
+	return false;
+}
 
 ///////////////////////////////////////////////////////////////////////////////
 //    																		 //
@@ -92,6 +114,13 @@ void Enemies::MapCollision(CollisonMapInfo& info)
 	MapWallCollision(info);
 	GroundStates(info);
 }
+
+bool Enemies::isPushButton(BlockButtonAndGate* button)
+{
+	button;
+	return false;
+}
+
 
 void Enemies::MapCollisionLeft(CollisonMapInfo& info) {
 	if (info.vel.x >= 0) {
@@ -533,7 +562,7 @@ void EnemyBat::Update()
 {
 
 	BehaviorNormal();
-	
+
 	Animation();
 	// 移動更新
 	wtf.translation_ += vel_;
@@ -545,7 +574,7 @@ void EnemyBat::Draw()
 	sprite->Draw(wtf, camera_, animePosX_, animePosY_, imageWidth_, imageHeight_, lrDirection_);
 }
 
-void EnemyBat::BehaviorNormal(){
+void EnemyBat::BehaviorNormal() {
 	// 左右の動き
 	if (wtf.translation_.x >= spawnPos_.x + maxMovementX_ ||
 		wtf.translation_.x <= spawnPos_.x - maxMovementX_) {
@@ -555,7 +584,7 @@ void EnemyBat::BehaviorNormal(){
 
 }
 
-void EnemyBat::BehaviorAttack(){
+void EnemyBat::BehaviorAttack() {
 
 	Vector2 playerPos;
 	// コウモリをプレイヤーの本体のみに動かす
@@ -563,7 +592,7 @@ void EnemyBat::BehaviorAttack(){
 		playerPos = player_->GetTentativePos();
 
 	}
-	 else {
+	else {
 		playerPos = player_->GetPos();
 	}
 
@@ -588,12 +617,13 @@ void EnemyBat::BehaviorAttack(){
 		else {
 			vel_.y = -kSpeed.y;
 		}
-	} else {
+	}
+	else {
 		BehaviorReturn();
 	}
 }
 
-void EnemyBat::BehaviorReturn(){
+void EnemyBat::BehaviorReturn() {
 	//// vector from enemy to spawn
 	//Vector2 enemyToSpawn = { spawnPos_.x - wtf.translation_.x,
 	//						 spawnPos_.y - wtf.translation_.y };
@@ -618,7 +648,7 @@ void EnemyBat::BehaviorReturn(){
 	//vel_.x = dir.x * kSpeed.x;
 	//vel_.y = dir.y * kSpeed.y;
 }
-  
+
 void EnemyBat::Animation()
 {
 	//　アニメーションの更新
@@ -726,7 +756,7 @@ void EnemyMummy::Update()
 
 	Animation();
 	// 移動更新
-	wtf.translation_.x +=  info.vel.x;
+	wtf.translation_.x += info.vel.x;
 
 	wtf.Update();
 }
@@ -746,7 +776,7 @@ void EnemyMummy::MapWallCollision(CollisonMapInfo& info)
 	// 左右の壁に当たると反射
 	if (info.LR) {
 		kSpeed.x = -kSpeed.x;
-		
+
 	}
 }
 
@@ -826,7 +856,7 @@ void EnemyMummy::Animation()
 	animationTimer_++;
 	switch (animationBehavior_) {
 	case AnimationBehavior::kMove:
-		
+
 		animePosY_ = 0;
 		animationMax_ = 3;
 		if (animationTimer_ % 24 == 0) {
@@ -850,12 +880,13 @@ void EnemyMummy::Animation()
 	}
 
 	// ミイラの方向を取得
-	if (kSpeed.x >= 0.0f) {		
+	if (kSpeed.x >= 0.0f) {
 		lrDirection_ = DrawSprite::LRDirection::kRight;
-	} else {
+	}
+	else {
 		lrDirection_ = DrawSprite::LRDirection::kLeft;
 	}
-	
+
 }
 
 

@@ -9,9 +9,8 @@
 #include"DrawFunc.h"
 #include"Camera.h"
 #include "EnemyManager.h"
-
-class Game : public IScene 
-{
+#include"MapBlockManager.h"
+class Game : public IScene {
 public:
 	Game();
 	~Game() override;
@@ -23,7 +22,6 @@ public:
 	void Draw() override;
 	// ブロックの生成
 	void GenerateBlocks();
-
 	void CheckAllCollisions();
 	enum class Phase { FadeIn, kPlay, kDeath, kFadeOut };
 	void ChangePhase(); // フェーズを変更する
@@ -36,8 +34,7 @@ public:
 private:
 	Camera* camera_;
 	MapChipField* mapChipField_;
-	DrawSprite* blockSprite_ = nullptr; // ブロックのスプライト
-	std::vector<std::vector<BlockManager*>> wTfBlock_;
+	MapBlockManager* blockManger;
 	Player* player_ = nullptr;// プレイヤー
 	EnemyManager enemyManager;
 	Phase phase_ = Phase::FadeIn;                             // ゲームのフェーズ

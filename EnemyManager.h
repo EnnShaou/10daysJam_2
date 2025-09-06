@@ -29,6 +29,8 @@ public:
 
     // --- ゲッター ---
     const std::list<Enemies*>& GetEnemies() const { return enemies_; }
+    bool isPushButton(BlockButtonAndGate* button);
+
 
 private:
     std::list<Enemies*> enemies_;   // 敵のリスト（全ての敵を格納）

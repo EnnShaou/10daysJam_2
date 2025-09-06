@@ -4,7 +4,7 @@
 #include "DrawFunc.h"
 #include "Wtf.h"
 #include "PlayerBulletManager.h"
-
+#include"MapBlockManager.h"
 class Enemies;
 class MapChipField;
 class Player
@@ -117,6 +117,8 @@ public:
 
 	// --- アニメーション関連 ---
 	void Animation();
+
+	bool isPushButton(BlockButtonAndGate* button);
 
 	// --- ゲッター ---
 	Vector2 GetPos() const { Vector2 worldPos = worldTransform_.translation_; return worldPos; }                   
