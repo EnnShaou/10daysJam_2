@@ -143,6 +143,9 @@ public:
 	// 当たり判定
 	void OnCollision() override;
 	bool isPushButton(BlockButtonAndGate* button)override;
+
+	// かぼちゃの速度のゲッター
+	float GetVelocity() const { return vel_.y; }
 private:
 	// ここにかぼちゃ敵固有の変数や処理を追加できる
 	void InputGravity(const CollisonMapInfo& info)override;
@@ -173,8 +176,11 @@ public:
 	}
 
 private:
-
+	// 照らす範囲
 	float lightRadius_ = 280.0f;
+
+	// アニメーション処理
+	void Animation() override;
 };
 
 // ------------------ コウモリ（派生） ------------------
@@ -195,33 +201,40 @@ public:
 	// 当たり判定
 	void OnCollision() override;
 
+	bool GetIsDead() { return isDead_;}
+
 private:
 
 	// コウモリの行動
 	enum class BatBehavior {
 		kNormal,
 		kAttack,
-		kReturn,
 		kDead,
 		kUnknown,
 	};
 
 	BatBehavior behavior_ = BatBehavior::kNormal;
+	BatBehavior behaviorNext_ = BatBehavior::kUnknown;
+
+	// プレイヤーの位置とその距離をゲットする関数
+	Vector2 GetPlayerPos();
+	float GetDistanceToPlayer(const Vector2& playerPos);
+	
+	void BehaviorNormalInitialize();
+	void BehaviorNormalUpdate();
+	void BehaviorAttackInitialize();
+	void BehaviorAttackUpdate();
+	void BehaviorDeadInitialize();
+	void BehaviorDeadUpdate();
+
 
 	Vector2 spawnPos_;					// スポーン位置
 	const float maxMovementX_ = 200.0f; // 待機時の最大移動量
-	void BehaviorNormal();
-	void BehaviorAttack();
-	void BehaviorReturn();
+	Vector2 currentSpeed_ = { kSpeed.x, kSpeed.y };
 
 	// アニメーション
 	void Animation() override;
 
-	bool isAtk_ = false;
-
-
-private:
-	// 死亡フラグ
 	bool isDead_ = false;
 };
 
@@ -244,6 +257,7 @@ public:
 	// 当たり判定
 	void OnCollision() override;
 
+	bool GetIsStun() { return isStan; }
 
 private:
 	void MapWallCollision(CollisonMapInfo& info) override;        // 壁との衝突判定
