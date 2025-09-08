@@ -2,13 +2,13 @@
 #include "Title.h"
 #include"Menu.h"
 #include"Game.h"
-Scene IScene::SceneNo = Scene::kMenu; // 現在のシーン番号を初期化
-Scene IScene::PreSceneNO = Scene::kMenu;
+Scene IScene::SceneNo = Scene::kGame; // 現在のシーン番号を初期化
+Scene IScene::PreSceneNO = Scene::kGame;
 sceneManage::sceneManage() {
 	// シーンの配列を初期化
-	currentSceneNo_ = Scene::kMenu;
-	preSceneNo_ = Scene::kMenu;
-	SceneArr_[static_cast<int>(currentSceneNo_)] = std::make_unique<MenuScene>();
+	currentSceneNo_ = Scene::kGame;
+	preSceneNo_ = Scene::kGame;
+	SceneArr_[static_cast<int>(currentSceneNo_)] = std::make_unique<Game>();
 }
 
 sceneManage::~sceneManage() {}
