@@ -88,7 +88,7 @@ void Player::Update()
 		GroundStates(info);
 	}
 
-	playerBullets_.Update();
+	playerBullets_.Update(GetPos());
 	Animation();
 
 	worldTransform_.Update();
@@ -548,6 +548,10 @@ void Player::BehaviorRootInitialize()
 		worldTransform_.scale_ = Vector2(1.0f, 1.0f);
 		isAstral = false;
 		astralBodyHP = maxAstralBodyHP;
+
+		// 弾削除
+		playerBullets_.ClearHoldingBullets();
+
 	}
 }
 void Player::BehaviorRootUpdate()
@@ -583,6 +587,9 @@ void Player::BehaviorAstralInitialize()
 	currentBullets_ = 0;
 	isAstral = true;
 	animationBehaviorNext_ = AnimationBehavior::kAstralRoot;
+	
+	// 弾初期化
+	playerBullets_.Initialize(GetPos(), camera_);
 }
 
 void Player::BehaviorAstralUpdate()
@@ -725,14 +732,15 @@ void Player::AstralBodyBehaviorAttackUpdate()
 	// 最大数以下なら弾を発射
 	if (currentBullets_ <= maxBullets_)
 	{
+
 		// 弾の速度
 		Vector2 dir = GetDir();
 
 		// 速度ベクトルを自キャラの向きに合わせて変更
 		dir = TransformNormal(dir, worldTransform_.matWorld_);
 
-		// 弾生成
-		playerBullets_.PushBullet(worldTransform_.translation_, camera_, dir);
+		// 弾発射
+		playerBullets_.Shot(dir);
 	}
 
 	// 攻撃後は通常状態に戻る
@@ -859,7 +867,7 @@ void Player::Animation()
 	{
 	case Player::AnimationBehavior::kRoot:
 
-		animationTimer++;
+		
 		if (!onGround)
 		{
 			if (vel_.y > 0.f)
@@ -878,7 +886,7 @@ void Player::Animation()
 		break;
 	case Player::AnimationBehavior::kMove:
 
-		animationTimer++;
+		
 		if (!onGround)
 		{
 			if (vel_.y > 0.f)
@@ -897,7 +905,7 @@ void Player::Animation()
 		break;
 	case Player::AnimationBehavior::kJumpUp:
 
-		animationTimer++;
+		
 		if (!onGround && vel_.y < 0.f)
 		{
 			animationBehaviorNext_ = Player::AnimationBehavior::kJumpDown;
@@ -905,14 +913,13 @@ void Player::Animation()
 		break;
 	case Player::AnimationBehavior::kJumpDown:
 
-		animationTimer++;
 		if (onGround)
 		{
 			animationBehaviorNext_ = Player::AnimationBehavior::kRoot;
 		}
 		break;
 	case Player::AnimationBehavior::kDamage:
-		animationTimer++;
+
 		if (damageCooldown_ <= 0) {
 			animationBehaviorNext_ = Player::AnimationBehavior::kRoot;
 		}

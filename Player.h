@@ -144,7 +144,10 @@ public:
 	Behavior& GetBehavior()  { return behavior_; }                                                                 
 	bool IsDead() const { return isDead_; }                                                                        
 	bool IsClear() const { return isClear; }                                                                       
-	Vector2 GetSize() const { return Vector2(kWidth, kHeight); }                                                   
+	Vector2 GetNomalSize() const { return nomalSize; }
+
+	Vector2 GetAstralSize() const { return astralSize; }
+
 	bool IsAstral() const { return isAstral; }                                                                     
 	const PlayerBulletManager& GetBullets() const { return playerBullets_; }                                       
 
@@ -230,4 +233,8 @@ private:
 	bool isKnockback_ = false; 
 	float knockbackTimer_ = 0.0f;
 	const float knockbackDuration_ = 0.3f; // ノックバックが続く秒数
+
+	// --- 当たり判定 ---
+	Vector2 nomalSize = { 50.0f,70.0f };
+	Vector2 astralSize = { 60.0f,60.0f };
 };
