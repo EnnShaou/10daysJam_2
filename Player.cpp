@@ -87,7 +87,7 @@ void Player::Update()
 		GroundStates(info);
 	}
 	Invincible();
-	playerBullets_.Update();
+	playerBullets_.Update(GetPos());
 	Animation();
 
 	worldTransform_.Update();
