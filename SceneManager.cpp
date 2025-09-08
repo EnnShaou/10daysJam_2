@@ -1,12 +1,12 @@
 #include "SceneManager.h"
 #include "Title.h"
 #include"Game.h"
-Scene IScene::SceneNo = Scene::kGame; // 現在のシーン番号を初期化
+Scene IScene::SceneNo = Scene::kTitle; // 現在のシーン番号を初期化
 sceneManage::sceneManage() {
 	// シーンの配列を初期化
-	currentSceneNo_ = Scene::kGame;
-	preSceneNo_ = Scene::kGame;
-	SceneArr_[static_cast<int>(currentSceneNo_)] = std::make_unique<Game>();
+	currentSceneNo_ = Scene::kTitle;
+	preSceneNo_ = Scene::kTitle;
+	SceneArr_[static_cast<int>(currentSceneNo_)] = std::make_unique<TitleScene>();
 }
 
 sceneManage::~sceneManage() {}
