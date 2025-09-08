@@ -867,6 +867,29 @@ void EnemyMummy::OnCollision()
 	}
 }
 
+bool EnemyMummy::isPushButton(BlockButtonAndGate* button)
+{
+	std::array<Vector2, kNumCorner> posNew;
+	for (uint32_t i = 0; i < posNew.size(); ++i) {
+		posNew[i] = CornerPos(wtf.translation_, static_cast<Corner>(i));
+	}
+
+	std::array<Corner, 2> checkCorners = { kLeftBottom, kRightBottom };
+
+	Vector2 btnPos = button->getPos();
+	float halfSize = 32.0f;
+
+	for (auto corner : checkCorners) {
+		Vector2 c = posNew[corner];
+		if (c.x >= btnPos.x - halfSize && c.x <= btnPos.x + halfSize &&
+			c.y >= btnPos.y - halfSize && c.y <= btnPos.y + halfSize) {
+			return true;
+		}
+	}
+
+	return false;
+}
+
 void EnemyMummy::MapWallCollision(CollisonMapInfo& info)
 {
 	// 左右の壁に当たると反射

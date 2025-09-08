@@ -258,11 +258,13 @@ public:
 	void OnCollision() override;
 
 	bool GetIsStun() { return isStan; }
+	bool isPushButton(BlockButtonAndGate* button)override;
 
 private:
 	void MapWallCollision(CollisonMapInfo& info) override;        // 壁との衝突判定
 	void MapCollisionRight(CollisonMapInfo& info) override;
 	void MapCollisionLeft(CollisonMapInfo& info) override;
+
 	// --- フラグ・タイマー ---
 	bool isStan = false;       // 気絶フラグ
 	float stanTimer = 0.0f;    // 気絶タイマー
