@@ -10,7 +10,7 @@ Player::Player() : vel_(0, 0) {}
 
 Player::~Player() {}
 
-void Player::Initialize(Camera* camera, Vector2& pos) 
+void Player::Initialize(Camera* camera, Vector2& pos)
 {
 	assert(camera);
 	camera_ = camera;
@@ -132,12 +132,14 @@ void Player::Draw()
 	}
 	else
 	{
+
 		int texX = (animationCount * 58) + (lrDir_ == LRDir::kRight ? 0 : 58);
 		int texY = static_cast<int>(animationBehavior_) * 72 + 2;
 		int scaleX = (lrDir_ == LRDir::kRight ? 1 : -1) * 58;
 
 		playerSprite_->SetColor(0xffffffff); // 通常色
 		playerSprite_->Draw(worldTransform_, camera_, texX, texY, scaleX, 72);
+
 	}
 
 	if (animationBehavior_ == AnimationBehavior::kDamage) 
@@ -158,26 +160,26 @@ void Player::Draw()
 }
 void Player::Move()
 {
-	if (isDead_) 
+	if (isDead_)
 	{
 		return;
 	}
 
-	Vector2 acc = InputMove(false, isMove, lrDir_);
+	Vector2 acc = InputMove(false, isMove, lrDirection_);
 
 	if (isMove)
 	{
 		vel_ += acc;
 		vel_.x = std::clamp(vel_.x, -kPlayerSpeedMax, kPlayerSpeedMax);
 	}
-	else 
+	else
 	{
 		vel_.x = 0.0f;
 	}
 
-	if (onGround) 
+	if (onGround)
 	{
-		if (Keys::IsTrigger(DIK_SPACE)) 
+		if (Keys::IsTrigger(DIK_SPACE))
 		{
 			vel_.y = kJumpAcceleration; // ジャンプの加速度を設定
 		}
@@ -186,7 +188,7 @@ void Player::Move()
 
 void Player::AstralMove()
 {
-	Vector2 acc = InputMove(true, isMove, lrDir_);
+	Vector2 acc = InputMove(true, isMove, lrDirection_);
 	if (isMove)
 	{
 		vel_ += acc;
@@ -195,7 +197,7 @@ void Player::AstralMove()
 
 		worldTransform_.translation_ += vel_;
 	}
-	else 
+	else
 	{
 		vel_ = Vector2(0.0f, 0.0f);
 	}
@@ -205,7 +207,7 @@ void Player::AstralMove()
 		worldTransform_.translation_.x,
 		mapChipField_->kBlockWidth,
 		mapChipField_->blockCountX_ * mapChipField_->kBlockWidth - mapChipField_->kBlockWidth * 2);
-
+ 
 	worldTransform_.translation_.y = std::clamp(
 		worldTransform_.translation_.y,
 		mapChipField_->kBlockHeight,
@@ -222,42 +224,42 @@ void Player::AstralMove()
 		tentativeWorldTransform_.translation_.y + kAstralBodyMaxDistance_);
 }
 
-Vector2 Player::InputMove(bool allowVertical, bool& moving, LRDir& direction)
+Vector2 Player::InputMove(bool allowVertical, bool& moving, DrawSprite::LRDirection& direction)
 {
 	Vector2 acc{ 0.0f, 0.0f };
 	moving = false;
 
-	if (Keys::IsPress(DIK_D) || Keys::IsPress(DIK_RIGHT)) 
+	if (Keys::IsPress(DIK_D) || Keys::IsPress(DIK_RIGHT))
 	{
 		if (vel_.x < 0.0f)
 		{
 			vel_.x = 0.0f;
 		}
-		if (direction != kRight)
+		if (direction != DrawSprite::LRDirection::kRight)
 		{
-			direction = kRight;
+			direction = DrawSprite::LRDirection::kRight;
 		}
 		acc.x += kPlayerSpeed;
 		moving = true;
 	}
 
-	if (Keys::IsPress(DIK_A) || Keys::IsPress(DIK_LEFT)) 
+	if (Keys::IsPress(DIK_A) || Keys::IsPress(DIK_LEFT))
 	{
 		if (vel_.x > 0.0f)
 		{
 			vel_.x = 0.0f;
 		}
-		if (direction != kLeft)
+		if (direction != DrawSprite::LRDirection::kLeft)
 		{
-			direction = kLeft;
+			direction = DrawSprite::LRDirection::kLeft;
 		}
 		acc.x -= kPlayerSpeed;
 		moving = true;
 	}
 
-	if (allowVertical) 
+	if (allowVertical)
 	{
-		if (Keys::IsPress(DIK_W) || Keys::IsPress(DIK_UP)) 
+		if (Keys::IsPress(DIK_W) || Keys::IsPress(DIK_UP))
 		{
 			if (vel_.y < 0.0f)
 			{
@@ -267,7 +269,7 @@ Vector2 Player::InputMove(bool allowVertical, bool& moving, LRDir& direction)
 			moving = true;
 		}
 
-		if (Keys::IsPress(DIK_S) || Keys::IsPress(DIK_DOWN)) 
+		if (Keys::IsPress(DIK_S) || Keys::IsPress(DIK_DOWN))
 		{
 			if (vel_.y > 0.0f)
 			{
@@ -279,7 +281,7 @@ Vector2 Player::InputMove(bool allowVertical, bool& moving, LRDir& direction)
 	}
 
 	// 斜め移動の速度を調整
-	if (moving) 
+	if (moving)
 	{
 		acc = acc.normalize();
 		acc.x *= kPlayerSpeed;
@@ -477,9 +479,9 @@ void Player::MapWallCollision(CollisonMapInfo& info) {
 //	aabb.max = Vector3(center.x + kWidth / 2 - kBlank, center.y + kHeight / 2 - kBlank, center.z);
 //	return aabb;
 //}
-void Player::OnCollisionNomal(const Enemies* enemies) 
+void Player::OnCollisionNomal(const Enemies* enemies)
 {
-	(void)enemies; 
+	(void)enemies;
 
 	// ダメージ無敵時間中はダメージを受けない
 	if (damageCooldown_ > 0)
@@ -507,7 +509,7 @@ void Player::OnCollisionNomal(const Enemies* enemies)
 	}
 
 	// HPが0以下になったら死亡フラグを立てる
-	if (nomalBodyHP <= 0) 
+	if (nomalBodyHP <= 0)
 	{
 		isDead_ = true;
 	}
@@ -562,7 +564,7 @@ void Player::BehaviorAttackInitialize()
 
 }
 
-void Player::BehaviorAttackUpdate() 
+void Player::BehaviorAttackUpdate()
 {
 	behaviorNext_ = Behavior::kRoot; // 攻撃行動が終了したらルートに戻る
 }
@@ -718,7 +720,7 @@ void Player::AstralBodyBehaviorAttackUpdate()
 	if (currentBullets_ <= maxBullets_)
 	{
 		// 弾の速度
-		Vector2 dir = { lrDir_ == LRDir::kRight ? 1.0f : -1.0f , 0.0f };
+		Vector2 dir = GetDir();
 
 		// 速度ベクトルを自キャラの向きに合わせて変更
 		dir = TransformNormal(dir, worldTransform_.matWorld_);
@@ -942,4 +944,31 @@ void Player::Animation()
 		animationTimer = 0;// 60フレームに1回
 		animationCount = (animationCount + 1) % animationMax;
 	}
+}
+
+bool Player::isPushButton(BlockButtonAndGate* button)
+{
+	if (behavior_ == Behavior::kAstral)
+	{
+		return false;
+	}
+	std::array<Vector2, kNumCorner> posNew;
+	for (uint32_t i = 0; i < posNew.size(); ++i) {
+		posNew[i] = CornerPos(worldTransform_.translation_, static_cast<Corner>(i));
+	}
+
+	std::array<Corner, 2> checkCorners = { kLeftBottom, kRightBottom };
+
+	Vector2 btnPos = button->getPos();
+	float halfSize = 32.0f;
+
+	for (auto corner : checkCorners) {
+		Vector2 c = posNew[corner];
+		if (c.x >= btnPos.x - halfSize && c.x <= btnPos.x + halfSize &&
+			c.y >= btnPos.y - halfSize && c.y <= btnPos.y + halfSize) {
+			return true;
+		}
+	}
+
+	return false;
 }

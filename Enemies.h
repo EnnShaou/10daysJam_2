@@ -5,7 +5,7 @@
 #include"Camera.h"
 #include"MapChipField.h"
 #include"Player.h"
-
+#include"MapBlockManager.h"
 // ------------------ 敵の基底クラス ------------------
 class Enemies
 {
@@ -56,6 +56,7 @@ public:
 	//void SetMapChipField(MapChipField* mapChipField) { mapChipField_ = mapChipField; }
 	void SetPlayer(Player* player) { player_ = player; }
 
+	virtual bool isPushButton(BlockButtonAndGate* button);
 protected:
 	MapChipField* mapChipField_;  // マップフィールドポインタ
 	DrawSprite* sprite = nullptr; // 敵スプライト
@@ -73,7 +74,7 @@ protected:
 	const float kLimitFallSpeed = kGravity * 20.f;  //　落下速度制限
 
 	//void GroundStates(const CollisonMapInfo& info);      // 地面との接地状態更新
-	
+
 	// --- マップ ---
 	void MapCollisionTop(CollisonMapInfo& info);            // 上方向の衝突判定
 	void MapCollisionBottom(CollisonMapInfo& info);         // 下方向の衝突判定
@@ -89,7 +90,7 @@ protected:
 	bool onGround = false;  // 地面に接地しているか
 
 	// ビヘイビア管理用の関数
-	enum class Behavior 
+	enum class Behavior
 	{
 		kStop,
 		kAstral,
@@ -141,7 +142,7 @@ public:
 
 	// 当たり判定
 	void OnCollision() override;
-
+	bool isPushButton(BlockButtonAndGate* button)override;
 private:
 	// ここにかぼちゃ敵固有の変数や処理を追加できる
 	void InputGravity(const CollisonMapInfo& info)override;
@@ -167,6 +168,9 @@ public:
 
 	// 当たり判定
 	void OnCollision() override;
+	float getRadius() {
+		return lightRadius_;
+	}
 
 private:
 
@@ -190,7 +194,7 @@ public:
 	void Draw() override;
 	// 当たり判定
 	void OnCollision() override;
-	
+
 private:
 
 	// コウモリの行動
@@ -222,7 +226,7 @@ private:
 };
 
 // ------------------ ミイラ（派生） ------------------
-class EnemyMummy : public Enemies 
+class EnemyMummy : public Enemies
 {
 public:
 	EnemyMummy();

@@ -13,6 +13,8 @@ public:
 	DrawSprite(int texture, Vector2 textureSize);
 	~DrawSprite();
 	void SetColor(unsigned int color) { color_ = color; }
+	Vector2 GetSize()const { return textureSize_; }
+	void SetSize(Vector2 size) { textureSize_ = size; }
 	void Draw(WtF& wt,               // 物体変換
 		Camera* camera,        // カメラ
 		int srcX, int srcY, int srcW, int srcH, LRDirection lrDir = kRight);
