@@ -103,9 +103,9 @@ void Player::Draw()
 
 	if (behavior_ == Behavior::kAstral)
 	{
-		int texX = (animationCount * 64) + (lrDir_ == LRDir::kRight ? 0 : 64);
+		int texX = (animationCount * 64);
 		int texY = static_cast<int>(animationBehavior_) * 64 + 2;
-		int scaleX = (lrDir_ == LRDir::kRight ? 1 : -1) * 64;
+		int scaleX = 64;
 
 		switch (animationBehavior_)
 		{
@@ -124,28 +124,28 @@ void Player::Draw()
 			break;
 		}
 
-		astralBodySprite_->Draw(worldTransform_, camera_, texX, texY, scaleX, 64);
+		astralBodySprite_->Draw(worldTransform_, camera_, texX, texY, scaleX, 64, lrDirection_);
 
 		// 肉体（留まってる本体）描画も必要なら
 		int playerTexY = 72 * 5;
-		playerSprite_->Draw(tentativeWorldTransform_, camera_, 0, playerTexY, 68, 72);
+		playerSprite_->Draw(tentativeWorldTransform_, camera_, 0, playerTexY, 68, 72, lrDirection_);
 	}
 	else
 	{
 
-		int texX = (animationCount * 58) + (lrDir_ == LRDir::kRight ? 0 : 58);
+		int texX = (animationCount * 58);
 		int texY = static_cast<int>(animationBehavior_) * 72 + 2;
-		int scaleX = (lrDir_ == LRDir::kRight ? 1 : -1) * 58;
+		int scaleX = 58;
 
 		playerSprite_->SetColor(0xffffffff); // 通常色
-		playerSprite_->Draw(worldTransform_, camera_, texX, texY, scaleX, 72);
+		playerSprite_->Draw(worldTransform_, camera_, texX, texY, scaleX, 72, lrDirection_);
 
 	}
 
-	if (animationBehavior_ == AnimationBehavior::kDamage) 
+	if (animationBehavior_ == AnimationBehavior::kDamage)
 	{
-		int texX = (animationCount * 58) + (lrDir_ == LRDir::kRight ? 0 : 58);
-		playerSprite_->Draw(worldTransform_, camera_, texX, 72 * 4, (lrDir_ == LRDir::kRight ? 1 : -1) * 58, 72);
+		int texX = (animationCount * 58);
+		playerSprite_->Draw(worldTransform_, camera_, texX, 72 * 4, 58, 72, lrDirection_);
 	}
 
 	playerBullets_.Draw();
@@ -207,7 +207,7 @@ void Player::AstralMove()
 		worldTransform_.translation_.x,
 		mapChipField_->kBlockWidth,
 		mapChipField_->blockCountX_ * mapChipField_->kBlockWidth - mapChipField_->kBlockWidth * 2);
- 
+
 	worldTransform_.translation_.y = std::clamp(
 		worldTransform_.translation_.y,
 		mapChipField_->kBlockHeight,
@@ -524,7 +524,7 @@ void Player::OnCollisionAstral(const Enemies* enemies)
 	}
 
 	// ノックバック方向（敵が左なら右に飛ばす）
-	float dir = (lrDir_ == LRDir::kRight) ? -1.0f : 1.0f;
+	float dir = GetVel().x;
 	Vector2 knockDir = { dir, 0.0f };
 
 	AstralbehaviorNext_ = AstralBehavior::kKnockback;
@@ -609,7 +609,7 @@ void Player::BehaviorAstralUpdate()
 	case AstralBehavior::kAttack:
 		AstralBodyBehaviorAttackUpdate();
 		break;
-	case AstralBehavior::kKnockback: 
+	case AstralBehavior::kKnockback:
 		AstralBodyBehaviorKnockbackUpdate();
 		break;
 	default:
@@ -831,11 +831,11 @@ void Player::Animation()
 			animationMax = 2;
 			break;
 		case Player::AnimationBehavior::kDamage:
-			animationMax = 2; 
+			animationMax = 2;
 			break;
 
 		case Player::AnimationBehavior::kAstralBodyIdle:
-			animationMax = 1; 
+			animationMax = 1;
 			break;
 		case AnimationBehavior::kAstralRoot:
 			animationMax = 3;
@@ -913,7 +913,7 @@ void Player::Animation()
 		break;
 
 	case Player::AnimationBehavior::kAstralBodyIdle:
-		
+
 		break;
 	default:
 		break;
