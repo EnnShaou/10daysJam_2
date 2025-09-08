@@ -173,6 +173,7 @@ private:
 	// --- 速度・向き ---
 	Vector2 vel_;                 // 移動速度
 	DrawSprite::LRDirection lrDirection_ = DrawSprite::LRDirection::kRight;
+	DrawSprite::LRDirection templrDirection_ = DrawSprite::LRDirection::kRight;
 
 	// --- 定数 ---
 	static inline const float kPlayerSpeed = 1.0f;                  // プレイヤーの基本移動速度

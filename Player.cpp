@@ -127,7 +127,7 @@ void Player::Draw()
 
 		// 肉体（留まってる本体）描画も必要なら
 		int playerTexY = 72 * 5;
-		playerSprite_->Draw(tentativeWorldTransform_, camera_, 0, playerTexY, 68, 72, lrDirection_);
+		playerSprite_->Draw(tentativeWorldTransform_, camera_, 0, playerTexY, 68, 72, templrDirection_);
 
 		DrawHitBox(worldTransform_, camera_, int(astralSize.x), int(astralSize.y));
 	}
@@ -591,6 +591,7 @@ void Player::BehaviorRootUpdate()
 
 	if (Keys::IsTrigger(DIK_F) && onGround)
 	{
+		templrDirection_ = lrDirection_;
 		SwitchBody();
 	}
 
