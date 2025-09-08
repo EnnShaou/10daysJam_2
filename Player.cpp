@@ -306,6 +306,10 @@ void Player::MapCollision(CollisonMapInfo& info) {
 	{
 		isClear = true;
 	}
+	if (type == MapChipType::kBlock)
+	{
+		worldTransform_.translation_.x -= kWidth * 2;
+	}
 }
 void Player::MapCollisionTop(CollisonMapInfo& info) {
 
@@ -613,7 +617,7 @@ void Player::BehaviorAstralInitialize()
 	currentBullets_ = 0;
 	isAstral = true;
 	animationBehaviorNext_ = AnimationBehavior::kAstralRoot;
-	
+
 	// 弾初期化
 	playerBullets_.Initialize(GetPos(), camera_);
 }
@@ -658,7 +662,7 @@ void Player::BehaviorAstralUpdate()
 
 void Player::BehaviorKnockbackInitialize()
 {
-	
+
 	behavior_ = Behavior::kKnockback;
 	knockbackTimer_ = knockbackDuration_;
 	invincibleTimer_ = maxInvincibleTimer;
@@ -667,7 +671,7 @@ void Player::BehaviorKnockbackInitialize()
 
 void Player::BehaviorKnockbackUpdate()
 {
-	
+
 	// ノックバックの移動処理
 	CollisonMapInfo info;
 	info.vel = knockback_;

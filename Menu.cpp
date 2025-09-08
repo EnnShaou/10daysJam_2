@@ -19,6 +19,8 @@ void MenuScene::Initialize()
 	fade_ = new Fade();                       // フェードイン・フェードアウト用のオブジェクトを生成
 	fade_->Initialize();                      // フェードの初期化
 	fade_->Start(Fade::Status::FadeIn, 1.0f); // フェードインを開始
+
+
 }
 
 void MenuScene::Update()
