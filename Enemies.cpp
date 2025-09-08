@@ -325,7 +325,7 @@ void EnemyPumpkin::Initialize(Camera* camera, Vector2& pos, MapChipField* mapChi
 	mapChipField_ = mapChipField;
 
 	kSpeed = { 2.0f, 2.0f };  //かぼちゃの速さ
-	kAtkRange = 140.0f;         //プレイヤーがこの範囲にいると動く (320)
+	kAtkRange = 320.0f;         //プレイヤーがこの範囲にいると動く (320)
 
 	kWidth = 50;              // 当たり判定の幅
 	kHeight = 30;             // 当たり判定の高さ
@@ -596,7 +596,7 @@ void EnemyBat::Initialize(Camera* camera, Vector2& pos, MapChipField* mapChipFie
 	mapChipField_ = mapChipField;
 
 	kSpeed = { 1.6f, 1.0f };
-	kAtkRange = 100.0f;
+	kAtkRange = 280.0f;
 
 	// 当たり判定
 	kWidth = 24.0f;
@@ -797,23 +797,23 @@ EnemyMummy::~EnemyMummy() {
 
 void EnemyMummy::Initialize(Camera* camera, Vector2& pos, MapChipField* mapChipField)
 {
-	sprite = new DrawSprite(Novice::LoadTexture("./Resources/Enemies/mummy.png"), { 58,72 });
+	sprite = new DrawSprite(Novice::LoadTexture("./Resources/Enemies/mummy.png"), { 42,64 });
 	sprite->SetColor(0xffffffff);
 	camera_ = camera;
 	wtf.Initialize();
 	wtf.translation_ = pos;
 	mapChipField_ = mapChipField;
 
-	kSpeed = { 0.52f, 0.0f };
+	kSpeed = { 0.45f, 0.0f };
 	kAtkRange = 0.0f; //攻撃範囲
 
 	// 当たり判定
-	kWidth = 32.0f;
-	kHeight = 64.0f;
+	kWidth = 28.0f;
+	kHeight = 48.0f;
 
 	// アニメーション用の幅と縦サイズ
-	imageWidth_ = 58;
-	imageHeight_ = 72;
+	imageWidth_ = 42;
+	imageHeight_ = 64;
 }
 
 void EnemyMummy::Update()
@@ -886,10 +886,11 @@ void EnemyMummy::MapCollisionRight(CollisonMapInfo& info)
 	auto indexRB = mapChipField_->GetMapChipIndexByPosition(posNew[kRightBottom]);
 
 	auto typeRT = mapChipField_->GetMapChipTypeIndex(indexRT.xIndex, indexRT.yIndex);
-	auto typeRB = mapChipField_->GetMapChipTypeIndex(indexRB.xIndex, indexRB.yIndex + 1);
+	auto typeRB = mapChipField_->GetMapChipTypeIndex(indexRB.xIndex, indexRB.yIndex);
+	auto typeRBB = mapChipField_->GetMapChipTypeIndex(indexRB.xIndex, indexRB.yIndex + 1);
 
 	// --- 右上にブロックがあったら
-	if (typeRT == MapChipType::kBlock) {
+	if (typeRT == MapChipType::kBlock || typeRB == MapChipType::kBlock) {
 		auto index = mapChipField_->GetMapChipIndexByPosition(
 			wtf.translation_ + info.vel + Vector2(kWidth / 2, 0.f));
 		auto indexSetNext = mapChipField_->GetMapChipIndexByPosition(
@@ -902,7 +903,7 @@ void EnemyMummy::MapCollisionRight(CollisonMapInfo& info)
 		}
 	}
 	// --- 右下にブロックがなかったら
-	else if (typeRB != MapChipType::kBlock) {
+	else if (typeRBB != MapChipType::kBlock) {
 		info.LR = true;
 	}
 
@@ -923,10 +924,11 @@ void EnemyMummy::MapCollisionLeft(CollisonMapInfo& info)
 	auto indexLB = mapChipField_->GetMapChipIndexByPosition(posNew[kLeftBottom]);
 
 	auto typeLT = mapChipField_->GetMapChipTypeIndex(indexLT.xIndex, indexLT.yIndex);
-	auto typeLB = mapChipField_->GetMapChipTypeIndex(indexLB.xIndex, indexLB.yIndex + 1);
+	auto typeLB = mapChipField_->GetMapChipTypeIndex(indexLB.xIndex, indexLB.yIndex);
+	auto typeLBB = mapChipField_->GetMapChipTypeIndex(indexLB.xIndex, indexLB.yIndex + 1);
 
 	// --- 左上にブロックがあったら
-	if (typeLT == MapChipType::kBlock) {
+	if (typeLT == MapChipType::kBlock || typeLB == MapChipType::kBlock) {
 		auto index = mapChipField_->GetMapChipIndexByPosition(wtf.translation_ + info.vel - Vector2(kWidth / 2, 0.f));
 		auto indexSetNext = mapChipField_->GetMapChipIndexByPosition(wtf.translation_ - Vector2(kWidth / 2, 0.f));
 
@@ -937,7 +939,7 @@ void EnemyMummy::MapCollisionLeft(CollisonMapInfo& info)
 		}
 	}
 	// --- 左下にブロックがなかったら
-	else if (typeLB != MapChipType::kBlock) {
+	else if (typeLBB != MapChipType::kBlock) {
 		info.LR = true;
 	}
 }
