@@ -1,5 +1,6 @@
 #include "Fade.h"
 #include <algorithm>
+
 Fade::Fade() {}
 
 Fade::~Fade() {
@@ -7,7 +8,8 @@ Fade::~Fade() {
 }
 
 void Fade::Initialize() {
-	//TextureHandle_ = TextureManager::Load("white1x1.png"); // テクスチャの読み込み
+	TextureHandle_ = Novice::LoadTexture("white1x1.png"); // テクスチャの読み込み
+	color_ = RGBA(0, 0, 0, 255);
 }
 
 void Fade::Update() {
@@ -21,7 +23,9 @@ void Fade::Update() {
 		if (count_ >= duration_) {
 			count_ = duration_;
 		}
-		//fadeSprite_->SetColor(Vector4(0, 0, 0, 1.0f - std::clamp(count_ / duration_, 0.0f, 1.0f)));
+		color_.A = static_cast<int>(
+			255 - std::clamp(static_cast<float>(count_) / duration_, 0.0f, 1.0f) * 255
+			);
 		break;
 
 	case Fade::Status::FadeOut:
@@ -29,15 +33,17 @@ void Fade::Update() {
 		if (count_ >= duration_) {
 			count_ = duration_;
 		}
-		//fadeSprite_->SetColor(Vector4(0, 0, 0, std::clamp(count_ / duration_, 0.0f, 1.0f)));
+		color_.A = static_cast<int>(
+			std::clamp(static_cast<float>(count_) / duration_, 0.0f, 1.0f) * 255
+			);
 		break;
 	}
 }
 
 void Fade::Draw() {
 
-	if (status_ == Status::None) {
-	}
+	Novice::DrawSprite(0, 0, TextureHandle_, 1280, 720, 0.f, color_);
+
 }
 
 void Fade::Start(Status status, float duration) {
@@ -51,7 +57,7 @@ void Fade::Stop() {
 
 	status_ = Status::None;              // フェードの状態を「なし」に設定
 	count_ = 0.0f;                       // カウントをリセット
-	//fadeSprite_->SetColor({ 0, 0, 0, 1 }); // スプライトの色を完全に不透明に設定
+	color_.A = 255;
 }
 
 bool Fade::IsFinished() const {

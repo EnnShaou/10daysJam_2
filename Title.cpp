@@ -1,5 +1,5 @@
 #include "Title.h"
-#include "ImGui.h"
+
 #include"keys.h"
 #include"Novice.h"
 
@@ -37,15 +37,14 @@ void TitleScene::Update() {
 
 #ifdef _DEBUG
 		// ImGuiの表示
-		ImGui::Text("Title Scene");
-		ImGui::Text("Press Enter to start the game.");
+		Novice::ScreenPrintf(0, 0, "TITLE");
 #endif                                // _DEBUG
 
 		break;
 
 	case TitleScene::Phase::kFadeOut:
 		if (fade_->IsFinished()) { // フェードアウトが完了したらシーンを終了
-			//SceneNo = ;
+			SceneNo =Scene::kGame ;
 		}
 		fade_->Update();        // フェードの更新
 		break;
@@ -57,5 +56,4 @@ void TitleScene::Update() {
 void TitleScene::Draw() {
 
 	fade_->Draw();
-	Novice::ScreenPrintf(0, 0, "Title Scene Phase:");
 }

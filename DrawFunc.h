@@ -26,3 +26,33 @@ private:
 };
 
 void DrawCircle(WtF& wt,	Camera* camera, int radius, unsigned int color);
+
+void DrawHitBox(WtF& wt, Camera* camera, int width, int height);
+class RGBA {
+	public:
+	int R, G, B, A;
+	RGBA(int r = 255, int g = 255, int b = 255, int a = 255)
+		: R(int(r)), G(int(g)), B(int(b)), A(int(a)) {
+	}
+	~RGBA(){}
+
+	operator int() const {
+		return (R << 24) | (G << 16) | (B << 8) | A;
+	}
+	RGBA operator+(const RGBA& other) const {
+		return RGBA(
+			min(R + other.R, 255),
+			min(G + other.G, 255),
+			min(B + other.B, 255),
+			min(A + other.A, 255)
+		);
+	}
+	RGBA operator-(const RGBA& other) const {
+		return RGBA(
+			max(R - other.R, 0),
+			max(G - other.G, 0),
+			max(B - other.B, 0),
+			max(A - other.A, 0)
+		);
+	}
+};

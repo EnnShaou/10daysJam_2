@@ -1,4 +1,6 @@
 #pragma once
+#include"Novice.h"
+#include"DrawFunc.h"
 class Fade {
 public:
 	Fade();
@@ -20,4 +22,5 @@ private:
 	Status status_ = Status::None;               // フェードの状態
 	float duration_ = 0.0f;                      // フェードの持続時間
 	float count_ = 0.0f;                         // フェードのカウント
+	RGBA  color_;
 };

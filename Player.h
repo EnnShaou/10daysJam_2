@@ -103,6 +103,7 @@ public:
 	void OnCollisionAstral(const Enemies* enemies);
 
 
+
 	// --- 行動パターン初期化・更新 ---
 	void BehaviorRootInitialize();
 	void BehaviorRootUpdate();
@@ -113,7 +114,7 @@ public:
 	void BehaviorAstralInitialize();
 	void BehaviorAstralUpdate();
 
-	void BehaviorKnockbackInitialize(const Vector2& knockDir);
+	void BehaviorKnockbackInitialize();
 	void BehaviorKnockbackUpdate();
 
 	// --- 幽体状態の切り替え処理 ---
@@ -126,7 +127,7 @@ public:
 	void AstralBodyBehaviorAttackInitialize();
 	void AstralBodyBehaviorAttackUpdate();
 
-	void AstralBodyBehaviorKnockbackInitialize(const Vector2& knockDir);
+	void AstralBodyBehaviorKnockbackInitialize();
 	void AstralBodyBehaviorKnockbackUpdate();
 
 	// --- アニメーション関連 ---
@@ -153,6 +154,10 @@ public:
 
 	// --- セッター ---
 	void SetMapChipField(MapChipField* mapChipField) { mapChipField_ = mapChipField; }
+
+	bool GetInvincible() const { return isInvincible_; }
+
+	
 
 private:
 	// --- 弾関連 ---
@@ -217,7 +222,7 @@ private:
 	float coolTime_ = 3.0f;                  // 幽体状態になるまでのクールタイム
 
 	// --- 体力 ---
-	static inline const int maxNomalBodyHP = 3;  // 通常状態の最大体力
+	static inline const int maxNomalBodyHP = 100;  // 通常状態の最大体力
 	static inline const int maxAstralBodyHP = 1; // 幽体状態の最大体力
 	int nomalBodyHP = maxNomalBodyHP;            // 通常状態の体力
 	int astralBodyHP = maxAstralBodyHP;          // 幽体状態の体力
@@ -231,10 +236,18 @@ private:
 
 	// --- ノックバック ---
 	bool isKnockback_ = false; 
+	Vector2 knockback_ = { 5.2f, 0.0f };
 	float knockbackTimer_ = 0.0f;
-	const float knockbackDuration_ = 0.3f; // ノックバックが続く秒数
 
 	// --- 当たり判定 ---
 	Vector2 nomalSize = { 50.0f,70.0f };
 	Vector2 astralSize = { 60.0f,60.0f };
+
+	const float knockbackDuration_ = 0.5f; // ノックバックが続く秒数
+
+	int invincibleTimer_ = 0;
+	const int maxInvincibleTimer = 90;
+	bool isInvincible_ = false;
+
+	void Invincible();
 };
