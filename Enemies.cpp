@@ -327,8 +327,8 @@ void EnemyPumpkin::Initialize(Camera* camera, Vector2& pos, MapChipField* mapChi
 	kSpeed = { 2.0f, 2.0f };  //かぼちゃの速さ
 	kAtkRange = 320.0f;         //プレイヤーがこの範囲にいると動く (320)
 
-	kWidth = 50;              // 当たり判定の幅
-	kHeight = 30;             // 当たり判定の高さ
+	kWidth = 38;              // 当たり判定の幅
+	kHeight = 26;             // 当たり判定の高さ
 
 	// アニメーション用の幅と縦サイズ
 	imageWidth_ = 64;
@@ -439,6 +439,7 @@ void EnemyPumpkin::Update() {
 void EnemyPumpkin::Draw()
 {
 	sprite->Draw(wtf, camera_, animePosX_, animePosY_, imageWidth_, imageHeight_);
+	DrawHitBox(wtf, camera_, int(kWidth), int(kHeight));
 	Novice::ScreenPrintf(10, 400, "PumpkinVelY %0.2f", vel_.y);
 }
 
@@ -476,7 +477,7 @@ void EnemyLamp::Initialize(Camera* camera, Vector2& pos, MapChipField* mapChipFi
 	kAtkRange = lightRadius_ - 30.0f;
 
 	// 当たり判定用
-	kWidth = 42;
+	kWidth = 32;
 	kHeight = 42;
 
 	// 画像サイズ
@@ -523,7 +524,7 @@ void EnemyLamp::Draw()
 {
 	DrawCircle(wtf, camera_, int(lightRadius_), RED);
 	sprite->Draw(wtf, camera_, animePosX_, animePosY_, imageHeight_, imageWidth_);
-
+	DrawHitBox(wtf, camera_, int(kWidth), int(kHeight));
 }
 
 void EnemyLamp::OnCollision()
@@ -599,8 +600,8 @@ void EnemyBat::Initialize(Camera* camera, Vector2& pos, MapChipField* mapChipFie
 	kAtkRange = 280.0f;
 
 	// 当たり判定
-	kWidth = 24.0f;
-	kHeight = 24.0f;
+	kWidth = 20.0f;
+	kHeight = 18.0f;
 
 	// 画像サイズ
 	imageWidth_ = 32;
@@ -668,6 +669,8 @@ void EnemyBat::Update()
 void EnemyBat::Draw()
 {
 	sprite->Draw(wtf, camera_, animePosX_, animePosY_, imageWidth_, imageHeight_, lrDirection_);
+
+	DrawHitBox(wtf, camera_, int(kWidth), int(kHeight));
 }
 
 void EnemyBat::Animation()
@@ -809,7 +812,7 @@ void EnemyMummy::Initialize(Camera* camera, Vector2& pos, MapChipField* mapChipF
 
 	// 当たり判定
 	kWidth = 28.0f;
-	kHeight = 48.0f;
+	kHeight = 32.0f;
 
 	// アニメーション用の幅と縦サイズ
 	imageWidth_ = 42;
@@ -853,6 +856,7 @@ void EnemyMummy::Update()
 void EnemyMummy::Draw()
 {
 	sprite->Draw(wtf, camera_, animePosX_, animePosY_, imageWidth_, imageHeight_, lrDirection_);
+	DrawHitBox(wtf, camera_, int(kWidth), int(kHeight));
 }
 
 void EnemyMummy::OnCollision()

@@ -87,6 +87,7 @@ void Player::Update()
 		GroundStates(info);
 	}
 
+	Invincible();
 	playerBullets_.Update();
 	Animation();
 
@@ -132,22 +133,26 @@ void Player::Draw()
 	else
 	{
 
-		int texX = (animationCount * 58);
-		int texY = static_cast<int>(animationBehavior_) * 72 + 2;
-		int scaleX = 58;
+		if (invincibleTimer_ % 6 == 0) {
+			int texX = (animationCount * 58);
+			int texY = static_cast<int>(animationBehavior_) * 72 + 2;
+			int scaleX = 58;
 
-		playerSprite_->SetColor(0xffffffff); // 通常色
-		playerSprite_->Draw(worldTransform_, camera_, texX, texY, scaleX, 72, lrDirection_);
-
+			playerSprite_->SetColor(0xffffffff); // 通常色
+			playerSprite_->Draw(worldTransform_, camera_, texX, texY, scaleX, 72, lrDirection_);
+		}
 	}
 
 	if (animationBehavior_ == AnimationBehavior::kDamage)
 	{
-		int texX = (animationCount * 58);
-		playerSprite_->Draw(worldTransform_, camera_, texX, 72 * 4, 58, 72, lrDirection_);
+		//int texX = (animationCount * 58);
+		//playerSprite_->Draw(worldTransform_, camera_, texX, 72 * 4, 58, 72, lrDirection_);
 	}
 
+
 	playerBullets_.Draw();
+
+	DrawHitBox(worldTransform_, camera_, int(kWidth), int(kHeight));
 
 	// Debug表示
 	Novice::ScreenPrintf(30, 50, "behavior_: %d", behavior_);
@@ -156,6 +161,7 @@ void Player::Draw()
 	Novice::ScreenPrintf(30, 110, "Astralbehavior_: %d", Astralbehavior_);
 	Novice::ScreenPrintf(30, 130, "AstralbehaviorNext_: %d", AstralbehaviorNext_);
 	Novice::ScreenPrintf(30, 150, "astralBodyTimer: %f", astralBodyTimer_);
+	Novice::ScreenPrintf(1000, 10, "invincible: %d", isInvincible_);
 }
 void Player::Move()
 {
@@ -505,10 +511,19 @@ void Player::OnCollisionNomal(const Enemies* enemies)
 	if (enemies)
 	{
 		Vector2 enemyPos = enemies->GetPos();
-		Vector2 knockDir = (worldTransform_.translation_ - enemyPos).normalize();
+		//Vector2 knockDir = (worldTransform_.translation_ - enemyPos).normalize();
+
+		if (worldTransform_.translation_.x >= enemyPos.x) {
+			knockback_.x = 5.2f;
+			lrDirection_ = DrawSprite::LRDirection::kLeft;
+		}
+		else {
+			knockback_.x = -5.2f;
+			lrDirection_ = DrawSprite::LRDirection::kRight;
+		}
 
 		behaviorNext_ = Behavior::kKnockback;
-		BehaviorKnockbackInitialize(knockDir);
+		BehaviorKnockbackInitialize();
 	}
 
 	// HPが0以下になったら死亡フラグを立てる
@@ -527,12 +542,19 @@ void Player::OnCollisionAstral(const Enemies* enemies)
 	}
 
 	// ノックバック方向（敵が左なら右に飛ばす）
-	float dir = GetVel().x;
-	Vector2 knockDir = { dir, 0.0f };
+	Vector2 enemyPos = enemies->GetPos();
+	if (worldTransform_.translation_.x >= enemyPos.x) {
+		knockback_.x = 3.2f;
+		lrDirection_ = DrawSprite::LRDirection::kLeft;
+	}
+	else {
+		knockback_.x = -3.2f;
+		lrDirection_ = DrawSprite::LRDirection::kRight;
+	}
 
 	AstralbehaviorNext_ = AstralBehavior::kKnockback;
 	animationBehaviorNext_ = AnimationBehavior::kAstralDeath;
-	AstralBodyBehaviorKnockbackInitialize(knockDir);
+	AstralBodyBehaviorKnockbackInitialize();
 
 	pendingAstralDamage_ = true; // ダメージ保留
 }
@@ -576,7 +598,7 @@ void Player::BehaviorAttackUpdate()
 
 void Player::BehaviorAstralInitialize()
 {
-	coolTime_ = 5.f;
+	coolTime_ = 3.f;
 	astralBodyTimer_ = 0.0f;
 	behavior_ = Behavior::kAstral;
 	currentBullets_ = 0;
@@ -622,20 +644,21 @@ void Player::BehaviorAstralUpdate()
 	}
 }
 
-void Player::BehaviorKnockbackInitialize(const Vector2& knockDir)
+void Player::BehaviorKnockbackInitialize()
 {
+	
 	behavior_ = Behavior::kKnockback;
 	knockbackTimer_ = knockbackDuration_;
-	vel_ = knockDir * 6.0f;
-	vel_.y = 5.0f;
-	onGround = false;
+	invincibleTimer_ = maxInvincibleTimer;
+	vel_ = { 0.0f, 0.0f };
 }
 
 void Player::BehaviorKnockbackUpdate()
 {
+	
 	// ノックバックの移動処理
 	CollisonMapInfo info;
-	info.vel = vel_;
+	info.vel = knockback_;
 
 	MapCollision(info);
 	MapCollisionMove(info);
@@ -643,8 +666,9 @@ void Player::BehaviorKnockbackUpdate()
 	MapWallCollision(info);
 	GroundStates(info);
 
+
 	knockbackTimer_ -= frameTime;
-	if (knockbackTimer_ <= 0.0f || onGround)
+	if (knockbackTimer_ <= 0.0f)
 	{
 		behaviorNext_ = Behavior::kRoot;
 	}
@@ -738,41 +762,39 @@ void Player::AstralBodyBehaviorAttackUpdate()
 	AstralbehaviorNext_ = AstralBehavior::kRoot;
 }
 
-void Player::AstralBodyBehaviorKnockbackInitialize(const Vector2& knockDir)
+void Player::AstralBodyBehaviorKnockbackInitialize()
 {
 	Astralbehavior_ = AstralBehavior::kKnockback;
 
 	knockbackTimer_ = 0.5f;
-
-	vel_ = knockDir * 6.0f; // 横方向速度
-	vel_.y = 4.0f; // 上方向に跳ねる
+	vel_ = { 0.0f, 0.0f };
 }
 
 void Player::AstralBodyBehaviorKnockbackUpdate()
 {
 	// ノックバック移動
-	worldTransform_.translation_ += vel_;
+	worldTransform_.translation_ += knockback_;
 
-	// シェイク量の計算（強め＆ハイ周波数）
-	float shakeAmplitude = 5.0f; // 揺れの強さ（少し大きく）
-	float shakeFrequency = 80.0f; // 揺れの速さ
-	float elapsed = knockbackDuration_ - knockbackTimer_;
-	float shakeOffsetX = sinf(elapsed * shakeFrequency) * shakeAmplitude;
-	float shakeOffsetY = cosf(elapsed * shakeFrequency * 1.5f) * (shakeAmplitude / 2.0f);
+	//// シェイク量の計算（強め＆ハイ周波数）
+	//float shakeAmplitude = 5.0f; // 揺れの強さ（少し大きく）
+	//float shakeFrequency = 80.0f; // 揺れの速さ
+	//float elapsed = knockbackDuration_ - knockbackTimer_;
+	//float shakeOffsetX = sinf(elapsed * shakeFrequency) * shakeAmplitude;
+	//float shakeOffsetY = cosf(elapsed * shakeFrequency * 1.5f) * (shakeAmplitude / 2.0f);
 
-	// シェイクを適用（ノックバック移動の後に追加）
-	worldTransform_.translation_.x += shakeOffsetX;
-	worldTransform_.translation_.y += shakeOffsetY;
+	//// シェイクを適用（ノックバック移動の後に追加）
+	//worldTransform_.translation_.x += shakeOffsetX;
+	//worldTransform_.translation_.y += shakeOffsetY;
 
-	// 点滅処理
-	if (static_cast<int>(elapsed * 15) % 2 == 0)
-	{
-		//sprite_.SetColor({ 1.0f, 0.2f, 0.2f, 1.0f });
-	}
-	else
-	{
-		//sprite_.SetColor({ 1.0f, 1.0f, 1.0f, 1.0f });
-	}
+	//// 点滅処理
+	//if (static_cast<int>(elapsed * 15) % 2 == 0)
+	//{
+	//	//sprite_.SetColor({ 1.0f, 0.2f, 0.2f, 1.0f });
+	//}
+	//else
+	//{
+	//	//sprite_.SetColor({ 1.0f, 1.0f, 1.0f, 1.0f });
+	//}
 
 	// 制限範囲
 	worldTransform_.translation_.x = std::clamp(
@@ -810,12 +832,12 @@ void Player::AstralBodyBehaviorKnockbackUpdate()
 
 void Player::Animation()
 {
+	animationTimer++;
 	if (animationBehaviorNext_ != AnimationBehavior::kUnknown)
 	{
 		animationBehavior_ = animationBehaviorNext_;
 		animationBehaviorNext_ = AnimationBehavior::kUnknown;
 		animationCount = 0;
-		animationTimer = 0;
 
 		switch (animationBehavior_)
 		{
@@ -858,7 +880,6 @@ void Player::Animation()
 	{
 	case Player::AnimationBehavior::kRoot:
 
-		animationTimer++;
 		if (!onGround)
 		{
 			if (vel_.y > 0.f)
@@ -877,7 +898,6 @@ void Player::Animation()
 		break;
 	case Player::AnimationBehavior::kMove:
 
-		animationTimer++;
 		if (!onGround)
 		{
 			if (vel_.y > 0.f)
@@ -896,7 +916,6 @@ void Player::Animation()
 		break;
 	case Player::AnimationBehavior::kJumpUp:
 
-		animationTimer++;
 		if (!onGround && vel_.y < 0.f)
 		{
 			animationBehaviorNext_ = Player::AnimationBehavior::kJumpDown;
@@ -904,14 +923,12 @@ void Player::Animation()
 		break;
 	case Player::AnimationBehavior::kJumpDown:
 
-		animationTimer++;
 		if (onGround)
 		{
 			animationBehaviorNext_ = Player::AnimationBehavior::kRoot;
 		}
 		break;
 	case Player::AnimationBehavior::kDamage:
-		animationTimer++;
 		if (damageCooldown_ <= 0) {
 			animationBehaviorNext_ = Player::AnimationBehavior::kRoot;
 		}
@@ -924,14 +941,12 @@ void Player::Animation()
 		break;
 	}
 
-	animationTimer++;
 
 	// attack の場合はアニメーションしない
 	if (animationBehavior_ != AnimationBehavior::kAstralAttack) {
 		if (animationTimer >= 60 / (animationMax * 2)) {
-			animationTimer = 0;
+			//animationTimer = 0;
 			animationCount++;
-
 			// 死亡アニメーションだけ非ループ
 			if (animationBehavior_ == AnimationBehavior::kAstralDeath) {
 				if (animationCount >= animationMax) {
@@ -953,13 +968,17 @@ void Player::Animation()
 
 bool Player::isPushButton(BlockButtonAndGate* button)
 {
+	Vector2 playerPos = worldTransform_.translation_;
+
 	if (behavior_ == Behavior::kAstral)
 	{
-		return false;
+		// 幽体の時本体の位置を求める
+		playerPos = tentativeWorldTransform_.translation_;
 	}
 	std::array<Vector2, kNumCorner> posNew;
 	for (uint32_t i = 0; i < posNew.size(); ++i) {
-		posNew[i] = CornerPos(worldTransform_.translation_, static_cast<Corner>(i));
+
+		posNew[i] = CornerPos(playerPos, static_cast<Corner>(i));
 	}
 
 	std::array<Corner, 2> checkCorners = { kLeftBottom, kRightBottom };
@@ -976,4 +995,15 @@ bool Player::isPushButton(BlockButtonAndGate* button)
 	}
 
 	return false;
+}
+
+void Player::Invincible()
+{
+	if (invincibleTimer_ > 0) {
+		isInvincible_ = true;
+		invincibleTimer_--;
+	}
+	else {
+		isInvincible_ = false;
+	}
 }
