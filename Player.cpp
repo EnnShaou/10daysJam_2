@@ -350,6 +350,10 @@ void Player::MapCollisionBottom(CollisonMapInfo& info) {
 			}
 
 		}
+		if (type == MapChipType::kThorn)
+		{
+			isDead_ = true;
+		}
 	}
 }
 void Player::MapCollisionLeft(CollisonMapInfo& info) {
@@ -533,6 +537,8 @@ void Player::OnCollisionAstral(const Enemies* enemies)
 
 	pendingAstralDamage_ = true; // ダメージ保留
 }
+
+
 
 void Player::BehaviorRootInitialize()
 {

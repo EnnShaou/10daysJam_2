@@ -78,8 +78,8 @@ public:
 
 private:
 
-	Gate* gate_ = nullptr;   
-	bool isPressed_ = false; 
+	Gate* gate_ = nullptr;
+	bool isPressed_ = false;
 
 };
 
@@ -92,7 +92,17 @@ public:
 	void Update() override;
 	void Draw(Camera* camera) override;
 private:
-	bool isShow = false; 
+	bool isShow = false;
+};
+class Thorn : public Block
+{
+public:
+	Thorn() {}
+	~Thorn() {}
+	void Initialize(Vector2 pos) override;
+	void Update() override;
+	void Draw(Camera* camera) override;
+private:
 };
 
 class MapBlockManager

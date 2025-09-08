@@ -119,42 +119,58 @@ void Game::GenerateBlocks() {
 			if (mapChipType == MapChipType::kButton1)
 			{
 				auto* button = new BlockButtonAndGate();
-				button->setBindID(1);  
+				button->setBindID(1);
 				blockManger->pushBlock(button, pos, x, y);
 			}
-			if (mapChipType == MapChipType::kGate1)
-			{
-				auto* gate = new Gate();
-				gate->setBindID(1);  
-				blockManger->pushBlock(gate, pos, x, y);
-			}
+
 			if (mapChipType == MapChipType::kButton2)
 			{
 				auto* button = new BlockButtonAndGate();
-				button->setBindID(2);  
+				button->setBindID(2);
 				blockManger->pushBlock(button, pos, x, y);
+			}
+
+			if (mapChipType == MapChipType::kButton3)
+			{
+				auto* button = new BlockButtonAndGate();
+				button->setBindID(3);
+				blockManger->pushBlock(button, pos, x, y);
+			}
+
+			if (mapChipType == MapChipType::HiddenFloor)
+			{
+				blockManger->pushBlock(new HiddenFloor(), pos, x, y);
+			}
+			if (mapChipType == MapChipType::kThorn)
+			{
+				blockManger->pushBlock(new Thorn(), pos, x, y);
+			}
+		}
+	}
+
+	// ブロックの生成
+	for (uint32_t y = 0; y < numBlockY; y++) {
+		for (uint32_t x = 0; x < numBlockX; x++) {
+
+			MapChipType mapChipType = mapChipField_->GetMapChipTypeIndex(x, y);
+			Vector2 pos = mapChipField_->GetMapChipPositionByIndex(x, y);
+			if (mapChipType == MapChipType::kGate1)
+			{
+				auto* gate = new Gate();
+				gate->setBindID(1);
+				blockManger->pushBlock(gate, pos, x, y);
 			}
 			if (mapChipType == MapChipType::kGate2)
 			{
 				auto* gate = new Gate();
-				gate->setBindID(2);  
+				gate->setBindID(2);
 				blockManger->pushBlock(gate, pos, x, y);
-			}
-			if (mapChipType == MapChipType::kButton3)
-			{
-				auto* button = new BlockButtonAndGate();
-				button->setBindID(3);  
-				blockManger->pushBlock(button, pos, x, y);
 			}
 			if (mapChipType == MapChipType::kGate3)
 			{
 				auto* gate = new Gate();
-				gate->setBindID(3);  
+				gate->setBindID(3);
 				blockManger->pushBlock(gate, pos, x, y);
-			}
-			if (mapChipType == MapChipType::HiddenFloor)
-			{
-				blockManger->pushBlock(new HiddenFloor(), pos, x, y);
 			}
 		}
 	}
@@ -248,7 +264,7 @@ void Game::CheckAllCollisions()
 					Novice::ScreenPrintf(30, 220, "HitBat!)");
 					player_->OnCollisionNomal(enemy);
 				}
-			}	
+			}
 		}
 	}
 #pragma endregion

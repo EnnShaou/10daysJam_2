@@ -102,6 +102,7 @@ public:
 
 	void OnCollisionAstral(const Enemies* enemies);
 
+
 	// --- 行動パターン初期化・更新 ---
 	void BehaviorRootInitialize();
 	void BehaviorRootUpdate();

@@ -88,8 +88,10 @@ void Gate::Initialize(Vector2 pos) {
 	auto index = mapChipField_->GetMapChipIndexByPosition(wtf_.translation_);
 	auto type = mapChipField_->GetMapChipTypeIndex(index.xIndex, index.yIndex);
 	while (type != MapChipType::kBlock) {
+		mapChipField_->setMapChipData(MapChipType::kBlock, index.xIndex, index.yIndex + gateIndex);
 		gateIndex++;
 		type = mapChipField_->GetMapChipTypeIndex(index.xIndex, index.yIndex + gateIndex);
+
 	}
 	sprite->SetSize({ sprite->GetSize().x,gateIndex * 64.f });
 }
@@ -250,3 +252,21 @@ void HiddenFloor::Draw(Camera* camera)
 	sprite->Draw(wtf_, camera, 0, 0, 64, 64);
 }
 
+void Thorn::Initialize(Vector2 pos)
+{
+	sprite = new DrawSprite(Novice::LoadTexture("white1x1.png"), { 64,64 });
+	wtf_.Initialize();
+	wtf_.translation_ = pos;
+	sprite->SetColor(BLACK);
+
+}
+
+void Thorn::Update()
+{
+	wtf_.Update();
+}
+
+void Thorn::Draw(Camera* camera)
+{
+	sprite->Draw(wtf_, camera, 0, 0, 64, 64);
+}
