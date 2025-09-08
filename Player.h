@@ -240,8 +240,8 @@ private:
 	float knockbackTimer_ = 0.0f;
 
 	// --- 当たり判定 ---
-	Vector2 nomalSize = { 50.0f,70.0f };
-	Vector2 astralSize = { 60.0f,60.0f };
+	Vector2 nomalSize = { 25.0f,50.0f };
+	Vector2 astralSize = { 45.0f,45.0f };
 
 	const float knockbackDuration_ = 0.5f; // ノックバックが続く秒数
 

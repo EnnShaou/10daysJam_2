@@ -264,7 +264,8 @@ void Game::CheckAllCollisions()
 		{
 			// 敵の情報を取得
 			Rect enemyRect = { bat->GetPos().x, bat->GetPos().y, bat->GetSize().x, bat->GetSize().y };
-
+			Rect playerTempRect = { player_->GetTentativePos().x,player_->GetTentativePos().y,player_->GetNomalSize().x,player_->GetNomalSize().y };
+			
 			// 当たり判定のチェック
 			if (bat->GetIsDead() == false) {
 
@@ -277,7 +278,7 @@ void Game::CheckAllCollisions()
 						}
 					}
 					else {
-						if (playerAstralRect.IsCollision(enemyRect))
+						if (playerTempRect.IsCollision(enemyRect))
 						{
 							Novice::ScreenPrintf(30, 220, "HitBat!)");
 							player_->OnCollisionAstral(enemy);
@@ -326,7 +327,8 @@ void Game::CheckAllCollisions()
 		{
 			// 敵の情報を取得
 			Rect enemyRect = { mummy->GetPos().x, mummy->GetPos().y, mummy->GetSize().x, mummy->GetSize().y };
-			
+			Rect playerTempRect = { player_->GetTentativePos().x,player_->GetTentativePos().y,player_->GetNomalSize().x,player_->GetNomalSize().y };
+
 			// 当たり判定のチェック
 			if (mummy->GetIsStun() == false) {
 
@@ -339,7 +341,7 @@ void Game::CheckAllCollisions()
 						}
 					}
 					else {
-						if (playerAstralRect.IsCollision(enemyRect))
+						if (playerTempRect.IsCollision(enemyRect))
 						{
 							Novice::ScreenPrintf(30, 220, "HitBat!)");
 							player_->OnCollisionAstral(enemy);
