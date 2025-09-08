@@ -7,7 +7,7 @@ class PlayerBullets
 {
 public:
 	// --- 初期化 ---
-	void Initialize(Camera* camera_, Vector2 pos,Vector2 vel);
+	void Initialize(Camera* camera, Vector2 pos,Vector2 dir);
 
 	// --- デストラクタ ---
 	~PlayerBullets();
@@ -18,15 +18,22 @@ public:
 	// --- 描画処理 ---
 	void Draw();
 
+	// --- 発射開始 ---
+	void Launch();
+
 	// --- ゲッター ---
 	bool IsDead() const { return isDead_; }
-	Vector2 GetPos() const { Vector2 worldPos = wtf.translation_; return worldPos; }
+	Vector2 GetPos() const { Vector2 worldPos = worldTransform_.translation_; return worldPos; }
 	Vector2 GetSize() const { return Vector2(kWidth, kHeight); }
+	void SetPosition(const Vector2& pos) { worldTransform_.translation_ = pos; worldTransform_.Update();}
+
+	// --- セッター ---
+	void SetDead(bool isDead) { isDead_ = isDead; }
 
 private:
 	// --- トランスフォーム・カメラ・スプライト ---
 	DrawSprite* sprite = nullptr; // プレイヤーの弾スプライト
-	WtF wtf;                      // ワールドトランスフォーム
+	WtF worldTransform_;          // ワールドトランスフォーム
 	Camera* camera_ = nullptr;    // カメラ参照
 
 	// --- 定数 ---
@@ -35,7 +42,7 @@ private:
 	static inline const float kBlank = 2.0f;   // 当たり判定余白
 
 	// --- 速度 ---
-	Vector2 vel_ = { 10.0f, 0.0f }; // 弾の速度
+	Vector2 vel_ = {}; // 弾の速度
 
 	// --- 状態フラグ ---
 	bool isActive_ = true; // 弾が有効かどうか
@@ -46,5 +53,5 @@ private:
 	float lifeTime_ = 5.0f;         // 弾の寿命（秒）
 
 	// --- 向き ---
-	Vector2 dir_ = { 0.0f,0.0f };
+	Vector2 dir_ = {};
 };

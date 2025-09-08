@@ -202,7 +202,8 @@ void Game::GenerateBlocks() {
 void Game::CheckAllCollisions()
 {
 	// プレイヤーの情報を取得
-	Rect playerRect = { player_->GetPos().x,player_->GetPos().y,player_->GetSize().x,player_->GetSize().y };
+	Rect playerNomalRect = { player_->GetPos().x,player_->GetPos().y,player_->GetNomalSize().x,player_->GetNomalSize().y };
+	Rect playerAstralRect = { player_->GetPos().x,player_->GetPos().y,player_->GetAstralSize().x,player_->GetAstralSize().y };
 
 #pragma region "playerとpumpkinの当たり判定"
 	for (const auto& enemy : enemyManager.GetEnemies())
@@ -213,17 +214,19 @@ void Game::CheckAllCollisions()
 			Rect enemyRect = { pumpkin->GetPos().x, pumpkin->GetPos().y, pumpkin->GetSize().x, pumpkin->GetSize().y };
 			float enemyVelocityY = pumpkin->GetVelocity();
 			// 当たり判定のチェック
-			if (playerRect.IsCollision(enemyRect) && player_->IsAstral())
+			if (playerAstralRect.IsCollision(enemyRect) && player_->IsAstral())
 			{
 				Novice::ScreenPrintf(30, 180, "HitPumpkin!)");
 				player_->OnCollisionAstral(enemy);
 			}
-			else if (playerRect.IsCollision(enemyRect) && !player_->IsAstral())
+			else if (playerNomalRect.IsCollision(enemyRect) && !player_->IsAstral())
 			{
 				// かぼちゃが落下している時だけダメージを受ける
 				if (enemyVelocityY < 0.0f) {
-					Novice::ScreenPrintf(30, 180, "HitPumpkin!)");
-					player_->OnCollisionNomal(enemy);
+					if (player_->GetInvincible() == false) {
+						Novice::ScreenPrintf(30, 180, "HitPumpkin!)");
+						player_->OnCollisionNomal(enemy);
+					}
 				}
 			}
 		}
@@ -239,7 +242,7 @@ void Game::CheckAllCollisions()
 			Rect enemyRect = { lamp->GetPos().x, lamp->GetPos().y, lamp->GetSize().x, lamp->GetSize().y };
 
 			// 当たり判定のチェック
-			if (playerRect.IsCollision(enemyRect) && player_->IsAstral())
+			if (playerAstralRect.IsCollision(enemyRect) && player_->IsAstral())
 			{
 				Novice::ScreenPrintf(30, 200, "HitLamp!)");
 				player_->OnCollisionAstral(enemy);
@@ -258,10 +261,22 @@ void Game::CheckAllCollisions()
 
 			// 当たり判定のチェック
 			if (bat->GetIsDead() == false) {
-				if (playerRect.IsCollision(enemyRect) && !player_->IsAstral())
-				{
-					Novice::ScreenPrintf(30, 220, "HitBat!)");
-					player_->OnCollisionNomal(enemy);
+
+				if (player_->GetInvincible() == false) {
+					if (!player_->IsAstral()) {
+						if (playerNomalRect.IsCollision(enemyRect))
+						{
+							Novice::ScreenPrintf(30, 220, "HitBat!)");
+							player_->OnCollisionNomal(enemy);
+						}
+					}
+					else {
+						if (playerAstralRect.IsCollision(enemyRect))
+						{
+							Novice::ScreenPrintf(30, 220, "HitBat!)");
+							player_->OnCollisionAstral(enemy);
+						}
+					}
 				}
 			}
 		}
@@ -305,13 +320,25 @@ void Game::CheckAllCollisions()
 		{
 			// 敵の情報を取得
 			Rect enemyRect = { mummy->GetPos().x, mummy->GetPos().y, mummy->GetSize().x, mummy->GetSize().y };
-
+			
 			// 当たり判定のチェック
 			if (mummy->GetIsStun() == false) {
-				if (playerRect.IsCollision(enemyRect) && !player_->IsAstral())
-				{
-					Novice::ScreenPrintf(30, 220, "HitMummy!)");
-					player_->OnCollisionNomal(enemy);
+
+				if (player_->GetInvincible() == false) {
+					if (!player_->IsAstral()) {
+						if (playerNomalRect.IsCollision(enemyRect))
+						{
+							Novice::ScreenPrintf(30, 220, "HitBat!)");
+							player_->OnCollisionNomal(enemy);
+						}
+					}
+					else {
+						if (playerAstralRect.IsCollision(enemyRect))
+						{
+							Novice::ScreenPrintf(30, 220, "HitBat!)");
+							player_->OnCollisionAstral(enemy);
+						}
+					}
 				}
 			}
 		}
