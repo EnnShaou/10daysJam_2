@@ -4,6 +4,7 @@
 #include <algorithm>
 #include "keys.h"
 #include <array>
+#include "EnemyManager.h"
 
 Player::Player() : vel_(0, 0) {}
 
@@ -17,11 +18,7 @@ void Player::Initialize(Camera* camera, Vector2& pos)
 	worldTransform_.translation_ = pos;
 	tentativeWorldTransform_.Initialize();
 	playerSprite_ = new DrawSprite(Novice::LoadTexture("./Resources/Player/player.png"), { 58,72 });
-	playerSprite_->SetColor(0xffffffff);
-	astralBodySprite_ = new DrawSprite(Novice::LoadTexture("white1x1.png"), { 68,72 });
-	astralBodySprite_->SetColor(BLUE);
-	dathSprite_ = new DrawSprite(Novice::LoadTexture("white1x1.png"), { 68,72 });
-	dathSprite_->SetColor(BLACK);
+	astralBodySprite_ = new DrawSprite(Novice::LoadTexture("./Resources/PlayerGhost/playerGhost.png"), { 64,64 });
 	astralBodyHP = maxAstralBodyHP;
 	nomalBodyHP = maxNomalBodyHP;
 	damageCooldown_ = 0;
@@ -73,6 +70,9 @@ void Player::Update()
 	case Behavior::kAstral:
 		BehaviorAstralUpdate();
 		break;
+	case Behavior::kKnockback:
+		BehaviorKnockbackUpdate();
+		break;
 	default:
 		break;
 	}
@@ -101,20 +101,56 @@ void Player::Draw()
 		return;
 	}
 
-	if (!isDead_ && behavior_ != Behavior::kAstral)
-	{
-		playerSprite_->Draw(worldTransform_, camera_, animationCount * 58, static_cast<int>(animationBehavior_) * 72 + 2, 58, 72, lrDirection_); // プレイヤーを描画
-	}
-
 	if (behavior_ == Behavior::kAstral)
 	{
-		dathSprite_->Draw(tentativeWorldTransform_, camera_, 0, 0, 68, 72); // プレイヤーを描画
-		astralBodySprite_->Draw(worldTransform_, camera_, 0, 0, 68, 72);
+		int texX = (animationCount * 64) + (lrDir_ == LRDir::kRight ? 0 : 64);
+		int texY = static_cast<int>(animationBehavior_) * 64 + 2;
+		int scaleX = (lrDir_ == LRDir::kRight ? 1 : -1) * 64;
+
+		switch (animationBehavior_)
+		{
+		case AnimationBehavior::kAstralRoot:
+			texY = 0;
+			break;
+		case AnimationBehavior::kAstralAttack:
+			texY = 64;
+			texX = 0;
+			break;
+		case AnimationBehavior::kAstralDeath:
+			texY = 128;
+			break;
+		default:
+			texY = 0;
+			break;
+		}
+
+		astralBodySprite_->Draw(worldTransform_, camera_, texX, texY, scaleX, 64);
+
+		// 肉体（留まってる本体）描画も必要なら
+		int playerTexY = 72 * 5;
+		playerSprite_->Draw(tentativeWorldTransform_, camera_, 0, playerTexY, 68, 72);
+	}
+	else
+	{
+
+		int texX = (animationCount * 58) + (lrDir_ == LRDir::kRight ? 0 : 58);
+		int texY = static_cast<int>(animationBehavior_) * 72 + 2;
+		int scaleX = (lrDir_ == LRDir::kRight ? 1 : -1) * 58;
+
+		playerSprite_->SetColor(0xffffffff); // 通常色
+		playerSprite_->Draw(worldTransform_, camera_, texX, texY, scaleX, 72);
+
 	}
 
-	// 弾の描画
+	if (animationBehavior_ == AnimationBehavior::kDamage) 
+	{
+		int texX = (animationCount * 58) + (lrDir_ == LRDir::kRight ? 0 : 58);
+		playerSprite_->Draw(worldTransform_, camera_, texX, 72 * 4, (lrDir_ == LRDir::kRight ? 1 : -1) * 58, 72);
+	}
+
 	playerBullets_.Draw();
 
+	// Debug表示
 	Novice::ScreenPrintf(30, 50, "behavior_: %d", behavior_);
 	Novice::ScreenPrintf(30, 70, "behaviorNext_: %d", behaviorNext_);
 	Novice::ScreenPrintf(30, 90, "coolTimer: %.2f", coolTime_);
@@ -171,7 +207,7 @@ void Player::AstralMove()
 		worldTransform_.translation_.x,
 		mapChipField_->kBlockWidth,
 		mapChipField_->blockCountX_ * mapChipField_->kBlockWidth - mapChipField_->kBlockWidth * 2);
-
+ 
 	worldTransform_.translation_.y = std::clamp(
 		worldTransform_.translation_.y,
 		mapChipField_->kBlockHeight,
@@ -453,11 +489,24 @@ void Player::OnCollisionNomal(const Enemies* enemies)
 		return;
 	}
 
+	// 点滅アニメーション切り替え
+	animationBehaviorNext_ = AnimationBehavior::kDamage;
+
 	// ダメージ処理
 	nomalBodyHP--;
 
 	// ダメージ無敵時間をリセット
 	damageCooldown_ = damageCooldownMax;
+
+	// ノックバック処理
+	if (enemies)
+	{
+		Vector2 enemyPos = enemies->GetPos();
+		Vector2 knockDir = (worldTransform_.translation_ - enemyPos).normalize();
+
+		behaviorNext_ = Behavior::kKnockback;
+		BehaviorKnockbackInitialize(knockDir);
+	}
 
 	// HPが0以下になったら死亡フラグを立てる
 	if (nomalBodyHP <= 0)
@@ -469,12 +518,20 @@ void Player::OnCollisionNomal(const Enemies* enemies)
 void Player::OnCollisionAstral(const Enemies* enemies)
 {
 	(void)enemies;
-	astralBodyHP--;
-	if (astralBodyHP <= 0)
+	if (Astralbehavior_ == AstralBehavior::kKnockback)
 	{
-		behaviorNext_ = Behavior::kRoot;
-		worldTransform_ = tentativeWorldTransform_;
+		return; // 連続ヒット防止
 	}
+
+	// ノックバック方向（敵が左なら右に飛ばす）
+	float dir = (lrDir_ == LRDir::kRight) ? -1.0f : 1.0f;
+	Vector2 knockDir = { dir, 0.0f };
+
+	AstralbehaviorNext_ = AstralBehavior::kKnockback;
+	animationBehaviorNext_ = AnimationBehavior::kAstralDeath;
+	AstralBodyBehaviorKnockbackInitialize(knockDir);
+
+	pendingAstralDamage_ = true; // ダメージ保留
 }
 
 void Player::BehaviorRootInitialize()
@@ -500,11 +557,6 @@ void Player::BehaviorRootUpdate()
 	}
 
 	Move();
-
-	if (Keys::IsTrigger(DIK_SPACE) && !onGround)
-	{
-		behaviorNext_ = Behavior::kAttack; // 攻撃行動に切り替え
-	}
 }
 
 void Player::BehaviorAttackInitialize()
@@ -524,6 +576,7 @@ void Player::BehaviorAstralInitialize()
 	behavior_ = Behavior::kAstral;
 	currentBullets_ = 0;
 	isAstral = true;
+	animationBehaviorNext_ = AnimationBehavior::kAstralRoot;
 }
 
 void Player::BehaviorAstralUpdate()
@@ -556,8 +609,39 @@ void Player::BehaviorAstralUpdate()
 	case AstralBehavior::kAttack:
 		AstralBodyBehaviorAttackUpdate();
 		break;
+	case AstralBehavior::kKnockback: 
+		AstralBodyBehaviorKnockbackUpdate();
+		break;
 	default:
 		break;
+	}
+}
+
+void Player::BehaviorKnockbackInitialize(const Vector2& knockDir)
+{
+	behavior_ = Behavior::kKnockback;
+	knockbackTimer_ = knockbackDuration_;
+	vel_ = knockDir * 6.0f;
+	vel_.y = 5.0f;
+	onGround = false;
+}
+
+void Player::BehaviorKnockbackUpdate()
+{
+	// ノックバックの移動処理
+	CollisonMapInfo info;
+	info.vel = vel_;
+
+	MapCollision(info);
+	MapCollisionMove(info);
+	MapAfterCollision(info);
+	MapWallCollision(info);
+	GroundStates(info);
+
+	knockbackTimer_ -= frameTime;
+	if (knockbackTimer_ <= 0.0f || onGround)
+	{
+		behaviorNext_ = Behavior::kRoot;
 	}
 }
 
@@ -578,6 +662,7 @@ void Player::AstralBodyBehaviorRootInitialize()
 {
 	Astralbehavior_ = AstralBehavior::kRoot;
 	attackTimer = kAttackTime;
+	animationBehaviorNext_ = AnimationBehavior::kAstralBodyIdle;
 }
 
 void Player::AstralBodyBehaviorRootUpdate()
@@ -590,6 +675,7 @@ void Player::AstralBodyBehaviorRootUpdate()
 	{
 		behaviorNext_ = Behavior::kRoot;
 		worldTransform_ = tentativeWorldTransform_;
+		animationBehaviorNext_ = AnimationBehavior::kRoot;
 	}
 
 	// 本体に戻る
@@ -597,6 +683,7 @@ void Player::AstralBodyBehaviorRootUpdate()
 	{
 		behaviorNext_ = Behavior::kRoot;
 		worldTransform_ = tentativeWorldTransform_;
+		animationBehaviorNext_ = AnimationBehavior::kRoot;
 	}
 
 	// 攻撃クールタイム更新
@@ -620,6 +707,7 @@ void Player::AstralBodyBehaviorAttackInitialize()
 {
 
 	Astralbehavior_ = AstralBehavior::kAttack;
+	animationBehaviorNext_ = AnimationBehavior::kAstralAttack;
 	attackTimer = 0.0f;
 }
 
@@ -643,6 +731,76 @@ void Player::AstralBodyBehaviorAttackUpdate()
 
 	// 攻撃後は通常状態に戻る
 	AstralbehaviorNext_ = AstralBehavior::kRoot;
+}
+
+void Player::AstralBodyBehaviorKnockbackInitialize(const Vector2& knockDir)
+{
+	Astralbehavior_ = AstralBehavior::kKnockback;
+
+	knockbackTimer_ = 0.5f;
+
+	vel_ = knockDir * 6.0f; // 横方向速度
+	vel_.y = 4.0f; // 上方向に跳ねる
+}
+
+void Player::AstralBodyBehaviorKnockbackUpdate()
+{
+	// ノックバック移動
+	worldTransform_.translation_ += vel_;
+
+	// シェイク量の計算（強め＆ハイ周波数）
+	float shakeAmplitude = 5.0f; // 揺れの強さ（少し大きく）
+	float shakeFrequency = 80.0f; // 揺れの速さ
+	float elapsed = knockbackDuration_ - knockbackTimer_;
+	float shakeOffsetX = sinf(elapsed * shakeFrequency) * shakeAmplitude;
+	float shakeOffsetY = cosf(elapsed * shakeFrequency * 1.5f) * (shakeAmplitude / 2.0f);
+
+	// シェイクを適用（ノックバック移動の後に追加）
+	worldTransform_.translation_.x += shakeOffsetX;
+	worldTransform_.translation_.y += shakeOffsetY;
+
+	// 点滅処理
+	if (static_cast<int>(elapsed * 15) % 2 == 0)
+	{
+		//sprite_.SetColor({ 1.0f, 0.2f, 0.2f, 1.0f });
+	}
+	else
+	{
+		//sprite_.SetColor({ 1.0f, 1.0f, 1.0f, 1.0f });
+	}
+
+	// 制限範囲
+	worldTransform_.translation_.x = std::clamp(
+		worldTransform_.translation_.x,
+		tentativeWorldTransform_.translation_.x - kAstralBodyMaxDistance_,
+		tentativeWorldTransform_.translation_.x + kAstralBodyMaxDistance_);
+	worldTransform_.translation_.y = std::clamp(
+		worldTransform_.translation_.y,
+		tentativeWorldTransform_.translation_.y - kAstralBodyMaxDistance_,
+		tentativeWorldTransform_.translation_.y + kAstralBodyMaxDistance_);
+
+	knockbackTimer_ -= frameTime;
+
+	if (knockbackTimer_ <= 0.0f)
+	{
+		if (pendingAstralDamage_)
+		{
+			astralBodyHP--;
+			pendingAstralDamage_ = false;
+
+			if (astralBodyHP <= 0)
+			{
+				behaviorNext_ = Behavior::kRoot;
+				worldTransform_ = tentativeWorldTransform_;
+				animationBehaviorNext_ = AnimationBehavior::kRoot;
+				//sprite_.SetColor({ 1.0f, 1.0f, 1.0f, 1.0f });
+				return;
+			}
+		}
+
+		AstralbehaviorNext_ = AstralBehavior::kRoot;
+		//sprite_.SetColor({ 1.0f, 1.0f, 1.0f, 1.0f });
+	}
 }
 
 void Player::Animation()
@@ -671,6 +829,22 @@ void Player::Animation()
 		case Player::AnimationBehavior::kJumpDown:
 			animationBehavior_ = Player::AnimationBehavior::kJumpDown;
 			animationMax = 2;
+			break;
+		case Player::AnimationBehavior::kDamage:
+			animationMax = 2; 
+			break;
+
+		case Player::AnimationBehavior::kAstralBodyIdle:
+			animationMax = 1; 
+			break;
+		case AnimationBehavior::kAstralRoot:
+			animationMax = 3;
+			break;
+		case AnimationBehavior::kAstralAttack:
+			animationMax = 1;
+			break;
+		case AnimationBehavior::kAstralDeath:
+			animationMax = 3;
 			break;
 		}
 	}
@@ -731,8 +905,39 @@ void Player::Animation()
 			animationBehaviorNext_ = Player::AnimationBehavior::kRoot;
 		}
 		break;
+	case Player::AnimationBehavior::kDamage:
+		animationTimer++;
+		if (damageCooldown_ <= 0) {
+			animationBehaviorNext_ = Player::AnimationBehavior::kRoot;
+		}
+		break;
+
+	case Player::AnimationBehavior::kAstralBodyIdle:
+		
+		break;
 	default:
 		break;
+	}
+
+	animationTimer++;
+
+	// attack の場合はアニメーションしない
+	if (animationBehavior_ != AnimationBehavior::kAstralAttack) {
+		if (animationTimer >= 60 / (animationMax * 2)) {
+			animationTimer = 0;
+			animationCount++;
+
+			// 死亡アニメーションだけ非ループ
+			if (animationBehavior_ == AnimationBehavior::kAstralDeath) {
+				if (animationCount >= animationMax) {
+					animationCount = animationMax - 1; // 最後のフレームで止める
+					// 死亡後の処理を入れるならここ
+				}
+			}
+			else {
+				animationCount = animationCount % animationMax;
+			}
+		}
 	}
 
 	if (animationTimer >= 60 / (animationMax * 2)) {

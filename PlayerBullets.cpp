@@ -6,7 +6,7 @@ void PlayerBullets::Initialize(Camera* camera, Vector2 pos, Vector2 dir)
 	camera_ = camera;
 	wtf.Initialize();
 	wtf.translation_ = pos;
-	sprite = new DrawSprite(Novice::LoadTexture("white1x1.png"), { 30,30 });
+	sprite = new DrawSprite(Novice::LoadTexture("./Resources/PlayerBullet/bullet.png"), { 32,32 });
 	sprite->SetColor(0xffffffff);
 	isActive_ = true;
 	isDead_ = false;
