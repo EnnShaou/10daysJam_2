@@ -270,3 +270,21 @@ void Thorn::Draw(Camera* camera)
 {
 	sprite->Draw(wtf_, camera, 0, 0, 64, 64);
 }
+
+void Clear::Initialize(Vector2 pos)
+{
+	sprite = new DrawSprite(Novice::LoadTexture("white1x1.png"), { 64,64 });
+	wtf_.Initialize();
+	wtf_.translation_ = pos;
+	sprite->SetColor(0x550055ff);
+}
+
+void Clear::Update()
+{
+	wtf_.Update();
+}
+
+void Clear::Draw(Camera* camera)
+{
+	sprite->Draw(wtf_, camera, 0, 0, 64, 64);
+}

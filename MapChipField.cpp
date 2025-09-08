@@ -20,6 +20,8 @@ namespace {
 		{"10", MapChipType::EnemyLamp},
 		{"11", MapChipType::EnemyBat},
 		{"12", MapChipType::EnemyMummy},
+		{"13", MapChipType::kPlayer},
+		{"14", MapChipType::kClear},
 
 	};
 }

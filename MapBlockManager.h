@@ -104,6 +104,16 @@ public:
 	void Draw(Camera* camera) override;
 private:
 };
+class Clear : public Block
+{
+public:
+	Clear() {}
+	~Clear() {}
+	void Initialize(Vector2 pos) override;
+	void Update() override;
+	void Draw(Camera* camera) override;
+private:
+};
 
 class MapBlockManager
 {

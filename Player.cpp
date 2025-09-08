@@ -295,6 +295,12 @@ void Player::MapCollision(CollisonMapInfo& info) {
 	MapCollisionBottom(info);
 	MapCollisionLeft(info);
 	MapCollisionRight(info);
+	auto index = mapChipField_->GetMapChipIndexByPosition(worldTransform_.translation_);
+	auto type = mapChipField_->GetMapChipTypeIndex(index.xIndex, index.yIndex);
+	if (type == MapChipType::kClear)
+	{
+		isClear = true;
+	}
 }
 void Player::MapCollisionTop(CollisonMapInfo& info) {
 

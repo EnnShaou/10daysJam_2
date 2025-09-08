@@ -15,7 +15,7 @@ public:
 	Game();
 	~Game() override;
 	// 初期
-	void Initialize() override;
+	virtual void Initialize() override;
 	// 更新
 	void Update() override;
 	// 描画
@@ -31,7 +31,7 @@ public:
 		MapChipType mapChipType;
 	};
 
-private:
+protected:
 	Camera* camera_;
 	MapChipField* mapChipField_;
 	MapBlockManager* blockManger;
@@ -41,3 +41,14 @@ private:
 	Fade* fade_ = nullptr;                       // フェードイン・フェードアウト用のオブジェクト
 };
 
+class Stage1 :public Game
+{
+public:
+	Stage1() {}
+	~Stage1() {}
+
+	void Initialize()override;
+
+private:
+
+};
