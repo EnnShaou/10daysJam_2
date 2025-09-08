@@ -325,9 +325,9 @@ void EnemyPumpkin::Initialize(Camera* camera, Vector2& pos, MapChipField* mapChi
 	mapChipField_ = mapChipField;
 
 	kSpeed = { 2.0f, 2.0f };  //かぼちゃの速さ
-	kAtkRange = 240.0f;         //プレイヤーがこの範囲にいると動く
+	kAtkRange = 140.0f;         //プレイヤーがこの範囲にいると動く (320)
 
-	kWidth = 60;              // 当たり判定の幅
+	kWidth = 50;              // 当たり判定の幅
 	kHeight = 30;             // 当たり判定の高さ
 
 	// アニメーション用の幅と縦サイズ
@@ -439,6 +439,7 @@ void EnemyPumpkin::Update() {
 void EnemyPumpkin::Draw()
 {
 	sprite->Draw(wtf, camera_, animePosX_, animePosY_, imageWidth_, imageHeight_);
+	Novice::ScreenPrintf(10, 400, "PumpkinVelY %0.2f", vel_.y);
 }
 
 void EnemyPumpkin::OnCollision()
@@ -464,7 +465,7 @@ EnemyLamp::~EnemyLamp()
 
 void EnemyLamp::Initialize(Camera* camera, Vector2& pos, MapChipField* mapChipField)
 {
-	sprite = new DrawSprite(Novice::LoadTexture("white1x1.png"), { 64,64 });
+	sprite = new DrawSprite(Novice::LoadTexture("./Resources/Enemies/lampGhost.png"), { 64,64 });
 	sprite->SetColor(0xdfeb3dff);
 	camera_ = camera;
 	wtf.Initialize();
@@ -472,7 +473,15 @@ void EnemyLamp::Initialize(Camera* camera, Vector2& pos, MapChipField* mapChipFi
 	mapChipField_ = mapChipField;
 
 	kSpeed = { 1.2f, 1.2f };
-	kAtkRange = 320.0f;
+	kAtkRange = lightRadius_ - 30.0f;
+
+	// 当たり判定用
+	kWidth = 42;
+	kHeight = 42;
+
+	// 画像サイズ
+	imageWidth_ = 64;
+	imageHeight_ = 64;
 }
 
 void EnemyLamp::Update()
@@ -505,6 +514,7 @@ void EnemyLamp::Update()
 		break;
 	}
 
+	Animation();
 	wtf.translation_ += vel_;
 	wtf.Update();
 }
@@ -512,12 +522,51 @@ void EnemyLamp::Update()
 void EnemyLamp::Draw()
 {
 	DrawCircle(wtf, camera_, int(lightRadius_), RED);
-	sprite->Draw(wtf, camera_, 0, 0, 64, 64);
+	sprite->Draw(wtf, camera_, animePosX_, animePosY_, imageHeight_, imageWidth_);
 
 }
 
 void EnemyLamp::OnCollision()
 {
+}
+
+void EnemyLamp::Animation()
+{
+	//　アニメーションの更新
+	animationTimer_++;
+	switch (behavior_) {
+	case Behavior::kStop:
+
+		animePosY_ = 0;
+		animePosX_ = 0;
+		animationMax_ = 1;
+
+		break;
+	case Behavior::kAstral:
+
+		animePosY_ = imageHeight_;
+		animationMax_ = 3;
+		if (animationTimer_ % 24 == 0) {
+			animePosX_ += imageWidth_;
+
+		}
+		if (animePosX_ >= imageWidth_ * animationMax_) {
+			animePosX_ = 0;
+		}
+
+	
+		break;
+	default:
+		break;
+	}
+
+	// 方向を取得
+	if (vel_.x >= 0.0f) {
+		lrDirection_ = DrawSprite::LRDirection::kRight;
+	}
+	else {
+		lrDirection_ = DrawSprite::LRDirection::kLeft;
+	}
 }
 
 /// <summary>
@@ -547,7 +596,7 @@ void EnemyBat::Initialize(Camera* camera, Vector2& pos, MapChipField* mapChipFie
 	mapChipField_ = mapChipField;
 
 	kSpeed = { 1.6f, 1.0f };
-	kAtkRange = 480.0f; //攻撃範囲 500
+	kAtkRange = 100.0f;
 
 	// 当たり判定
 	kWidth = 24.0f;
@@ -558,10 +607,57 @@ void EnemyBat::Initialize(Camera* camera, Vector2& pos, MapChipField* mapChipFie
 	imageHeight_ = 32;
 }
 
+Vector2 EnemyBat::GetPlayerPos() {
+	if (player_->GetBehavior() == Player::Behavior::kAstral) {
+		return player_->GetTentativePos();
+	}
+	return player_->GetPos();
+}
+
+float EnemyBat::GetDistanceToPlayer(const Vector2& playerPos) {
+	Vector2 enemyToPlayer = { playerPos.x - wtf.translation_.x,
+							  playerPos.y - wtf.translation_.y };
+	return sqrtf(enemyToPlayer.x * enemyToPlayer.x +
+		enemyToPlayer.y * enemyToPlayer.y);
+}
+
 void EnemyBat::Update()
 {
+	if (behaviorNext_ != BatBehavior::kUnknown) {
+		behavior_ = behaviorNext_;
+		behaviorNext_ = BatBehavior::kUnknown;
 
-	BehaviorNormal();
+		// 初期化処理
+		switch (behavior_) {
+		case BatBehavior::kNormal:
+			BehaviorNormalInitialize();
+			break;
+		case BatBehavior::kAttack:
+			BehaviorAttackInitialize();
+			break;
+		case BatBehavior::kDead:
+			BehaviorDeadInitialize();
+			break;
+
+		default:
+			break;
+		}
+	}
+
+	switch (behavior_) {
+	case BatBehavior::kNormal:
+		BehaviorNormalUpdate();
+		break;
+	case BatBehavior::kAttack:
+		BehaviorAttackUpdate();
+		break;
+	case BatBehavior::kDead:
+		BehaviorDeadUpdate();
+		break;
+	default:
+		break;
+	}
+		
 
 	Animation();
 	// 移動更新
@@ -572,81 +668,6 @@ void EnemyBat::Update()
 void EnemyBat::Draw()
 {
 	sprite->Draw(wtf, camera_, animePosX_, animePosY_, imageWidth_, imageHeight_, lrDirection_);
-}
-
-void EnemyBat::BehaviorNormal() {
-	// 左右の動き
-	if (wtf.translation_.x >= spawnPos_.x + maxMovementX_ ||
-		wtf.translation_.x <= spawnPos_.x - maxMovementX_) {
-		kSpeed.x = -kSpeed.x;
-	}
-	vel_.x = +kSpeed.x;
-
-}
-
-void EnemyBat::BehaviorAttack() {
-
-	Vector2 playerPos;
-	// コウモリをプレイヤーの本体のみに動かす
-	if (player_->GetBehavior() == Player::Behavior::kAstral) {
-		playerPos = player_->GetTentativePos();
-
-	}
-	else {
-		playerPos = player_->GetPos();
-	}
-
-	//　プレイヤーが敵の攻撃範囲にいるかどうかを計算
-	Vector2 pumpkinPos = wtf.translation_;
-	Vector2 enemyToPlayer = { playerPos.x - pumpkinPos.x, playerPos.y - pumpkinPos.y };
-	float distanceToPlayer = sqrtf(enemyToPlayer.x * enemyToPlayer.x + enemyToPlayer.y * enemyToPlayer.y);
-
-	// プレイヤーの方向に動く
-	if (distanceToPlayer <= kAtkRange) {
-		behavior_ = BatBehavior::kAttack;
-		if (playerPos.x >= pumpkinPos.x) {
-			vel_.x = +kSpeed.x;
-		}
-		else {
-			vel_.x = -kSpeed.x;
-		}
-
-		if (playerPos.y >= pumpkinPos.y) {
-			vel_.y = +kSpeed.y;
-		}
-		else {
-			vel_.y = -kSpeed.y;
-		}
-	}
-	else {
-		BehaviorReturn();
-	}
-}
-
-void EnemyBat::BehaviorReturn() {
-	//// vector from enemy to spawn
-	//Vector2 enemyToSpawn = { spawnPos_.x - wtf.translation_.x,
-	//						 spawnPos_.y - wtf.translation_.y };
-
-	//// distance to spawn
-	//float distanceToSpawn = sqrtf(enemyToSpawn.x * enemyToSpawn.x +
-	//	enemyToSpawn.y * enemyToSpawn.y);
-
-	//// if close enough, stop and switch back to Normal
-	//if (distanceToSpawn < 1.0f) { // tolerance so it doesn’t jitter
-	//	vel_ = { 0.0f, 0.0f };
-
-	//	behavior_ = BatBehavior::kNormal;
-	//	return;
-	//}
-
-	//// normalize direction
-	//Vector2 dir = { enemyToSpawn.x / distanceToSpawn,
-	//				enemyToSpawn.y / distanceToSpawn };
-
-	//// move toward spawn with some speed
-	//vel_.x = dir.x * kSpeed.x;
-	//vel_.y = dir.y * kSpeed.y;
 }
 
 void EnemyBat::Animation()
@@ -671,8 +692,17 @@ void EnemyBat::Animation()
 	case BatBehavior::kDead:
 
 		animePosY_ = imageHeight_;
-		animePosX_ = 0;
-		animationMax_ = 1;
+		animationMax_ = 2;
+		if (animationTimer_ % 12 == 0) {
+			animePosX_ += imageWidth_;
+
+		}
+		if (animePosX_ >= imageWidth_ * animationMax_) {
+			animePosX_ = imageWidth_ * animationMax_;
+		}
+
+		break;
+	case BatBehavior::kUnknown:
 
 		break;
 	default:
@@ -690,8 +720,65 @@ void EnemyBat::Animation()
 
 void EnemyBat::OnCollision()
 {
+	behaviorNext_ = BatBehavior::kDead;	
+}
+
+void EnemyBat::BehaviorNormalInitialize() {
+	vel_ = { 0.0f, 0.0f };
+}
+
+void EnemyBat::BehaviorNormalUpdate() {
+	// プレイヤーの
+	Vector2 playerPos = GetPlayerPos();
+	float distanceToPlayer = GetDistanceToPlayer(playerPos);
+	if (distanceToPlayer <= kAtkRange) {
+		behaviorNext_ = BatBehavior::kAttack;
+		return;
+	}
+
+	// 通常動作・左右の動き
+	if (wtf.translation_.x >= spawnPos_.x + maxMovementX_ ||
+		wtf.translation_.x <= spawnPos_.x - maxMovementX_) {
+		currentSpeed_.x = -currentSpeed_.x;
+	}
+	vel_.x = currentSpeed_.x;
+}
+
+void EnemyBat::BehaviorAttackInitialize() {
+	currentSpeed_ = { kSpeed.x, kSpeed.y };
+	vel_ = { 0.0f, 0.0f };
+}
+
+void EnemyBat::BehaviorAttackUpdate() {
+	Vector2 playerPos = GetPlayerPos();
+	float distanceToPlayer = GetDistanceToPlayer(playerPos);
+
+	if (distanceToPlayer > kAtkRange) {
+		//behaviorNext_ = BatBehavior::kReturn;
+		// return;
+	}
+
+	// プレイヤーの方向へ進
+	vel_.x = (playerPos.x >= wtf.translation_.x) ? +kSpeed.x : -kSpeed.x;
+	vel_.y = (playerPos.y >= wtf.translation_.y) ? +kSpeed.y : -kSpeed.y;
+}
+
+void EnemyBat::BehaviorDeadInitialize() {
+	vel_ = { 0.0f, 0.0f };
+	animePosX_ = 0;
 	isDead_ = true;
 }
+
+void EnemyBat::BehaviorDeadUpdate() {
+	
+	wtf.scale_ -= { 0.015f, 0.015f };
+	if (wtf.scale_.x <= 0.0f) {
+		behaviorNext_ = BatBehavior::kUnknown;
+		wtf.scale_ = { 0.0f, 0.0f };
+	}
+}
+
+
 
 /// <summary>
 /// Enemy Mummy
@@ -733,11 +820,13 @@ void EnemyMummy::Update()
 {
 	if (isStan)
 	{
+		animationBehavior_ = AnimationBehavior::kStop;
 		vel_.x = 0.0f;
 		stanTimer += 1.0f / 60.0f;
 	}
 	else
 	{
+		animationBehavior_ = AnimationBehavior::kMove;
 		vel_.x = +kSpeed.x;
 	}
 
@@ -768,7 +857,10 @@ void EnemyMummy::Draw()
 
 void EnemyMummy::OnCollision()
 {
-	isStan = true;
+	if (isStan == false) {
+		isStan = true;
+		animePosX_ = 0;
+	}
 }
 
 void EnemyMummy::MapWallCollision(CollisonMapInfo& info)
@@ -871,8 +963,14 @@ void EnemyMummy::Animation()
 	case AnimationBehavior::kStop:
 
 		animePosY_ = imageHeight_;
-		animePosX_ = 0;
-		animationMax_ = 1;
+		animationMax_ = 2;
+		if (animationTimer_ % 24 == 0) {
+			animePosX_ += imageWidth_;
+
+		}
+		if (animePosX_ >= imageWidth_ * animationMax_) {
+			animePosX_ = imageWidth_ * animationMax_;
+		}
 
 		break;
 	default:
