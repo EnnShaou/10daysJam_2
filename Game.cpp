@@ -222,8 +222,10 @@ void Game::CheckAllCollisions()
 			{
 				// かぼちゃが落下している時だけダメージを受ける
 				if (enemyVelocityY < 0.0f) {
-					Novice::ScreenPrintf(30, 180, "HitPumpkin!)");
-					player_->OnCollisionNomal(enemy);
+					if (player_->GetInvincible() == false) {
+						Novice::ScreenPrintf(30, 180, "HitPumpkin!)");
+						player_->OnCollisionNomal(enemy);
+					}
 				}
 			}
 		}
@@ -255,13 +257,24 @@ void Game::CheckAllCollisions()
 		{
 			// 敵の情報を取得
 			Rect enemyRect = { bat->GetPos().x, bat->GetPos().y, bat->GetSize().x, bat->GetSize().y };
-
+			Rect tempPlayerRect = { player_->GetTentativePos().x,player_->GetTentativePos().y,player_->GetSize().x,player_->GetSize().y };
 			// 当たり判定のチェック
 			if (bat->GetIsDead() == false) {
-				if (playerRect.IsCollision(enemyRect) && !player_->IsAstral())
-				{
-					Novice::ScreenPrintf(30, 220, "HitBat!)");
-					player_->OnCollisionNomal(enemy);
+				if (player_->GetInvincible() == false) {
+					if (!player_->IsAstral()) {
+						if (playerRect.IsCollision(enemyRect))
+						{
+							Novice::ScreenPrintf(30, 220, "HitBat!)");
+							player_->OnCollisionNomal(enemy);
+						}
+					}
+					else {
+						if (tempPlayerRect.IsCollision(enemyRect))
+						{
+							Novice::ScreenPrintf(30, 220, "HitBat!)");
+							player_->OnCollisionAstral(enemy);
+						}
+					}
 				}
 			}
 		}
@@ -305,13 +318,24 @@ void Game::CheckAllCollisions()
 		{
 			// 敵の情報を取得
 			Rect enemyRect = { mummy->GetPos().x, mummy->GetPos().y, mummy->GetSize().x, mummy->GetSize().y };
-
+			Rect tempPlayerRect = { player_->GetTentativePos().x,player_->GetTentativePos().y,player_->GetSize().x,player_->GetSize().y };
 			// 当たり判定のチェック
 			if (mummy->GetIsStun() == false) {
-				if (playerRect.IsCollision(enemyRect) && !player_->IsAstral())
-				{
-					Novice::ScreenPrintf(30, 220, "HitMummy!)");
-					player_->OnCollisionNomal(enemy);
+				if (player_->GetInvincible() == false) {
+					if (!player_->IsAstral()) {
+						if (playerRect.IsCollision(enemyRect))
+						{
+							Novice::ScreenPrintf(30, 220, "HitBat!)");
+							player_->OnCollisionNomal(enemy);
+						}
+					}
+					else {
+						if (tempPlayerRect.IsCollision(enemyRect))
+						{
+							Novice::ScreenPrintf(30, 220, "HitBat!)");
+							player_->OnCollisionAstral(enemy);
+						}
+					}
 				}
 			}
 		}

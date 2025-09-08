@@ -26,6 +26,8 @@ private:
 };
 
 void DrawCircle(WtF& wt,	Camera* camera, int radius, unsigned int color);
+
+void DrawHitBox(WtF& wt, Camera* camera, int width, int height);
 class RGBA {
 	public:
 	int R, G, B, A;

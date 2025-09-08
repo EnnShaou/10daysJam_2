@@ -65,3 +65,14 @@ void DrawCircle(WtF& wt, Camera* camera, int radius, unsigned int color)
 	
 	Novice::DrawEllipse(int(screenPos.x), int(screenPos.y), radius, radius, 0.0f, color, kFillModeWireFrame);
 }
+
+void DrawHitBox(WtF& wt, Camera* camera, int width, int height)
+{
+	// --- 2. ワールド座標 → スクリーン座標
+	Matrix3x3 vpMatrix = camera->matView * camera->matProjection * camera->viewPort;
+	Vector2 screenPos;
+	screenPos = Transform(wt.translation_, vpMatrix);
+
+	Novice::DrawBox(static_cast<int>(screenPos.x - (width / 2)), static_cast<int>(screenPos.y - (height / 2)),
+		static_cast<int>(width), static_cast<int>(height), 0.f, RED, kFillModeWireFrame);
+}
