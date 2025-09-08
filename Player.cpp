@@ -128,6 +128,8 @@ void Player::Draw()
 		// 肉体（留まってる本体）描画も必要なら
 		int playerTexY = 72 * 5;
 		playerSprite_->Draw(tentativeWorldTransform_, camera_, 0, playerTexY, 68, 72, lrDirection_);
+
+		DrawHitBox(worldTransform_, camera_, int(astralSize.x), int(astralSize.y));
 	}
 	else
 	{
@@ -140,6 +142,8 @@ void Player::Draw()
 			playerSprite_->SetColor(0xffffffff); // 通常色
 			playerSprite_->Draw(worldTransform_, camera_, texX, texY, scaleX, 72, lrDirection_);
 		}
+
+		DrawHitBox(worldTransform_, camera_, int(nomalSize.x), int(nomalSize.y));
 	}
 
 	if (animationBehavior_ == AnimationBehavior::kDamage)
@@ -150,8 +154,6 @@ void Player::Draw()
 
 
 	playerBullets_.Draw();
-
-	DrawHitBox(worldTransform_, camera_, int(kWidth), int(kHeight));
 
 	// Debug表示
 	Novice::ScreenPrintf(30, 50, "behavior_: %d", behavior_);
