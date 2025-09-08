@@ -7,9 +7,10 @@ enum class MapChipType {
 	kBlank = -1, kBlock,
 	kButton1, kGate1,
 	kButton2, kGate2,
-	kButton3, kGate3, 
-	HiddenFloor,kThorn,
-	EnemyPumpkin = 9, EnemyLamp = 10, EnemyBat = 11, EnemyMummy = 12
+	kButton3, kGate3,
+	HiddenFloor, kThorn,
+	EnemyPumpkin = 9, EnemyLamp = 10, EnemyBat = 11, EnemyMummy = 12,
+	kPlayer, kClear
 };
 
 struct MapChipData {

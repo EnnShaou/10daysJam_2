@@ -30,10 +30,6 @@ void Game::Initialize() {
 	mapChipField_->LoadMapChipCsv("Resources/MapData/map_data1.csv");
 	camera_ = new Camera({ 0,0 });
 	camera_->Initialize(1280, 720);
-
-
-
-
 	blockManger = new MapBlockManager();
 	blockManger->setCamera(camera_);
 	blockManger->setMapChipField(mapChipField_);
@@ -170,6 +166,16 @@ void Game::GenerateBlocks() {
 				auto* gate = new Gate();
 				gate->setBindID(3);
 				blockManger->pushBlock(gate, pos, x, y);
+			}
+			if (mapChipType == MapChipType::kPlayer)
+			{
+				Vector2 playerPos = mapChipField_->GetMapChipPositionByIndex(x, y);
+				player_->Initialize(camera_, playerPos);
+				mapChipField_->setMapChipData(MapChipType::kBlank, x, y);
+			}
+			if (mapChipType == MapChipType::kClear)
+			{
+				blockManger->pushBlock(new Clear(), pos, x, y);
 			}
 		}
 	}
@@ -392,10 +398,15 @@ void Game::ChangePhase() {
 		//	fade_->Start(Fade::Status::FadeOut, 1.0f); // フェードアウトを開始
 		//	phase_ = GameScene::Phase::kFadeOut;       // フェーズをフェードアウトに変更
 		//}
-		//if (player_->IsClear()) {
-		//	fade_->Start(Fade::Status::FadeOut, 1.0f); // フェードアウトを開始
-		//	phase_ = GameScene::Phase::kFadeOut;       // フェーズをフェードアウトに変更
-		//}
+		if (player_->IsClear()) {
+			fade_->Start(Fade::Status::FadeOut, 1.0f); // フェードアウトを開始
+			phase_ = Game::Phase::kFadeOut;       // フェーズをフェードアウトに変更
+		}
+		if (Keys::IsTrigger(DIK_R) || player_->IsDead())
+		{
+			fade_->Start(Fade::Status::FadeOut, 1.0f);
+			phase_ = Game::Phase::kFadeOut;
+		}
 		break;
 	case Game::Phase::kDeath:
 		//// タイマーを初期化
@@ -406,21 +417,21 @@ void Game::ChangePhase() {
 		break;
 	case Game::Phase::kFadeOut:
 		fade_->Update(); // フェードの更新
-		//if (player_->IsClear()) {
-		//	if (fade_->IsFinished()) {   // フェードアウトが完了したらシーンを終了
-		//		SceneNo = Scene::kClear; // シーンを終了
-		//	}
-		//}
+		if (player_->IsClear()) {
+			if (fade_->IsFinished()) {   // フェードアウトが完了したらシーンを終了
+				SceneNo = Scene::kMenu; // シーンを終了
+			}
+		}
 		//else if (player_->IsDead()) {
 		//	if (fade_->IsFinished()) {  // フェードアウトが完了したらシーンを終了
 		//		SceneNo = Scene::kOver; // シーンを終了
 		//	}
 		//}
-		//else {
-		//	if (fade_->IsFinished()) {   // フェードアウトが完了したらシーンを終了
-		//		SceneNo = Scene::kTitle; // シーンを終了
-		//	}
-		//}
+		else {
+			if (fade_->IsFinished()) {   // フェードアウトが完了したらシーンを終了
+				SceneNo = Scene::kReset; // シーンを終了
+			}
+		}
 
 		break;
 	default:
@@ -428,4 +439,27 @@ void Game::ChangePhase() {
 	}
 }
 
+void Stage1::Initialize()
+{
+	// マップチップフィールドの初期化
+	mapChipField_ = new MapChipField();
+	mapChipField_->LoadMapChipCsv("Resources/MapData/stage1.csv");
+	camera_ = new Camera({ 0,0 });
+	camera_->Initialize(1280, 720);
+	blockManger = new MapBlockManager();
+	blockManger->setCamera(camera_);
+	blockManger->setMapChipField(mapChipField_);
+	// プレイヤーの初期化
+	player_ = new Player();
+	player_->SetMapChipField(mapChipField_);
 
+	// フェードの初期化
+	fade_ = new Fade();
+	fade_->Initialize();
+	enemyManager.setPlayer(player_);
+	blockManger->setEnemies(&enemyManager);
+	GenerateBlocks();
+
+	blockManger->setPlayer(player_);
+	camera_->setTarget(player_);
+}
