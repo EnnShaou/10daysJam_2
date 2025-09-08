@@ -962,7 +962,7 @@ void Player::Animation()
 	if (animationBehavior_ != AnimationBehavior::kAstralAttack) {
 		if (animationTimer >= 60 / (animationMax * 2)) {
 			//animationTimer = 0;
-			animationCount++;
+			//animationCount++;
 			// 死亡アニメーションだけ非ループ
 			if (animationBehavior_ == AnimationBehavior::kAstralDeath) {
 				if (animationCount >= animationMax) {
