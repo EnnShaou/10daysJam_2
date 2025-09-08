@@ -1,5 +1,4 @@
 #include "Title.h"
-#include "ImGui.h"
 #include"keys.h"
 #include"Novice.h"
 
@@ -36,9 +35,7 @@ void TitleScene::Update() {
 		}
 
 #ifdef _DEBUG
-		// ImGuiの表示
-		ImGui::Text("Title Scene");
-		ImGui::Text("Press Enter to start the game.");
+		
 #endif                                // _DEBUG
 
 		break;
