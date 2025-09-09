@@ -37,6 +37,7 @@ protected:
 	MapChipField* mapChipField_;
 	MapChipField* backGroundMapChipField_;
 	MapBlockManager* blockManger;
+	MapBlockManager* BackGroundBlockManger;
 	Player* player_ = nullptr;// プレイヤー
 	EnemyManager enemyManager;
 	Phase phase_ = Phase::FadeIn;                             // ゲームのフェーズ

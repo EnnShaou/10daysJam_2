@@ -241,12 +241,14 @@ void HiddenFloor::Update()
 		if (type == MapChipType::kBlank) {
 			mapChipField_->setMapChipData(MapChipType::kBlock, index.xIndex, index.yIndex);
 			sprite->SetTexture(showTexture);
+			sprite->SetColor(0xffffffff);
 		}
 	}
 	else {
 		if (type == MapChipType::kBlock) {
 			mapChipField_->setMapChipData(MapChipType::kBlank, index.xIndex, index.yIndex);
 			sprite->SetTexture(texture);
+			sprite->SetColor(0xffffff11);
 		}
 	}
 	wtf_.Update();
@@ -263,6 +265,7 @@ void Thorn::Initialize(Vector2 pos)
 	sprite = new DrawSprite(Novice::LoadTexture("./Resources/Block/Thorn.png"), { 64,64 });
 	wtf_.Initialize();
 	wtf_.translation_ = pos;
+	
 
 }
 
