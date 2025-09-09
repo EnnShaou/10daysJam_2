@@ -756,7 +756,11 @@ void Player::AstralBodyBehaviorRootUpdate()
 	// 本体に戻る
 	if (Keys::IsTrigger(DIK_F) || Keys::IsTrigger(DIK_X))
 	{
+
 		astralBodyTimer_ = 0.0f;
+
+		Novice::PlayAudio(switchBodySFX, 0, 1.0f);
+
 		behaviorNext_ = Behavior::kRoot;
 		worldTransform_ = tentativeWorldTransform_;
 		animationBehaviorNext_ = AnimationBehavior::kRoot;

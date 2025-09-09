@@ -22,11 +22,11 @@ namespace {
 		{"12", MapChipType::EnemyMummy},
 		{"13", MapChipType::kPlayer},
 		{"14", MapChipType::kClear},
+
 		{"15", MapChipType::kButton4},
 		{"16", MapChipType::kGate4},
 		{"17", MapChipType::kButton5},
 		{"18", MapChipType::kGate5},
-
 	};
 }
 
