@@ -131,6 +131,18 @@ void Game::GenerateBlocks() {
 				button->setBindID(3);
 				blockManger->pushBlock(button, pos, x, y);
 			}
+			if (mapChipType == MapChipType::kButton4)
+			{
+				auto* button = new BlockButtonAndGate();
+				button->setBindID(4);
+				blockManger->pushBlock(button, pos, x, y);
+			}
+			if (mapChipType == MapChipType::kButton5)
+			{
+				auto* button = new BlockButtonAndGate();
+				button->setBindID(5);
+				blockManger->pushBlock(button, pos, x, y);
+			}
 
 			if (mapChipType == MapChipType::HiddenFloor)
 			{
@@ -167,6 +179,19 @@ void Game::GenerateBlocks() {
 				gate->setBindID(3);
 				blockManger->pushBlock(gate, pos, x, y);
 			}
+			if (mapChipType == MapChipType::kGate4)
+			{
+				auto* gate = new Gate();
+				gate->setBindID(4);
+				blockManger->pushBlock(gate, pos, x, y);
+			}
+			if (mapChipType == MapChipType::kGate5)
+			{
+				auto* gate = new Gate();
+				gate->setBindID(5);
+				blockManger->pushBlock(gate, pos, x, y);
+			}
+
 			if (mapChipType == MapChipType::kPlayer)
 			{
 				Vector2 playerPos = mapChipField_->GetMapChipPositionByIndex(x, y);
@@ -264,6 +289,7 @@ void Game::CheckAllCollisions()
 		{
 			// 敵の情報を取得
 			Rect enemyRect = { bat->GetPos().x, bat->GetPos().y, bat->GetSize().x, bat->GetSize().y };
+			Rect playerTempRect = { player_->GetTentativePos().x,player_->GetTentativePos().y,player_->GetNomalSize().x,player_->GetNomalSize().y };
 
 			// 当たり判定のチェック
 			if (bat->GetIsDead() == false) {
