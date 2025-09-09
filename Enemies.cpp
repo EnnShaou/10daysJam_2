@@ -440,7 +440,7 @@ void EnemyPumpkin::Draw()
 {
 	sprite->Draw(wtf, camera_, animePosX_, animePosY_, imageWidth_, imageHeight_);
 	DrawHitBox(wtf, camera_, int(kWidth), int(kHeight));
-	Novice::ScreenPrintf(10, 400, "PumpkinVelY %0.2f", vel_.y);
+	//Novice::ScreenPrintf(10, 400, "PumpkinVelY %0.2f", vel_.y);
 }
 
 void EnemyPumpkin::OnCollision()

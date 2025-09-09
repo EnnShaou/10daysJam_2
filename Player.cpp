@@ -28,6 +28,9 @@ void Player::Initialize(Camera* camera, Vector2& pos)
 	shootSFX = Novice::LoadAudio("./Resources/Audio/sfx/shoot.mp3");
 	switchBodySFX = Novice::LoadAudio("./Resources/Audio/sfx/switchBody.mp3");
 	jumpSFX = Novice::LoadAudio("./Resources/Audio/sfx/jump.mp3");
+
+	ui_ = new UI();
+	ui_->Initialize();
 }
 
 void Player::Update()
@@ -162,14 +165,16 @@ void Player::Draw()
 
 	playerBullets_.Draw();
 
+	ui_->Draw(GetHp(),GetAstralTimer());
+
 	// Debug表示
-	Novice::ScreenPrintf(30, 50, "behavior_: %d", behavior_);
+	/*Novice::ScreenPrintf(30, 50, "behavior_: %d", behavior_);
 	Novice::ScreenPrintf(30, 70, "behaviorNext_: %d", behaviorNext_);
 	Novice::ScreenPrintf(30, 90, "coolTimer: %.2f", coolTime_);
 	Novice::ScreenPrintf(30, 110, "Astralbehavior_: %d", Astralbehavior_);
 	Novice::ScreenPrintf(30, 130, "AstralbehaviorNext_: %d", AstralbehaviorNext_);
 	Novice::ScreenPrintf(30, 150, "astralBodyTimer: %f", astralBodyTimer_);
-	Novice::ScreenPrintf(1000, 10, "invincible: %d", isInvincible_);
+	Novice::ScreenPrintf(1000, 10, "invincible: %d", isInvincible_);*/
 }
 void Player::Move()
 {
@@ -734,6 +739,7 @@ void Player::AstralBodyBehaviorRootUpdate()
 
 	if (astralBodyTimer_ >= astralBodyDuration_)
 	{
+		astralBodyTimer_ = 0.0f;
 		behaviorNext_ = Behavior::kRoot;
 		worldTransform_ = tentativeWorldTransform_;
 		animationBehaviorNext_ = AnimationBehavior::kRoot;
@@ -742,6 +748,7 @@ void Player::AstralBodyBehaviorRootUpdate()
 	// 本体に戻る
 	if (Keys::IsTrigger(DIK_F))
 	{
+		astralBodyTimer_ = 0.0f;
 		behaviorNext_ = Behavior::kRoot;
 		worldTransform_ = tentativeWorldTransform_;
 		animationBehaviorNext_ = AnimationBehavior::kRoot;
@@ -856,6 +863,7 @@ void Player::AstralBodyBehaviorKnockbackUpdate()
 
 			if (astralBodyHP <= 0)
 			{
+				astralBodyTimer_ = 0.0f;
 				behaviorNext_ = Behavior::kRoot;
 				worldTransform_ = tentativeWorldTransform_;
 				animationBehaviorNext_ = AnimationBehavior::kRoot;

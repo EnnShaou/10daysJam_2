@@ -2,7 +2,7 @@
 #include "Title.h"
 #include"Menu.h"
 #include"Game.h"
-Scene IScene::SceneNo = Scene::kTitle; // 現在のシーン番号を初期化
+Scene IScene::SceneNo = Scene::kGame; // 現在のシーン番号を初期化
 Scene IScene::PreSceneNO = Scene::kGame;
 sceneManage::sceneManage() {
 	// シーンの配列を初期化
