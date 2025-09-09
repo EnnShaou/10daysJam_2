@@ -167,7 +167,7 @@ void Player::Draw()
 
 	playerBullets_.Draw();
 
-	ui_->Draw(GetHp(),GetAstralTimer());
+	ui_->Draw(GetHp(),GetAstralTimer(), GetCoolTime());
 
 	// Debug表示
 	/*Novice::ScreenPrintf(30, 50, "behavior_: %d", behavior_);
@@ -521,7 +521,7 @@ void Player::OnCollisionNomal(const Enemies* enemies)
 {
 	(void)enemies;
 	
-	Novice::PlayAudio(bodyDamagedSFX, 0, 1.0f);
+	
 	// ダメージ無敵時間中はダメージを受けない
 	if (damageCooldown_ > 0)
 	{
@@ -549,6 +549,8 @@ void Player::OnCollisionNomal(const Enemies* enemies)
 	// ノックバック処理
 	if (enemies && nomalBodyHP > 0)
 	{
+		Novice::PlayAudio(bodyDamagedSFX, 0, 1.0f);
+
 		// 点滅アニメーション切り替え
 		animationBehaviorNext_ = AnimationBehavior::kDamage;
 
@@ -756,6 +758,12 @@ void Player::AstralBodyBehaviorRootUpdate()
 	// 本体に戻る
 	if (Keys::IsTrigger(DIK_F) || Keys::IsTrigger(DIK_X))
 	{
+
+		// 早く戻りすぎた場合クールタイムを消費しない
+		if (astralBodyTimer_ <= 0.5f)
+		{
+			coolTime_ = 0.0f;
+		}
 
 		astralBodyTimer_ = 0.0f;
 
