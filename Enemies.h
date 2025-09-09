@@ -120,7 +120,7 @@ protected:
 	int animePosX_ = 0;			// 画像アニメーションのx位置
 	int animePosY_ = 0;			// 画像アニメーションのy位置
 
-	int testX = 0;
+	float atkOffset = 3.0f;
 };
 
 
@@ -150,6 +150,7 @@ private:
 	// ここにかぼちゃ敵固有の変数や処理を追加できる
 	void InputGravity(const CollisonMapInfo& info)override;
 	void Animation() override;
+
 };
 
 
@@ -177,10 +178,13 @@ public:
 
 private:
 	// 照らす範囲
-	float lightRadius_ = 280.0f;
+	float lightRadius_ = 260.0f;
 
 	// アニメーション処理
 	void Animation() override;
+
+	WtF lightWtf;                      // 座標など
+	DrawSprite* lightSprite = nullptr; // 敵スプライト
 };
 
 // ------------------ コウモリ（派生） ------------------
@@ -231,6 +235,7 @@ private:
 	Vector2 spawnPos_;					// スポーン位置
 	const float maxMovementX_ = 200.0f; // 待機時の最大移動量
 	Vector2 currentSpeed_ = { kSpeed.x, kSpeed.y };
+	float atkOffset = 3.0f;
 
 	// アニメーション
 	void Animation() override;

@@ -47,7 +47,9 @@ void PlayerBulletManager::Update(const Vector2& playerPos)
 
         auto& bullet = holdingBullets_[i];
         bullet->SetPosition(playerPos + offset); // プレイヤー位置に応じて追従配置
+        bullet->Animation();
     }
+
 
     // 発射された弾の更新処理
     for (auto& bullet : activeBullets_)

@@ -41,15 +41,30 @@ void PlayerBullets::Update()
 		}
 	}
 
+	Animation();
+
 	// ワールドトランスフォーム更新
 	worldTransform_.Update();
 }
 
+void PlayerBullets::Animation() {
+	animationTimer++;
+	animationMax = 3;
+	if (animationTimer % 12 == 0) {
+		animePosX += imageWidth;
+
+	}
+	if (animePosX >= imageWidth * animationMax) {
+		animePosX = 0;
+	}
+}
+
 void PlayerBullets::Draw()
 {
+
 	if (isActive_)
 	{
-		sprite->Draw(worldTransform_, camera_, 0, 0, 32, 32);
+		sprite->Draw(worldTransform_, camera_, animePosX, 0, imageWidth, imageHeight);
 	}
 }
 

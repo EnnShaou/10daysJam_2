@@ -17,18 +17,24 @@ void Enemies::AstralBehavior() {
 
 	// プレイヤーの方向に動く
 	if (distanceToPlayer <= kAtkRange) {
-		if (playerPos.x >= pumpkinPos.x) {
+		if (playerPos.x >= pumpkinPos.x + atkOffset) {
 			vel_.x = +kSpeed.x;
 		}
-		else {
+		else if (playerPos.x <= pumpkinPos.x - atkOffset) {
 			vel_.x = -kSpeed.x;
 		}
+		else {
+			vel_.x = 0.0f;
+		}
 
-		if (playerPos.y >= pumpkinPos.y) {
+		if (playerPos.y >= pumpkinPos.y + atkOffset) {
 			vel_.y = +kSpeed.y;
 		}
-		else {
+		else if (playerPos.y <= pumpkinPos.y - atkOffset) {
 			vel_.y = -kSpeed.y;
+		}
+		else {
+			vel_.y = 0.0f;
 		}
 	}
 	else {
@@ -467,10 +473,14 @@ EnemyLamp::~EnemyLamp()
 void EnemyLamp::Initialize(Camera* camera, Vector2& pos, MapChipField* mapChipField)
 {
 	sprite = new DrawSprite(Novice::LoadTexture("./Resources/Enemies/lampGhost.png"), { 64,64 });
-	sprite->SetColor(0xdfeb3dff);
+	sprite->SetColor(0xffffffff);
+	lightSprite = new DrawSprite(Novice::LoadTexture("./Resources/Enemies/light.png"), { 560,560 });
+	lightSprite->SetColor(0xffffffff);
 	camera_ = camera;
 	wtf.Initialize();
 	wtf.translation_ = pos;
+	lightWtf.Initialize();
+	lightWtf.translation_ = wtf.translation_;
 	mapChipField_ = mapChipField;
 
 	kSpeed = { 1.2f, 1.2f };
@@ -517,12 +527,15 @@ void EnemyLamp::Update()
 
 	Animation();
 	wtf.translation_ += vel_;
+	lightWtf.translation_ = wtf.translation_;
 	wtf.Update();
+	lightWtf.Update();
 }
 
 void EnemyLamp::Draw()
 {
 	DrawCircle(wtf, camera_, int(lightRadius_), RED);
+	lightSprite->Draw(lightWtf, camera_, 0, 0, 560, 560);
 	sprite->Draw(wtf, camera_, animePosX_, animePosY_, imageHeight_, imageWidth_);
 	DrawHitBox(wtf, camera_, int(kWidth), int(kHeight));
 }
@@ -588,7 +601,7 @@ EnemyBat::~EnemyBat()
 
 void EnemyBat::Initialize(Camera* camera, Vector2& pos, MapChipField* mapChipField)
 {
-	sprite = new DrawSprite(Novice::LoadTexture("./Resources/Enemies/bat.png"), { 32,32 });
+	sprite = new DrawSprite(Novice::LoadTexture("./Resources/Enemies/bat.png"), { 108,108 });
 	sprite->SetColor(0xffffffff);
 	camera_ = camera;
 	wtf.Initialize();
@@ -596,16 +609,16 @@ void EnemyBat::Initialize(Camera* camera, Vector2& pos, MapChipField* mapChipFie
 	wtf.translation_ = spawnPos_;
 	mapChipField_ = mapChipField;
 
-	kSpeed = { 1.6f, 1.0f };
+	kSpeed = { 1.2f, 0.8f };
 	kAtkRange = 280.0f;
 
 	// 当たり判定
-	kWidth = 20.0f;
-	kHeight = 18.0f;
+	kWidth = 32.0f;
+	kHeight = 32.0f;
 
 	// 画像サイズ
-	imageWidth_ = 32;
-	imageHeight_ = 32;
+	imageWidth_ = 108;
+	imageHeight_ = 108;
 
 	damagedSFX = Novice::LoadAudio("./Resources/Audio/sfx/batDead.mp3");
 }
@@ -684,7 +697,7 @@ void EnemyBat::Animation()
 	case BatBehavior::kAttack:
 
 		animePosY_ = 0;
-		animationMax_ = 3;
+		animationMax_ = 4;
 		if (animationTimer_ % 12 == 0) {
 			animePosX_ += imageWidth_;
 
@@ -715,7 +728,7 @@ void EnemyBat::Animation()
 	}
 
 	// ミイラの方向を取得
-	if (kSpeed.x >= 0.0f) {
+	if (vel_.x >= 0.0f) {
 		lrDirection_ = DrawSprite::LRDirection::kRight;
 	}
 	else {
@@ -767,8 +780,11 @@ void EnemyBat::BehaviorAttackUpdate() {
 	}
 
 	// プレイヤーの方向へ進
-	vel_.x = (playerPos.x >= wtf.translation_.x) ? +kSpeed.x : -kSpeed.x;
-	vel_.y = (playerPos.y >= wtf.translation_.y) ? +kSpeed.y : -kSpeed.y;
+	vel_.x = (playerPos.x >= wtf.translation_.x + atkOffset) ? +kSpeed.x :
+		(playerPos.x <= wtf.translation_.x - atkOffset) ? -kSpeed.x : 0.0f;
+
+	vel_.y = (playerPos.y >= wtf.translation_.y + atkOffset) ? +kSpeed.y :
+		(playerPos.y <= wtf.translation_.y - atkOffset) ? -kSpeed.y : 0.0f;
 }
 
 void EnemyBat::BehaviorDeadInitialize() {

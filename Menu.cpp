@@ -28,6 +28,8 @@ void MenuScene::Initialize()
 
 	chooseSFX = Novice::LoadAudio("./Resources/Audio/sfx/choose.mp3");
 	confirmSFX = Novice::LoadAudio("./Resources/Audio/sfx/confirm.mp3");
+
+	cursorTextureHandle_ = Novice::LoadTexture("./Resources/PlayerBullet/bullet.png");
 }
 
 void MenuScene::Update()
@@ -107,7 +109,7 @@ void MenuScene::Draw()
 	{
 		Novice::DrawSprite(posX + (i == 0 ? -80 : 256 + 80 - 32),
 			(posY + 24) * (static_cast<int>(StageNow) + 1) + 16,
-			cursorTextureHandle_, 32, 32, 0.F, 0xffffffff);
+			cursorTextureHandle_, 1.0f, 1.0f, 0.F, 0xffffffff);
 	}
 	fade_->Draw();
 }

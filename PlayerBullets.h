@@ -21,6 +21,8 @@ public:
 	// --- 発射開始 ---
 	void Launch();
 
+	void Animation();
+
 	// --- ゲッター ---
 	bool IsDead() const { return isDead_; }
 	Vector2 GetPos() const { Vector2 worldPos = worldTransform_.translation_; return worldPos; }
@@ -54,4 +56,12 @@ private:
 
 	// --- 向き ---
 	Vector2 dir_ = {};
+
+	
+
+	int animationTimer = 0;
+	int animationMax = 3;
+	int imageWidth = 32;
+	int imageHeight = 32;
+	int animePosX = 0;
 };
