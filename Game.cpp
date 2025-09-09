@@ -28,11 +28,16 @@ void Game::Initialize() {
 	// マップチップフィールドの初期化
 	mapChipField_ = new MapChipField();
 	mapChipField_->LoadMapChipCsv("Resources/MapData/map_data1.csv");
+	backGroundMapChipField_ = new MapChipField();
+	backGroundMapChipField_->LoadMapChipCsv("Resources/MapData/map_data1_backGround.csv");
 	camera_ = new Camera({ 0,0 });
 	camera_->Initialize(1280, 720);
 	blockManger = new MapBlockManager();
 	blockManger->setCamera(camera_);
 	blockManger->setMapChipField(mapChipField_);
+
+	BackGroundBlockManger = new MapBlockManager();
+	BackGroundBlockManger->setCamera(camera_);
 	// プレイヤーの初期化
 	player_ = new Player();
 	Vector2 playerPos = mapChipField_->GetMapChipPositionByIndex(2, 20);
@@ -70,6 +75,7 @@ void Game::Update() {
 		// 全ての当たり判定をチェック
 		CheckAllCollisions();
 		blockManger->Update();
+		BackGroundBlockManger->Update();
 		break;
 	case Game::Phase::kDeath:
 
@@ -85,6 +91,7 @@ void Game::Draw() {
 
 
 	Novice::DrawBox(0, 0, 1280, 720, 0.f, BLACK, kFillModeSolid);
+	BackGroundBlockManger->Draw();
 	blockManger->Draw();
 	player_->Draw();
 	enemyManager.Draw();
@@ -96,10 +103,24 @@ void Game::GenerateBlocks() {
 	// 要素数
 	uint32_t numBlockX = mapChipField_->blockCountX_;
 	uint32_t numBlockY = mapChipField_->blockCountY_;
-
+	uint32_t numBlockXBG = backGroundMapChipField_->blockCountX_;
+	uint32_t numBlockYBG = backGroundMapChipField_->blockCountY_;
 	// 要素数を変更
 	// 列数を設定(縦方向ブロック数)
 	blockManger->setSize(numBlockX, numBlockY);
+	BackGroundBlockManger->setSize(numBlockXBG, numBlockYBG);
+	for (uint32_t y = 0; y < numBlockYBG; y++) {
+		for (uint32_t x = 0; x < numBlockXBG; x++) {
+
+			MapChipType mapChipType = backGroundMapChipField_->GetMapChipTypeIndex(x, y);
+			Vector2 pos = backGroundMapChipField_->GetMapChipPositionByIndex(x, y);
+			if (mapChipType == MapChipType::kBlank) {
+
+				BackGroundBlockManger->pushBlock(new BackGroundBlock(), pos, x, y);
+			}
+		}
+	}
+
 
 	// ブロックの生成
 	for (uint32_t y = 0; y < numBlockY; y++) {
@@ -233,6 +254,7 @@ void Game::GenerateBlocks() {
 	}
 
 	blockManger->BindButtonAndGates();
+	
 }
 
 void Game::CheckAllCollisions()
