@@ -1,0 +1,38 @@
+#include "UI.h"
+
+void UI::Initialize()
+{
+	frameSprite = Novice::LoadTexture("./Resources/UI/frame.png"); 
+	iconSprite = Novice::LoadTexture("./Resources/UI/hpIcon.png"); 
+	gaugeSprite = Novice::LoadTexture("./Resources/UI/gauge.png"); 
+}
+
+void UI::Draw(int hp,float timer)
+{
+	// フレームの描画
+	Novice::DrawQuad(0, 0, 286, 0, 0, 176, 286, 176, 0, 0, 286, 176, frameSprite, WHITE);
+
+	// プレイヤーのHPアイコン描画
+	posX = 100;
+	posY = 20;
+	width = 34 * hp;
+	height = 48;
+	
+	Novice::DrawQuad(
+		posX, posY, posX + width, posY,
+		posX, posY + height, posX + width, posY + height,
+		0, 0, width, height,
+		iconSprite,WHITE);
+	
+	// 幽体の制限時間ゲージを描画
+	posX = 65;
+	posY = 122;
+	width = 160 - static_cast<int>(16 * timer);
+	height = 18;
+
+	Novice::DrawQuad(
+		posX, posY, posX + width, posY,
+		posX, posY + height, posX + width, posY + height,
+		0, 0, width, height,
+		gaugeSprite, WHITE);
+}

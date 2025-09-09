@@ -5,6 +5,7 @@
 #include "Wtf.h"
 #include "PlayerBulletManager.h"
 #include"MapBlockManager.h"
+#include "UI.h"
 class Enemies;
 class MapChipField;
 class Player
@@ -31,8 +32,9 @@ public:
 		kMove,
 		kJumpUp,
 		kJumpDown,
-		kDamage,         
+		kDamage, 
 		kAstralBodyIdle,
+		kDeath,
 		kAstralRoot,     // 幽体通常状態
 		kAstralAttack,   // 幽体攻撃
 		kAstralDeath,    // 幽体死亡
@@ -150,7 +152,11 @@ public:
 	Vector2 GetAstralSize() const { return astralSize; }
 
 	bool IsAstral() const { return isAstral; }                                                                     
-	const PlayerBulletManager& GetBullets() const { return playerBullets_; }                                       
+	const PlayerBulletManager& GetBullets() const { return playerBullets_; } 
+
+	int GetHp() const { return nomalBodyHP; }
+
+	float GetAstralTimer() const { return astralBodyTimer_; }
 
 	// --- セッター ---
 	void SetMapChipField(MapChipField* mapChipField) { mapChipField_ = mapChipField; }
@@ -210,6 +216,7 @@ private:
 	const float frameTime = 1.0f / 60.0f;
 	int damageCooldown_ = 0;
 	const int damageCooldownMax = 30;
+	float deathCount;
 
 	float legSpeed = 0.05f;
 
@@ -223,7 +230,7 @@ private:
 	float coolTime_ = 3.0f;                  // 幽体状態になるまでのクールタイム
 
 	// --- 体力 ---
-	static inline const int maxNomalBodyHP = 100;  // 通常状態の最大体力
+	static inline const int maxNomalBodyHP = 3;  // 通常状態の最大体力
 	static inline const int maxAstralBodyHP = 1; // 幽体状態の最大体力
 	int nomalBodyHP = maxNomalBodyHP;            // 通常状態の体力
 	int astralBodyHP = maxAstralBodyHP;          // 幽体状態の体力
@@ -261,5 +268,8 @@ private:
 	int shootSFX;
 	int switchBodySFX;
 	int jumpSFX;
+
+	// UI
+	UI* ui_ = nullptr;
 
 };

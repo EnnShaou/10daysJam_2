@@ -280,7 +280,7 @@ void Game::CheckAllCollisions()
 			// 当たり判定のチェック
 			if (playerAstralRect.IsCollision(enemyRect) && player_->IsAstral())
 			{
-				Novice::ScreenPrintf(30, 180, "HitPumpkin!)");
+				//Novice::ScreenPrintf(30, 180, "HitPumpkin!)");
 				player_->OnCollisionAstral(enemy);
 			}
 			else if (playerNomalRect.IsCollision(enemyRect) && !player_->IsAstral())
@@ -288,7 +288,7 @@ void Game::CheckAllCollisions()
 				// かぼちゃが落下している時だけダメージを受ける
 				if (enemyVelocityY < 0.0f) {
 					if (player_->GetInvincible() == false) {
-						Novice::ScreenPrintf(30, 180, "HitPumpkin!)");
+						//Novice::ScreenPrintf(30, 180, "HitPumpkin!)");
 						player_->OnCollisionNomal(enemy);
 					}
 				}
@@ -308,7 +308,7 @@ void Game::CheckAllCollisions()
 			// 当たり判定のチェック
 			if (playerAstralRect.IsCollision(enemyRect) && player_->IsAstral())
 			{
-				Novice::ScreenPrintf(30, 200, "HitLamp!)");
+				//Novice::ScreenPrintf(30, 200, "HitLamp!)");
 				player_->OnCollisionAstral(enemy);
 			}
 		}
@@ -331,14 +331,14 @@ void Game::CheckAllCollisions()
 					if (!player_->IsAstral()) {
 						if (playerNomalRect.IsCollision(enemyRect))
 						{
-							Novice::ScreenPrintf(30, 220, "HitBat!)");
+							//Novice::ScreenPrintf(30, 220, "HitBat!)");
 							player_->OnCollisionNomal(enemy);
 						}
 					}
 					else {
 						if (playerTempRect.IsCollision(enemyRect))
 						{
-							Novice::ScreenPrintf(30, 220, "HitBat!)");
+							//Novice::ScreenPrintf(30, 220, "HitBat!)");
 							player_->OnCollisionAstral(enemy);
 						}
 					}
@@ -370,7 +370,7 @@ void Game::CheckAllCollisions()
 
 				if (bulletRect.IsCollision(enemyRect))
 				{
-					Novice::ScreenPrintf(30, 240, "HitBatBullet!)");
+					//Novice::ScreenPrintf(30, 240, "HitBatBullet!)");
 					enemy->OnCollision();
 				}
 			}
@@ -394,14 +394,14 @@ void Game::CheckAllCollisions()
 					if (!player_->IsAstral()) {
 						if (playerNomalRect.IsCollision(enemyRect))
 						{
-							Novice::ScreenPrintf(30, 220, "HitBat!)");
+							//Novice::ScreenPrintf(30, 220, "HitBat!)");
 							player_->OnCollisionNomal(enemy);
 						}
 					}
 					else {
 						if (playerTempRect.IsCollision(enemyRect))
 						{
-							Novice::ScreenPrintf(30, 220, "HitBat!)");
+							//Novice::ScreenPrintf(30, 220, "HitBat!)");
 							player_->OnCollisionAstral(enemy);
 						}
 					}
@@ -433,7 +433,7 @@ void Game::CheckAllCollisions()
 
 				if (bulletRect.IsCollision(enemyRect))
 				{
-					Novice::ScreenPrintf(30, 240, "HitMummyBullet!)");
+					//Novice::ScreenPrintf(30, 240, "HitMummyBullet!)");
 					enemy->OnCollision();
 				}
 			}
