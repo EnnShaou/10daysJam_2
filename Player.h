@@ -32,8 +32,9 @@ public:
 		kMove,
 		kJumpUp,
 		kJumpDown,
-		kDamage,         
+		kDamage, 
 		kAstralBodyIdle,
+		kDeath,
 		kAstralRoot,     // 幽体通常状態
 		kAstralAttack,   // 幽体攻撃
 		kAstralDeath,    // 幽体死亡
@@ -215,6 +216,7 @@ private:
 	const float frameTime = 1.0f / 60.0f;
 	int damageCooldown_ = 0;
 	const int damageCooldownMax = 30;
+	float deathCount;
 
 	float legSpeed = 0.05f;
 

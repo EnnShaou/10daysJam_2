@@ -31,6 +31,8 @@ void Player::Initialize(Camera* camera, Vector2& pos)
 
 	ui_ = new UI();
 	ui_->Initialize();
+
+	deathCount = 0.01f;
 }
 
 void Player::Update()
@@ -197,7 +199,7 @@ void Player::Move()
 
 	if (onGround)
 	{
-		if (Keys::IsTrigger(DIK_SPACE))
+		if (Keys::IsTrigger(DIK_SPACE) || Keys::IsTrigger(DIK_Z))
 		{
 			Novice::PlayAudio(jumpSFX, 0, 0.5f);
 			vel_.y = kJumpAcceleration; // ジャンプの加速度を設定
@@ -526,18 +528,30 @@ void Player::OnCollisionNomal(const Enemies* enemies)
 		return;
 	}
 
-	// 点滅アニメーション切り替え
-	animationBehaviorNext_ = AnimationBehavior::kDamage;
-
 	// ダメージ処理
 	nomalBodyHP--;
+
+	// HPが0以下になったら死亡フラグを立てる
+	if (nomalBodyHP <= 0)
+	{
+		animationBehaviorNext_ = AnimationBehavior::kDeath;
+	}
+
+	// アニメーションが終わったら死亡フラグをオンにする
+	if (deathCount <= 0.0f)
+	{
+		isDead_ = true;
+	}
 
 	// ダメージ無敵時間をリセット
 	damageCooldown_ = damageCooldownMax;
 
 	// ノックバック処理
-	if (enemies)
+	if (enemies && nomalBodyHP > 0)
 	{
+		// 点滅アニメーション切り替え
+		animationBehaviorNext_ = AnimationBehavior::kDamage;
+
 		Vector2 enemyPos = enemies->GetPos();
 		//Vector2 knockDir = (worldTransform_.translation_ - enemyPos).normalize();
 
@@ -552,12 +566,6 @@ void Player::OnCollisionNomal(const Enemies* enemies)
 
 		behaviorNext_ = Behavior::kKnockback;
 		BehaviorKnockbackInitialize();
-	}
-
-	// HPが0以下になったら死亡フラグを立てる
-	if (nomalBodyHP <= 0)
-	{
-		isDead_ = true;
 	}
 }
 
@@ -611,7 +619,7 @@ void Player::BehaviorRootUpdate()
 		coolTime_ = max(0.0f, coolTime_);
 	}
 
-	if (Keys::IsTrigger(DIK_F) && onGround)
+	if ((Keys::IsTrigger(DIK_F) && onGround) || (Keys::IsTrigger(DIK_X) && onGround))
 	{
 		templrDirection_ = lrDirection_;
 		SwitchBody();
@@ -746,7 +754,7 @@ void Player::AstralBodyBehaviorRootUpdate()
 	}
 
 	// 本体に戻る
-	if (Keys::IsTrigger(DIK_F))
+	if (Keys::IsTrigger(DIK_F) || Keys::IsTrigger(DIK_X))
 	{
 		astralBodyTimer_ = 0.0f;
 		behaviorNext_ = Behavior::kRoot;
@@ -764,7 +772,7 @@ void Player::AstralBodyBehaviorRootUpdate()
 	}
 
 	// 弾発射
-	if (Keys::IsPress(DIK_SPACE) && attackTimer <= 0)
+	if ((Keys::IsPress(DIK_SPACE) && attackTimer <= 0) || (Keys::IsTrigger(DIK_Z) && attackTimer <= 0))
 	{
 		Novice::PlayAudio(shootSFX, 0, 1.0f);
 		attackTimer = kAttackTime; // クールタイムリセット
@@ -907,7 +915,9 @@ void Player::Animation()
 		case Player::AnimationBehavior::kDamage:
 			animationMax = 2;
 			break;
-
+		case Player::AnimationBehavior::kDeath:
+			animationMax = 4;
+			break;
 		case Player::AnimationBehavior::kAstralBodyIdle:
 			animationMax = 1;
 			break;
@@ -985,6 +995,12 @@ void Player::Animation()
 	case Player::AnimationBehavior::kAstralBodyIdle:
 
 		break;
+
+	case Player::AnimationBehavior::kDeath:
+		deathCount -= frameTime;
+
+		break;
+		
 	default:
 		break;
 	}
