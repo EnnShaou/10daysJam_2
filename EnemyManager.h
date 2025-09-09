@@ -29,7 +29,7 @@ public:
 
     // --- ゲッター ---
     const std::list<Enemies*>& GetEnemies() const { return enemies_; }
-    bool isPushButton(BlockButtonAndGate* button);
+    bool isPushButton(BlockButton* button);
 
 
 private:

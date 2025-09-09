@@ -56,7 +56,7 @@ public:
 	//void SetMapChipField(MapChipField* mapChipField) { mapChipField_ = mapChipField; }
 	void SetPlayer(Player* player) { player_ = player; }
 
-	virtual bool isPushButton(BlockButtonAndGate* button);
+	virtual bool isPushButton(BlockButton* button);
 protected:
 	MapChipField* mapChipField_;  // マップフィールドポインタ
 	DrawSprite* sprite = nullptr; // 敵スプライト
@@ -142,7 +142,7 @@ public:
 
 	// 当たり判定
 	void OnCollision() override;
-	bool isPushButton(BlockButtonAndGate* button)override;
+	bool isPushButton(BlockButton* button)override;
 
 	// かぼちゃの速度のゲッター
 	float GetVelocity() const { return vel_.y; }
@@ -260,7 +260,7 @@ public:
 	void OnCollision() override;
 
 	bool GetIsStun() { return isStan; }
-	bool isPushButton(BlockButtonAndGate* button)override;
+	bool isPushButton(BlockButton* button)override;
 
 private:
 	void MapWallCollision(CollisonMapInfo& info) override;        // 壁との衝突判定

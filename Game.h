@@ -35,6 +35,7 @@ public:
 protected:
 	Camera* camera_;
 	MapChipField* mapChipField_;
+	MapChipField* backGroundMapChipField_;
 	MapBlockManager* blockManger;
 	Player* player_ = nullptr;// プレイヤー
 	EnemyManager enemyManager;

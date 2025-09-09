@@ -133,7 +133,7 @@ public:
 	// --- アニメーション関連 ---
 	void Animation();
 
-	bool isPushButton(BlockButtonAndGate* button);
+	bool isPushButton(BlockButton* button);
 
 	// --- ゲッター ---
 	Vector2 GetPos() const { Vector2 worldPos = worldTransform_.translation_; return worldPos; }                   
@@ -234,6 +234,8 @@ private:
 	int animationCount;
 	int animationTimer;
 	int animationMax = 4;
+
+	float animationLagTime = 0.3f;
 
 	// --- ノックバック ---
 	bool isKnockback_ = false; 

@@ -90,7 +90,7 @@ void Game::Update() {
 void Game::Draw() {
 
 
-
+	Novice::DrawBox(0, 0, 1280, 720, 0.f, BLACK, kFillModeSolid);
 	blockManger->Draw();
 	player_->Draw();
 	enemyManager.Draw();
@@ -119,22 +119,34 @@ void Game::GenerateBlocks() {
 			}
 			if (mapChipType == MapChipType::kButton1)
 			{
-				auto* button = new BlockButtonAndGate();
+				auto* button = new BlockButton();
 				button->setBindID(1);
 				blockManger->pushBlock(button, pos, x, y);
 			}
 
 			if (mapChipType == MapChipType::kButton2)
 			{
-				auto* button = new BlockButtonAndGate();
+				auto* button = new BlockButton();
 				button->setBindID(2);
 				blockManger->pushBlock(button, pos, x, y);
 			}
 
 			if (mapChipType == MapChipType::kButton3)
 			{
-				auto* button = new BlockButtonAndGate();
+				auto* button = new BlockButton();
 				button->setBindID(3);
+				blockManger->pushBlock(button, pos, x, y);
+			}
+			if (mapChipType == MapChipType::kButton4)
+			{
+				auto* button = new BlockButton();
+				button->setBindID(4);
+				blockManger->pushBlock(button, pos, x, y);
+			}
+			if (mapChipType == MapChipType::kButton5)
+			{
+				auto* button = new BlockButton();
+				button->setBindID(5);
 				blockManger->pushBlock(button, pos, x, y);
 			}
 
@@ -173,6 +185,19 @@ void Game::GenerateBlocks() {
 				gate->setBindID(3);
 				blockManger->pushBlock(gate, pos, x, y);
 			}
+			if (mapChipType == MapChipType::kGate4)
+			{
+				auto* gate = new Gate();
+				gate->setBindID(4);
+				blockManger->pushBlock(gate, pos, x, y);
+			}
+			if (mapChipType == MapChipType::kGate5)
+			{
+				auto* gate = new Gate();
+				gate->setBindID(5);
+				blockManger->pushBlock(gate, pos, x, y);
+			}
+
 			if (mapChipType == MapChipType::kPlayer)
 			{
 				Vector2 playerPos = mapChipField_->GetMapChipPositionByIndex(x, y);
@@ -193,21 +218,26 @@ void Game::GenerateBlocks() {
 
 			if (mapChipType == MapChipType::EnemyPumpkin) {
 				enemyManager.PushEnemyPumpkin(mapChipField_->GetMapChipPositionByIndex(x, y), camera_, mapChipField_);
+				mapChipField_->setMapChipData(MapChipType::kBlank, x, y);
 			}
 
 			if (mapChipType == MapChipType::EnemyLamp) {
 				enemyManager.PushEnemyLamp(mapChipField_->GetMapChipPositionByIndex(x, y), camera_, mapChipField_);
+				mapChipField_->setMapChipData(MapChipType::kBlank, x, y);
 			}
 
 			if (mapChipType == MapChipType::EnemyBat) {
 				enemyManager.PushEnemyBat(mapChipField_->GetMapChipPositionByIndex(x, y), camera_, mapChipField_);
+				mapChipField_->setMapChipData(MapChipType::kBlank, x, y);
 			}
 
 			if (mapChipType == MapChipType::EnemyMummy) {
 				enemyManager.PushEnemyMummy(mapChipField_->GetMapChipPositionByIndex(x, y), camera_, mapChipField_);
+				mapChipField_->setMapChipData(MapChipType::kBlank, x, y);
 			}
 		}
 	}
+
 	blockManger->BindButtonAndGates();
 }
 
@@ -271,7 +301,7 @@ void Game::CheckAllCollisions()
 			// 敵の情報を取得
 			Rect enemyRect = { bat->GetPos().x, bat->GetPos().y, bat->GetSize().x, bat->GetSize().y };
 			Rect playerTempRect = { player_->GetTentativePos().x,player_->GetTentativePos().y,player_->GetNomalSize().x,player_->GetNomalSize().y };
-			
+
 			// 当たり判定のチェック
 			if (bat->GetIsDead() == false) {
 

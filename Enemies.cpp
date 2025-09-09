@@ -65,7 +65,7 @@ void Enemies::Animation() {
 
 }
 
-bool EnemyPumpkin::isPushButton(BlockButtonAndGate* button)
+bool EnemyPumpkin::isPushButton(BlockButton* button)
 {
 	std::array<Vector2, kNumCorner> posNew;
 	for (uint32_t i = 0; i < posNew.size(); ++i) {
@@ -115,7 +115,7 @@ void Enemies::MapCollision(CollisonMapInfo& info)
 	GroundStates(info);
 }
 
-bool Enemies::isPushButton(BlockButtonAndGate* button)
+bool Enemies::isPushButton(BlockButton* button)
 {
 	button;
 	return false;
@@ -878,7 +878,7 @@ void EnemyMummy::OnCollision()
 	}
 }
 
-bool EnemyMummy::isPushButton(BlockButtonAndGate* button)
+bool EnemyMummy::isPushButton(BlockButton* button)
 {
 	std::array<Vector2, kNumCorner> posNew;
 	for (uint32_t i = 0; i < posNew.size(); ++i) {
