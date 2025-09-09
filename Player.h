@@ -235,6 +235,8 @@ private:
 	int animationTimer;
 	int animationMax = 4;
 
+	float animationLagTime = 0.3f;
+
 	// --- ノックバック ---
 	bool isKnockback_ = false; 
 	Vector2 knockback_ = { 5.2f, 0.0f };
