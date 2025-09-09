@@ -158,6 +158,8 @@ public:
 
 	float GetAstralTimer() const { return astralBodyTimer_; }
 
+	float GetCoolTime() const { return coolTime_; }
+
 	// --- セッター ---
 	void SetMapChipField(MapChipField* mapChipField) { mapChipField_ = mapChipField; }
 

@@ -5,9 +5,10 @@ void UI::Initialize()
 	frameSprite = Novice::LoadTexture("./Resources/UI/frame.png"); 
 	iconSprite = Novice::LoadTexture("./Resources/UI/hpIcon.png"); 
 	gaugeSprite = Novice::LoadTexture("./Resources/UI/gauge.png"); 
+	gaugeSprite2 = Novice::LoadTexture("./Resources/UI/gauge2.png");
 }
 
-void UI::Draw(int hp,float timer)
+void UI::Draw(int hp,float timer, float coolTimer)
 {
 	// フレームの描画
 	Novice::DrawQuad(0, 0, 286, 0, 0, 176, 286, 176, 0, 0, 286, 176, frameSprite, WHITE);
@@ -23,10 +24,22 @@ void UI::Draw(int hp,float timer)
 		posX, posY + height, posX + width, posY + height,
 		0, 0, width, height,
 		iconSprite,WHITE);
+
+	// 幽体状態切り替えのクールタイム描画
+	posX = 64;
+	posY = 82;
+	width = 160 - static_cast<int>(54 * coolTimer);
+	height = 18;
+
+	Novice::DrawQuad(
+		posX, posY, posX + width, posY,
+		posX, posY + height, posX + width, posY + height,
+		0, 0, width, height,
+		gaugeSprite2, WHITE);
 	
 	// 幽体の制限時間ゲージを描画
-	posX = 65;
-	posY = 122;
+	posX = 64;
+	posY = 121;
 	width = 160 - static_cast<int>(16 * timer);
 	height = 18;
 
