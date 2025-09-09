@@ -880,13 +880,13 @@ void Player::Animation()
 			animationMax = 1;
 			break;
 		case AnimationBehavior::kAstralRoot:
-			animationMax = 3;
+			animationMax = 4;
 			break;
 		case AnimationBehavior::kAstralAttack:
-			animationMax = 1;
+			animationMax = 2;
 			break;
 		case AnimationBehavior::kAstralDeath:
-			animationMax = 3;
+			animationMax = 4;
 			break;
 		}
 	}
