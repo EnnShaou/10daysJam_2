@@ -113,7 +113,7 @@ void Player::Draw()
 			break;
 		case AnimationBehavior::kAstralAttack:
 			texY = 64;
-			texX = 0;
+			//texX = 0;
 			break;
 		case AnimationBehavior::kAstralDeath:
 			texY = 128;
@@ -713,7 +713,7 @@ void Player::AstralBodyBehaviorRootInitialize()
 {
 	Astralbehavior_ = AstralBehavior::kRoot;
 	attackTimer = kAttackTime;
-	animationBehaviorNext_ = AnimationBehavior::kAstralBodyIdle;
+	animationBehaviorNext_ = AnimationBehavior::kAstralRoot;
 }
 
 void Player::AstralBodyBehaviorRootUpdate()
@@ -760,17 +760,11 @@ void Player::AstralBodyBehaviorAttackInitialize()
 	Astralbehavior_ = AstralBehavior::kAttack;
 	animationBehaviorNext_ = AnimationBehavior::kAstralAttack;
 	attackTimer = 0.0f;
-}
-
-void Player::AstralBodyBehaviorAttackUpdate()
-{
-	// 弾の発射カウント
-	currentBullets_++;
+	animationLagTime = 0.3f;
 
 	// 最大数以下なら弾を発射
 	if (currentBullets_ <= maxBullets_)
 	{
-
 		// 弾の速度
 		Vector2 dir = GetDir();
 
@@ -780,9 +774,20 @@ void Player::AstralBodyBehaviorAttackUpdate()
 		// 弾発射
 		playerBullets_.Shot(dir);
 	}
+}
 
-	// 攻撃後は通常状態に戻る
-	AstralbehaviorNext_ = AstralBehavior::kRoot;
+void Player::AstralBodyBehaviorAttackUpdate()
+{
+	if(animationLagTime <= 0.0f)
+	{
+		// 弾の発射カウント
+		currentBullets_++;
+
+		// 攻撃後は通常状態に戻る
+		AstralbehaviorNext_ = AstralBehavior::kRoot;
+	}
+
+	animationLagTime -= frameTime;
 }
 
 void Player::AstralBodyBehaviorKnockbackInitialize()
@@ -888,13 +893,13 @@ void Player::Animation()
 			animationMax = 1;
 			break;
 		case AnimationBehavior::kAstralRoot:
-			animationMax = 3;
+			animationMax = 4;
 			break;
 		case AnimationBehavior::kAstralAttack:
-			animationMax = 1;
+			animationMax = 2;
 			break;
 		case AnimationBehavior::kAstralDeath:
-			animationMax = 3;
+			animationMax = 4;
 			break;
 		}
 	}
@@ -967,22 +972,7 @@ void Player::Animation()
 
 
 	// attack の場合はアニメーションしない
-	if (animationBehavior_ != AnimationBehavior::kAstralAttack) {
-		if (animationTimer >= 60 / (animationMax * 2)) {
-			//animationTimer = 0;
-			//animationCount++;
-			// 死亡アニメーションだけ非ループ
-			if (animationBehavior_ == AnimationBehavior::kAstralDeath) {
-				if (animationCount >= animationMax) {
-					animationCount = animationMax - 1; // 最後のフレームで止める
-					// 死亡後の処理を入れるならここ
-				}
-			}
-			else {
-				animationCount = animationCount % animationMax;
-			}
-		}
-	}
+	
 
 	if (animationTimer >= 60 / (animationMax * 2)) {
 		animationTimer = 0;// 60フレームに1回
