@@ -61,6 +61,11 @@ private:
 	bool isOpen_ = false;
 	int gateIndex = 0;
 	WtF drawWtf;
+
+	// オーディオ
+	int gateOpenSFX;
+	int gateCloseSFX;
+
 	int openTexture;
 	int closeTexture;
 };

@@ -10,6 +10,7 @@
 #include"Camera.h"
 #include "EnemyManager.h"
 #include"MapBlockManager.h"
+#include "BGM.h"
 class Game : public IScene {
 public:
 	Game();
@@ -40,6 +41,7 @@ protected:
 	EnemyManager enemyManager;
 	Phase phase_ = Phase::FadeIn;                             // ゲームのフェーズ
 	Fade* fade_ = nullptr;                       // フェードイン・フェードアウト用のオブジェクト
+	BGM* bgm_ = nullptr;
 };
 
 class Stage1 :public Game

@@ -606,6 +606,8 @@ void EnemyBat::Initialize(Camera* camera, Vector2& pos, MapChipField* mapChipFie
 	// 画像サイズ
 	imageWidth_ = 32;
 	imageHeight_ = 32;
+
+	damagedSFX = Novice::LoadAudio("./Resources/Audio/sfx/batDead.mp3");
 }
 
 Vector2 EnemyBat::GetPlayerPos() {
@@ -723,7 +725,10 @@ void EnemyBat::Animation()
 
 void EnemyBat::OnCollision()
 {
-	behaviorNext_ = BatBehavior::kDead;	
+	if (isDead_ == false) {
+		Novice::PlayAudio(damagedSFX, 0, 1.0f);
+		behaviorNext_ = BatBehavior::kDead;
+	}
 }
 
 void EnemyBat::BehaviorNormalInitialize() {
@@ -774,9 +779,11 @@ void EnemyBat::BehaviorDeadInitialize() {
 
 void EnemyBat::BehaviorDeadUpdate() {
 	
+	vel_.y = -0.4f;
 	wtf.scale_ -= { 0.015f, 0.015f };
 	if (wtf.scale_.x <= 0.0f) {
 		behaviorNext_ = BatBehavior::kUnknown;
+		vel_ = { 0.0f, 0.0f };
 		wtf.scale_ = { 0.0f, 0.0f };
 	}
 }
@@ -817,6 +824,9 @@ void EnemyMummy::Initialize(Camera* camera, Vector2& pos, MapChipField* mapChipF
 	// アニメーション用の幅と縦サイズ
 	imageWidth_ = 42;
 	imageHeight_ = 64;
+
+	// audio
+	damagedSFX = Novice::LoadAudio("./Resources/Audio/sfx/mummyDamaged.mp3");
 }
 
 void EnemyMummy::Update()
@@ -862,6 +872,7 @@ void EnemyMummy::Draw()
 void EnemyMummy::OnCollision()
 {
 	if (isStan == false) {
+		Novice::PlayAudio(damagedSFX, 0, 1.0f);
 		isStan = true;
 		animePosX_ = 0;
 	}
