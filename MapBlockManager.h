@@ -61,13 +61,15 @@ private:
 	bool isOpen_ = false;
 	int gateIndex = 0;
 	WtF drawWtf;
+	int openTexture;
+	int closeTexture;
 };
 
-class BlockButtonAndGate : public Block
+class BlockButton : public Block
 {
 public:
-	BlockButtonAndGate() {}
-	~BlockButtonAndGate() {}
+	BlockButton() {}
+	~BlockButton() {}
 
 	void Initialize(Vector2 pos) override;
 	void Update() override;
@@ -80,6 +82,8 @@ private:
 
 	Gate* gate_ = nullptr;
 	bool isPressed_ = false;
+	int pushButtonTexture;
+	int ButtonTexture;
 
 };
 
@@ -93,6 +97,8 @@ public:
 	void Draw(Camera* camera) override;
 private:
 	bool isShow = false;
+	int showTexture;
+	int texture;
 };
 class Thorn : public Block
 {
@@ -113,6 +119,15 @@ public:
 	void Update() override;
 	void Draw(Camera* camera) override;
 private:
+};
+class BackGroundBlock : public Block
+{
+public:
+	BackGroundBlock(){}
+	~BackGroundBlock(){}
+	void Initialize(Vector2 pos) override;
+private:
+
 };
 
 class MapBlockManager

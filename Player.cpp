@@ -310,7 +310,13 @@ void Player::MapCollision(CollisonMapInfo& info) {
 	}
 	if (type == MapChipType::kBlock)
 	{
-		worldTransform_.translation_.x -= kWidth * 2;
+		worldTransform_.translation_.x -= kWidth * 2.5f;
+	}
+	auto index2 = mapChipField_->GetMapChipIndexByPosition(worldTransform_.translation_ + Vector2(0.f, kHeight / 2));
+	auto type2 = mapChipField_->GetMapChipTypeIndex(index2.xIndex, index2.yIndex);
+	if (type2 == MapChipType::kThorn)
+	{
+		isDead_ = true;
 	}
 }
 void Player::MapCollisionTop(CollisonMapInfo& info) {
@@ -366,10 +372,7 @@ void Player::MapCollisionBottom(CollisonMapInfo& info) {
 			}
 
 		}
-		if (type == MapChipType::kThorn)
-		{
-			isDead_ = true;
-		}
+
 	}
 }
 void Player::MapCollisionLeft(CollisonMapInfo& info) {
@@ -987,7 +990,7 @@ void Player::Animation()
 	}
 }
 
-bool Player::isPushButton(BlockButtonAndGate* button)
+bool Player::isPushButton(BlockButton* button)
 {
 	Vector2 playerPos = worldTransform_.translation_;
 

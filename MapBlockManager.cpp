@@ -38,7 +38,7 @@ void MapBlockManager::Draw()
 void MapBlockManager::BindButtonAndGates() {
 	for (auto& row : block_) {
 		for (Block* b : row) {
-			if (auto* button = dynamic_cast<BlockButtonAndGate*>(b)) {
+			if (auto* button = dynamic_cast<BlockButton*>(b)) {
 				int id = button->getBindID();
 				if (id < 0) continue;
 
@@ -57,11 +57,10 @@ void MapBlockManager::BindButtonAndGates() {
 }
 
 
-
 void Block::Initialize(Vector2 pos)
 {
 
-	sprite = new DrawSprite(Novice::LoadTexture("white1x1.png"), { 64,64 });
+	sprite = new DrawSprite(Novice::LoadTexture("./Resources/Block/block1.png"), { 64,64 });
 	wtf_.Initialize();
 	wtf_.translation_ = pos;
 
@@ -77,12 +76,12 @@ void Block::Draw(Camera* camera)
 	sprite->Draw(wtf_, camera, 0, 0, 64, 64);
 }
 
-
 void Gate::Initialize(Vector2 pos) {
 	wtf_.translation_ = pos;
 	drawWtf.translation_ = pos;
-	sprite = new DrawSprite(Novice::LoadTexture("white1x1.png"), { 64,64 });
-	sprite->SetColor(BLUE);
+	openTexture = Novice::LoadTexture("./Resources/Block/Gate2.png");
+	closeTexture = Novice::LoadTexture("./Resources/Block/Gate1.png");
+	sprite = new DrawSprite(closeTexture, { 64,64 });
 	gateIndex = 0;
 
 	auto index = mapChipField_->GetMapChipIndexByPosition(wtf_.translation_);
@@ -114,13 +113,6 @@ void Gate::Update() {
 
 void Gate::Draw(Camera* camera) {
 	if (sprite) {
-		if (isOpen_) {
-			sprite->SetColor(0x33333388);
-		}
-		else
-		{
-			sprite->SetColor(BLUE);
-		}
 		sprite->Draw(drawWtf, camera, 0, 0, 64, 64);
 	}
 }
@@ -134,6 +126,8 @@ void Gate::Open() {
 		return;
 	}
 	int gateIndexOpen = 0;
+	sprite->SetTexture(openTexture);
+	sprite->SetColor(0xffffff99);
 	while (type != MapChipType::kBlank) {
 		mapChipField_->setMapChipData(MapChipType::kBlank, index.xIndex, index.yIndex + gateIndexOpen);
 		gateIndexOpen++;
@@ -153,7 +147,8 @@ void Gate::Close() {
 	{
 		return;
 	}
-
+	sprite->SetTexture(closeTexture);
+	sprite->SetColor(0xffffffff);
 	int gateIndexClose = 0;
 	while (type != MapChipType::kBlock) {
 		mapChipField_->setMapChipData(MapChipType::kBlock, index.xIndex, index.yIndex + gateIndexClose);
@@ -167,39 +162,43 @@ void Gate::Close() {
 	isOpen_ = false;
 }
 
-void BlockButtonAndGate::Initialize(Vector2 pos) {
+void BlockButton::Initialize(Vector2 pos) {
 	wtf_.translation_ = pos;
-	sprite = new DrawSprite(Novice::LoadTexture("white1x1.png"), { 64,64 });
-	sprite->SetColor(RED);
+	ButtonTexture = Novice::LoadTexture("./Resources/Block/Button1.png");
+	pushButtonTexture = Novice::LoadTexture("./Resources/Block/Button2.png");
+	sprite = new DrawSprite(ButtonTexture, { 64,64 });
 }
 
-void BlockButtonAndGate::Update() {
+void BlockButton::Update() {
 	bool pressedNow = false;
 	if (player_ && player_->isPushButton(this)) pressedNow = true;
 	if (!pressedNow && enemies_ && enemies_->isPushButton(this)) pressedNow = true;
 
 	if (pressedNow && !isPressed_) {
 		isPressed_ = true;
+		sprite->SetTexture(pushButtonTexture);
 		if (gate_) gate_->Open();
 	}
 	else if (!pressedNow && isPressed_) {
 		isPressed_ = false;
+		sprite->SetTexture(ButtonTexture);
 		if (gate_) gate_->Close();
 	}
 	wtf_.Update();
 }
 
-void BlockButtonAndGate::Draw(Camera* camera) {
+void BlockButton::Draw(Camera* camera) {
 	if (sprite) {
 		sprite->Draw(wtf_, camera, 0, 0, 64, 64);
 	}
 }
 void HiddenFloor::Initialize(Vector2 pos)
 {
-	sprite = new DrawSprite(Novice::LoadTexture("white1x1.png"), { 64,64 });
+	showTexture = Novice::LoadTexture("./Resources/Block/HiddenFloor1.png");
+	texture = Novice::LoadTexture("./Resources/Block/HiddenFloor2.png");
+	sprite = new DrawSprite(texture, { 64,64 });
 	wtf_.Initialize();
 	wtf_.translation_ = pos;
-	sprite->SetColor(GREEN);
 	auto index = mapChipField_->GetMapChipIndexByPosition(wtf_.translation_);
 	mapChipField_->setMapChipData(MapChipType::kBlock, index.xIndex, index.yIndex);
 }
@@ -234,13 +233,13 @@ void HiddenFloor::Update()
 	if (isShow) {
 		if (type == MapChipType::kBlank) {
 			mapChipField_->setMapChipData(MapChipType::kBlock, index.xIndex, index.yIndex);
-			sprite->SetColor(GREEN);
+			sprite->SetTexture(showTexture);
 		}
 	}
 	else {
 		if (type == MapChipType::kBlock) {
 			mapChipField_->setMapChipData(MapChipType::kBlank, index.xIndex, index.yIndex);
-			sprite->SetColor(0x11111144);
+			sprite->SetTexture(texture);
 		}
 	}
 	wtf_.Update();
@@ -254,10 +253,9 @@ void HiddenFloor::Draw(Camera* camera)
 
 void Thorn::Initialize(Vector2 pos)
 {
-	sprite = new DrawSprite(Novice::LoadTexture("white1x1.png"), { 64,64 });
+	sprite = new DrawSprite(Novice::LoadTexture("./Resources/Block/Thorn.png"), { 64,64 });
 	wtf_.Initialize();
 	wtf_.translation_ = pos;
-	sprite->SetColor(BLACK);
 
 }
 
@@ -287,4 +285,11 @@ void Clear::Update()
 void Clear::Draw(Camera* camera)
 {
 	sprite->Draw(wtf_, camera, 0, 0, 64, 64);
+}
+
+void BackGroundBlock::Initialize(Vector2 pos)
+{
+	sprite = new DrawSprite(Novice::LoadTexture("./Resources/Block/Block2.png"), { 64,64 });
+	wtf_.Initialize();
+	wtf_.translation_ = pos;
 }

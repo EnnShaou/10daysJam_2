@@ -18,23 +18,26 @@ public:
 	void Draw(WtF& wt,               // 物体変換
 		Camera* camera,        // カメラ
 		int srcX, int srcY, int srcW, int srcH, LRDirection lrDir = kRight);
-	
+	void SetTexture(int Texture) {
+		texture_ = Texture;
+	}
+
 private:
 	int texture_ = 0;
 	Vector2 textureSize_;
 	unsigned int color_;
 };
 
-void DrawCircle(WtF& wt,	Camera* camera, int radius, unsigned int color);
+void DrawCircle(WtF& wt, Camera* camera, int radius, unsigned int color);
 
 void DrawHitBox(WtF& wt, Camera* camera, int width, int height);
 class RGBA {
-	public:
+public:
 	int R, G, B, A;
 	RGBA(int r = 255, int g = 255, int b = 255, int a = 255)
 		: R(int(r)), G(int(g)), B(int(b)), A(int(a)) {
 	}
-	~RGBA(){}
+	~RGBA() {}
 
 	operator int() const {
 		return (R << 24) | (G << 16) | (B << 8) | A;

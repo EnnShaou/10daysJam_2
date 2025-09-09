@@ -66,7 +66,7 @@ void EnemyManager::setPlayer(Player* player)
 {
 	player_ = player;
 }
-bool EnemyManager::isPushButton(BlockButtonAndGate* button)
+bool EnemyManager::isPushButton(BlockButton* button)
 {
 	for (auto* enemy : enemies_)
 	{
