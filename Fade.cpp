@@ -54,7 +54,6 @@ void Fade::Start(Status status, float duration) {
 }
 
 void Fade::Stop() {
-
 	status_ = Status::None;              // フェードの状態を「なし」に設定
 	count_ = 0.0f;                       // カウントをリセット
 	color_.A = 255;

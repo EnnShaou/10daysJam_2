@@ -61,6 +61,10 @@ private:
 	bool isOpen_ = false;
 	int gateIndex = 0;
 	WtF drawWtf;
+
+	// オーディオ
+	int gateOpenSFX;
+	int gateCloseSFX;
 };
 
 class BlockButtonAndGate : public Block

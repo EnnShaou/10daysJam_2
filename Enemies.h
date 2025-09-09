@@ -236,6 +236,8 @@ private:
 	void Animation() override;
 
 	bool isDead_ = false;
+
+	int damagedSFX;
 };
 
 // ------------------ ミイラ（派生） ------------------
@@ -280,4 +282,7 @@ private:
 	AnimationBehavior animationBehavior_ = AnimationBehavior::kMove;
 	void Animation() override;
 
+
+	// audio
+	int damagedSFX;
 };

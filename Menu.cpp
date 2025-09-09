@@ -11,6 +11,9 @@ MenuScene::~MenuScene()
 		delete fade_;
 		fade_ = nullptr;
 	}
+
+	delete bgm_;
+	bgm_ = nullptr;
 }
 
 void MenuScene::Initialize()
@@ -20,11 +23,17 @@ void MenuScene::Initialize()
 	fade_->Initialize();                      // フェードの初期化
 	fade_->Start(Fade::Status::FadeIn, 1.0f); // フェードインを開始
 
+	bgm_ = new BGM();
+	bgm_->Initialize();
 
+	chooseSFX = Novice::LoadAudio("./Resources/Audio/sfx/choose.mp3");
+	confirmSFX = Novice::LoadAudio("./Resources/Audio/sfx/confirm.mp3");
 }
 
 void MenuScene::Update()
 {
+	bgm_->PlayBGM(0);
+	bgm_->SetVolume(0.1f);
 	switch (phase_) {
 	case MenuScene::Phase::kFadeIn:
 		phase_ = MenuScene::Phase::kMaui;
@@ -34,6 +43,7 @@ void MenuScene::Update()
 		fade_->Update(); // フェードの更新
 		if (Keys::IsTrigger(DIK_W) || Keys::IsTrigger(DIK_UP))
 		{
+			Novice::PlayAudio(chooseSFX, 0, 0.3f);
 			if (static_cast<Stage>(static_cast<int> (StageNow) - 1) != Stage::KUNKUWN)
 			{
 				StageNow = static_cast<Stage>(static_cast<int> (StageNow) - 1);
@@ -42,6 +52,7 @@ void MenuScene::Update()
 		}
 		if (Keys::IsTrigger(DIK_S) || Keys::IsTrigger(DIK_DOWN))
 		{
+			Novice::PlayAudio(chooseSFX, 0, 0.3f);
 			if (static_cast<Stage>(static_cast<int> (StageNow) + 1) != Stage::KNUMBER)
 			{
 				StageNow = static_cast<Stage>(static_cast<int> (StageNow) + 1);
@@ -50,6 +61,7 @@ void MenuScene::Update()
 
 
 		if (Keys::IsPress(DIK_SPACE)) {
+			Novice::PlayAudio(confirmSFX, 0, 0.5f);
 			phase_ = MenuScene::Phase::kFadeOut;      // フェードアウトフェーズに移行
 			fade_->Start(Fade::Status::FadeOut, 1.0f); // フェードアウトを開始
 		}
@@ -63,15 +75,16 @@ void MenuScene::Update()
 
 	case MenuScene::Phase::kFadeOut:
 		if (fade_->IsFinished()) { // フェードアウトが完了したらシーンを終了
+			bgm_->Stop();
 			switch (StageNow)
 			{
 			case MenuScene::Stage::STAGE1:
-				SceneNo = Scene::kStage1;
+				SceneNo = Scene::kGame;
 				break;
 			case MenuScene::Stage::STAGE2:
 				break;
 			}
-
+			
 		}
 		fade_->Update();        // フェードの更新
 		break;

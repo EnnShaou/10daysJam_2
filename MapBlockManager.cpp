@@ -94,6 +94,10 @@ void Gate::Initialize(Vector2 pos) {
 
 	}
 	sprite->SetSize({ sprite->GetSize().x,gateIndex * 64.f });
+
+	// audio
+	gateOpenSFX = Novice::LoadAudio("./Resources/Audio/sfx/gateOpen.mp3");
+	gateCloseSFX = Novice::LoadAudio("./Resources/Audio/sfx/gateClose.mp3");
 }
 
 void Gate::Update() {
@@ -133,6 +137,7 @@ void Gate::Open() {
 	{
 		return;
 	}
+
 	int gateIndexOpen = 0;
 	while (type != MapChipType::kBlank) {
 		mapChipField_->setMapChipData(MapChipType::kBlank, index.xIndex, index.yIndex + gateIndexOpen);
@@ -143,6 +148,7 @@ void Gate::Open() {
 			break;
 		}
 	}
+	Novice::PlayAudio(gateOpenSFX, 0, 1.0f);
 	isOpen_ = true;
 }
 
@@ -164,6 +170,7 @@ void Gate::Close() {
 			break;
 		}
 	}
+	Novice::PlayAudio(gateCloseSFX, 0, 1.0f);
 	isOpen_ = false;
 }
 

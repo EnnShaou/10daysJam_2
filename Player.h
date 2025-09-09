@@ -246,9 +246,18 @@ private:
 
 	const float knockbackDuration_ = 0.5f; // ノックバックが続く秒数
 
+	// 無敵時間
 	int invincibleTimer_ = 0;
 	const int maxInvincibleTimer = 90;
 	bool isInvincible_ = false;
 
 	void Invincible();
+
+	// オーディオファイル
+	int bodyDamagedSFX;
+	int ghostDamagedSFX;
+	int shootSFX;
+	int switchBodySFX;
+	int jumpSFX;
+
 };

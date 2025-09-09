@@ -21,6 +21,13 @@ void Player::Initialize(Camera* camera, Vector2& pos)
 	astralBodyHP = maxAstralBodyHP;
 	nomalBodyHP = maxNomalBodyHP;
 	damageCooldown_ = 0;
+
+	// オーディオファイル
+	bodyDamagedSFX = Novice::LoadAudio("./Resources/Audio/sfx/playerDamaged.mp3");
+	ghostDamagedSFX = Novice::LoadAudio("./Resources/Audio/sfx/ghostDamaged.mp3");
+	shootSFX = Novice::LoadAudio("./Resources/Audio/sfx/shoot.mp3");
+	switchBodySFX = Novice::LoadAudio("./Resources/Audio/sfx/switchBody.mp3");
+	jumpSFX = Novice::LoadAudio("./Resources/Audio/sfx/jump.mp3");
 }
 
 void Player::Update()
@@ -187,6 +194,7 @@ void Player::Move()
 	{
 		if (Keys::IsTrigger(DIK_SPACE))
 		{
+			Novice::PlayAudio(jumpSFX, 0, 0.5f);
 			vel_.y = kJumpAcceleration; // ジャンプの加速度を設定
 		}
 	}
@@ -502,7 +510,8 @@ void Player::MapWallCollision(CollisonMapInfo& info) {
 void Player::OnCollisionNomal(const Enemies* enemies)
 {
 	(void)enemies;
-
+	
+	Novice::PlayAudio(bodyDamagedSFX, 0, 1.0f);
 	// ダメージ無敵時間中はダメージを受けない
 	if (damageCooldown_ > 0)
 	{
@@ -547,11 +556,12 @@ void Player::OnCollisionNomal(const Enemies* enemies)
 void Player::OnCollisionAstral(const Enemies* enemies)
 {
 	(void)enemies;
+	
 	if (Astralbehavior_ == AstralBehavior::kKnockback)
 	{
 		return; // 連続ヒット防止
 	}
-
+	Novice::PlayAudio(switchBodySFX, 0, 1.0f);
 	// ノックバック方向（敵が左なら右に飛ばす）
 	Vector2 enemyPos = enemies->GetPos();
 	if (worldTransform_.translation_.x >= enemyPos.x) {
@@ -699,7 +709,7 @@ void Player::SwitchBody()
 	{
 		return;
 	}
-
+	Novice::PlayAudio(switchBodySFX, 0, 1.0f);
 	// 霊体化する前の位置を保存
 	tentativeWorldTransform_ = worldTransform_;
 
@@ -746,6 +756,7 @@ void Player::AstralBodyBehaviorRootUpdate()
 	// 弾発射
 	if (Keys::IsPress(DIK_SPACE) && attackTimer <= 0)
 	{
+		Novice::PlayAudio(shootSFX, 0, 1.0f);
 		attackTimer = kAttackTime; // クールタイムリセット
 		AstralbehaviorNext_ = AstralBehavior::kAttack;
 	}

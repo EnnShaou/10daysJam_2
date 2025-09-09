@@ -14,6 +14,8 @@ Game::~Game() {
 	// fade_の解放
 	delete fade_;
 	fade_ = nullptr;
+	delete bgm_;
+	bgm_ = nullptr;
 
 	delete blockManger;
 	blockManger = nullptr;
@@ -43,6 +45,9 @@ void Game::Initialize() {
 	// フェードの初期化
 	fade_ = new Fade();
 	fade_->Initialize();
+	// bgmの初期化
+	bgm_ = new BGM();
+	bgm_->Initialize();
 	enemyManager.setPlayer(player_);
 	blockManger->setEnemies(&enemyManager);
 	GenerateBlocks();
@@ -60,11 +65,12 @@ void Game::Update() {
 
 
 #endif
-
+	bgm_->PlayBGM(1);
+	bgm_->SetVolume(0.2f);
 	switch (phase_) {
 	case Game::Phase::kPlay:
 		camera_->Update();
-
+		
 		player_->Update();
 		enemyManager.Update();
 		// 全ての当たり判定をチェック
@@ -72,7 +78,7 @@ void Game::Update() {
 		blockManger->Update();
 		break;
 	case Game::Phase::kDeath:
-
+		
 		break;
 	default:
 		break;
@@ -431,10 +437,11 @@ void Game::ChangePhase() {
 		//}
 		else {
 			if (fade_->IsFinished()) {   // フェードアウトが完了したらシーンを終了
+				bgm_->Stop();
 				SceneNo = Scene::kReset; // シーンを終了
 			}
 		}
-
+		
 		break;
 	default:
 		break;
@@ -458,6 +465,10 @@ void Stage1::Initialize()
 	// フェードの初期化
 	fade_ = new Fade();
 	fade_->Initialize();
+
+	bgm_ = new BGM();
+	bgm_->Initialize();
+	
 	enemyManager.setPlayer(player_);
 	blockManger->setEnemies(&enemyManager);
 	GenerateBlocks();
