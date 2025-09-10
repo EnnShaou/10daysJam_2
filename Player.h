@@ -229,7 +229,7 @@ private:
 	// --- 幽体状態関連 ---
 	float astralBodyTimer_ = 0.0f;           // 幽体状態の残り時間タイマー
 	const float astralBodyDuration_ = 10.0f; // 幽体状態持続時間
-	float coolTime_ = 3.0f;                  // 幽体状態になるまでのクールタイム
+	float coolTime_ = 0.0f;                  // 幽体状態になるまでのクールタイム
 
 	// --- 体力 ---
 	static inline const int maxNomalBodyHP = 3;  // 通常状態の最大体力

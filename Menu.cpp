@@ -29,6 +29,7 @@ void MenuScene::Initialize()
 	chooseSFX = Novice::LoadAudio("./Resources/Audio/sfx/choose.mp3");
 	confirmSFX = Novice::LoadAudio("./Resources/Audio/sfx/confirm.mp3");
 
+	backgroundHandle_ = Novice::LoadTexture("./Resources/Scene/stageSelectSceen.png");
 	cursorTextureHandle_ = Novice::LoadTexture("./Resources/PlayerBullet/bullet.png");
 	stageTextureHandle_[0] = Novice::LoadTexture("./Resources/StageSelect/stageSelection1.png");
 	stageTextureHandle_[1] = Novice::LoadTexture("./Resources/StageSelect/stageSelection2.png");
@@ -92,7 +93,7 @@ void MenuScene::Update()
 			case MenuScene::Stage::STAGE2:
 				break;
 			}
-			
+
 		}
 		fade_->Update();        // フェードの更新
 		break;
@@ -103,12 +104,15 @@ void MenuScene::Update()
 
 void MenuScene::Draw()
 {
-
+	// 背景描画
+	Novice::DrawSpriteRect(0, 0, bgAnimePosX, 0, 1280, 720,
+		backgroundHandle_, 1.0f / 4.0f, 1.0f, 0.0f, WHITE);
 	int posX = 512;
-	int posY = 64;
+	int posY = 100;
+	int offset = 96;
 	for (int i = 0; i < static_cast<int>(Stage::KNUMBER); i++)
 	{
-		Novice::DrawSprite(posX, (posY + 24) * (i + 1),
+		Novice::DrawSprite(posX, (posY + (offset * (i + 1))),
 			stageTextureHandle_[i], 1.0f, 1.0f, 0.F, 0xffffffff);
 	}
 	for (int i = 0; i < 2; i++)
@@ -117,7 +121,7 @@ void MenuScene::Draw()
 			(posY + 24) * (static_cast<int>(StageNow) + 1) + 16,
 0			cursorTextureHandle_, 1.0f, 1.0f, 0.F, 0xffffffff);*/
 		Novice::DrawSpriteRect(posX + (i == 0 ? -80 : 256 + 80 - 32),
-			(posY + 24) * (static_cast<int>(StageNow) + 1) + 16,
+			(posY + (offset * (static_cast<int>(StageNow) + 1) + 16)),
 			animePosX, 0, imageWidth, imageHeight, cursorTextureHandle_, 1.0f / 3.0f, 1.0f, 0.0f, WHITE);
 	}
 	fade_->Draw();
@@ -128,11 +132,18 @@ void MenuScene::Animation() {
 	animationMax = 3;
 	if (animationTimer % 12 == 0) {
 		animePosX += imageWidth;
-
+		bgAnimePosX += 1280;
 	}
+	// icon
 	if (animePosX >= imageWidth * animationMax) {
 		animePosX = 0;
 	}
+
+	// background
+	if (bgAnimePosX >= 1280 * 4) {
+		bgAnimePosX = 0;
+	}
+	
 }
 
 void Reset::Update()

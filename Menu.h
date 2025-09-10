@@ -34,6 +34,7 @@ private:
 	Fade* fade_ = nullptr; // フェードイン・フェードアウト用のオブジェクトb                    // シーンが終了したかどうか
 	Phase phase_ = Phase::kFadeIn; // 現在のフェーズ
 	Stage StageNow = Stage::STAGE1;
+	int backgroundHandle_ = 0;
 	int stageTextureHandle_[static_cast<int>(Stage::KNUMBER)] = { 0 };
 	int cursorTextureHandle_ = 0;
 	BGM* bgm_ = nullptr;
@@ -44,6 +45,7 @@ private:
 	int animationTimer = 0;
 	int animationMax = 3;
 	int animePosX = 0;
+	int bgAnimePosX = 0;
 	int imageWidth = 32;
 	int imageHeight = 32;
 

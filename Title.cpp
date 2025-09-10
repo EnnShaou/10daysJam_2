@@ -27,12 +27,15 @@ void TitleScene::Initialize() {
 	bgm_->Initialize();
 
 	confirmSFX = Novice::LoadAudio("./Resources/Audio/sfx/confirm.mp3");
+	backgroundHandle_ = Novice::LoadTexture("./Resources/Scene/titleSceen.png");
+	spaceHandle_ = Novice::LoadTexture("./Resources/Scene/space.png");
 }
 
 void TitleScene::Update() {
 
 	bgm_->PlayBGM(0);
 	bgm_->SetVolume(0.15f);
+	Animation();
 	switch (phase_) {
 	case TitleScene::Phase::kFadeIn:
 		phase_ = TitleScene::Phase::kMaui;
@@ -66,6 +69,26 @@ void TitleScene::Update() {
 }
 
 void TitleScene::Draw() {
+	Novice::DrawSpriteRect(0, 0, animePosX, 0, imageWidth, imageHeight, 
+		backgroundHandle_, 1.0f / 4.0f, 1.0f, 0.0f, WHITE);
 
+	int cycleTime = 60; // 1秒ループ
+	int timeInCycle = animationTimer % cycleTime;
+
+	if (timeInCycle < 30) { 
+		Novice::DrawSprite(0, 0, spaceHandle_, 1.0f, 1.0f, 0.0f, WHITE);
+	}
 	fade_->Draw();
+}
+
+void TitleScene::Animation() {
+	animationTimer++;
+	animationMax = 4;
+	if (animationTimer % 12 == 0) {
+		animePosX += imageWidth;
+
+	}
+	if (animePosX >= imageWidth * animationMax) {
+		animePosX = 0;
+	}
 }
