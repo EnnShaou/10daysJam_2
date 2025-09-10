@@ -1007,7 +1007,8 @@ void Player::Animation()
 				animationBehaviorNext_ = Player::AnimationBehavior::kJumpDown;
 			}
 		}
-		if (Keys::IsPress(DIK_A) || Keys::IsPress(DIK_D))
+		if (Keys::IsPress(DIK_A) || Keys::IsPress(DIK_D) ||
+			Keys::IsPress(DIK_LEFT) || Keys::IsPress(DIK_RIGHT))
 		{
 			animationBehaviorNext_ = Player::AnimationBehavior::kMove;
 		}
@@ -1025,7 +1026,8 @@ void Player::Animation()
 				animationBehaviorNext_ = Player::AnimationBehavior::kJumpDown;
 			}
 		}
-		if (!Keys::IsPress(DIK_A) && !Keys::IsPress(DIK_D))
+		if (!Keys::IsPress(DIK_A) && !Keys::IsPress(DIK_D) &&
+			!Keys::IsPress(DIK_LEFT) && !Keys::IsPress(DIK_RIGHT))
 		{
 			animationBehaviorNext_ = Player::AnimationBehavior::kRoot;
 		}
