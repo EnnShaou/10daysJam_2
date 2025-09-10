@@ -27,7 +27,23 @@ void MapBlockManager::Draw()
 {
 	for (std::vector<Block*>& wtfby : block_) {
 		for (Block* wtfb : wtfby) {
-			if (wtfb) {
+			if (!wtfb)
+			{
+				continue;
+			}
+			if (wtfb == dynamic_cast<BackGroundBlock*>(wtfb)) {
+				wtfb->Draw(camera_);
+			}
+
+		}
+	}
+	for (std::vector<Block*>& wtfby : block_) {
+		for (Block* wtfb : wtfby) {
+			if (!wtfb)
+			{
+				continue;
+			}
+			if (wtfb != dynamic_cast<BackGroundBlock*>(wtfb)) {
 				wtfb->Draw(camera_);
 			}
 
@@ -178,7 +194,10 @@ void BlockButton::Initialize(Vector2 pos) {
 
 void BlockButton::Update() {
 	bool pressedNow = false;
-	if (player_ && player_->isPushButton(this)) pressedNow = true;
+	if (player_ && player_->isPushButton(this))
+	{
+		pressedNow = true;
+	}
 	if (!pressedNow && enemies_ && enemies_->isPushButton(this)) pressedNow = true;
 
 	if (pressedNow && !isPressed_) {
@@ -265,7 +284,7 @@ void Thorn::Initialize(Vector2 pos)
 	sprite = new DrawSprite(Novice::LoadTexture("./Resources/Block/Thorn.png"), { 64,64 });
 	wtf_.Initialize();
 	wtf_.translation_ = pos;
-	
+
 
 }
 
@@ -281,10 +300,11 @@ void Thorn::Draw(Camera* camera)
 
 void Clear::Initialize(Vector2 pos)
 {
-	sprite = new DrawSprite(Novice::LoadTexture("white1x1.png"), { 64,64 });
+	sprite = new DrawSprite(Novice::LoadTexture("./Resources/Block/clear.png"), { 96,128 });
 	wtf_.Initialize();
 	wtf_.translation_ = pos;
-	sprite->SetColor(0x550055ff);
+	
+	wtf_.translation_.y += 16.f;
 }
 
 void Clear::Update()
@@ -294,7 +314,7 @@ void Clear::Update()
 
 void Clear::Draw(Camera* camera)
 {
-	sprite->Draw(wtf_, camera, 0, 0, 64, 64);
+	sprite->Draw(wtf_, camera, 0, 0, 98, 128);
 }
 
 void BackGroundBlock::Initialize(Vector2 pos)
@@ -302,4 +322,93 @@ void BackGroundBlock::Initialize(Vector2 pos)
 	sprite = new DrawSprite(Novice::LoadTexture("./Resources/Block/Block2.png"), { 64,64 });
 	wtf_.Initialize();
 	wtf_.translation_ = pos;
+}
+
+void BackGroundBone::Initialize(Vector2 pos)
+{
+	sprite = new DrawSprite(Novice::LoadTexture("./Resources/Block/bone.png"), { 192,192 });
+	wtf_.Initialize();
+	wtf_.translation_ = pos;
+}
+
+void BackGroundBone::Draw(Camera* camera)
+{
+	sprite->Draw(wtf_, camera, 0, 0, 192, 192);
+}
+
+void BackGroundCandlestick::Initialize(Vector2 pos)
+{
+	texture[0] = Novice::LoadTexture("./Resources/Block/candlestick1.png");
+	texture[1] = Novice::LoadTexture("./Resources/Block/candlestick2.png");
+	sprite = new DrawSprite(texture[0], { 64,64 });
+	wtf_.Initialize();
+	wtf_.translation_ = pos;
+
+}
+
+void BackGroundCandlestick::Draw(Camera* camera)
+{
+	time++;
+	if (time >= 60)
+	{
+		time = 0;
+		count = (count + 1) % 2;
+		sprite->SetTexture(texture[count]);
+	}
+	sprite->Draw(wtf_, camera, 0, 0, 64, 64);
+}
+
+void BackGroundPumpkin::Initialize(Vector2 pos)
+{
+	sprite = new DrawSprite(Novice::LoadTexture("./Resources/Block/pumpkin1.png"), { 64,64 });
+	wtf_.Initialize();
+	wtf_.translation_ = pos;
+}
+
+void BackJump::Initialize(Vector2 pos)
+{
+	sprite = new DrawSprite(Novice::LoadTexture("./Resources/Block/tutorialJump.png"), { 72,84 });
+	wtf_.Initialize();
+	wtf_.translation_ = pos;
+}
+
+void BackJump::Draw(Camera* camera)
+{
+	sprite->Draw(wtf_, camera, 0, 0, 72, 84);
+}
+
+void BackMove::Initialize(Vector2 pos)
+{
+	sprite = new DrawSprite(Novice::LoadTexture("./Resources/Block/tutorialWalk.png"), { 80,72 });
+	wtf_.Initialize();
+	wtf_.translation_ = pos;
+}
+
+void BackMove::Draw(Camera* camera)
+{
+	sprite->Draw(wtf_, camera, 0, 0, 80, 72);
+}
+
+void BackAttack::Initialize(Vector2 pos)
+{
+	sprite = new DrawSprite(Novice::LoadTexture("./Resources/Block/tutorialShoot.png"), { 128,64 });
+	wtf_.Initialize();
+	wtf_.translation_ = pos;
+}
+
+void BackAttack::Draw(Camera* camera)
+{
+	sprite->Draw(wtf_, camera, 0, 0, 128, 64);
+}
+
+void BackAstral::Initialize(Vector2 pos)
+{
+	sprite = new DrawSprite(Novice::LoadTexture("./Resources/Block/tutorialSwitch.png"), { 128,90 });
+	wtf_.Initialize();
+	wtf_.translation_ = pos;
+}
+
+void BackAstral::Draw(Camera* camera)
+{
+	sprite->Draw(wtf_, camera, 0, 0, 128, 90);
 }

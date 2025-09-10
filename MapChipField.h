@@ -11,7 +11,10 @@ enum class MapChipType {
 	HiddenFloor, kThorn,
 	EnemyPumpkin = 9, EnemyLamp = 10, EnemyBat = 11, EnemyMummy = 12,
 	kPlayer, kClear
-	, kButton4, kGate4, kButton5, kGate5
+	, kButton4, kGate4, kButton5, kGate5,
+	kBbone, kBPumpkin, kBCandlestick,
+	tutorialJump, tutorialShoot, tutorialSwitch, tutorialWalk
+
 };
 
 struct MapChipData {
@@ -47,7 +50,7 @@ public:
 	MapChipField::IndexSet GetMapChipIndexByPosition(const Vector2& pos);
 	MapChipField::Rect GetRectByIndex(uint32_t xIndex, uint32_t yIndex);
 	void setMapChipData(const MapChipType Typ, uint32_t xIndex, uint32_t yIndex);
-
+	MapChipData GetMapData() { return mapChipData_; }
 private:
 	MapChipData mapChipData_;
 };
