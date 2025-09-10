@@ -40,6 +40,14 @@ private:
 
 	int chooseSFX;		// 上下ボタン
 	int confirmSFX;		// 選択を確定
+
+	int animationTimer = 0;
+	int animationMax = 3;
+	int animePosX = 0;
+	int imageWidth = 32;
+	int imageHeight = 32;
+
+	void Animation();
 };
 class Reset : public IScene
 {
