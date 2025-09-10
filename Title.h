@@ -2,7 +2,6 @@
 #include"SceneManager.h"
 #include"Fade.h"
 
-#include "BGM.h"
 
 class TitleScene : public IScene {
 
@@ -25,7 +24,7 @@ private:
 	// bool finished_ = false;                     // シーンが終了したかどうか
 	float elapsedTime_ = 0.0f;
 	Phase phase_ = Phase::kFadeIn; // 現在のフェーズ
-	BGM* bgm_ = nullptr;
+
 
 	int confirmSFX;
 

@@ -12,8 +12,6 @@ MenuScene::~MenuScene()
 		fade_ = nullptr;
 	}
 
-	delete bgm_;
-	bgm_ = nullptr;
 }
 
 void MenuScene::Initialize()
@@ -23,8 +21,7 @@ void MenuScene::Initialize()
 	fade_->Initialize();                      // フェードの初期化
 	fade_->Start(Fade::Status::FadeIn, 1.0f); // フェードインを開始
 
-	bgm_ = new BGM();
-	bgm_->Initialize();
+
 
 	chooseSFX = Novice::LoadAudio("./Resources/Audio/sfx/choose.mp3");
 	confirmSFX = Novice::LoadAudio("./Resources/Audio/sfx/confirm.mp3");
@@ -40,8 +37,7 @@ void MenuScene::Initialize()
 
 void MenuScene::Update()
 {
-	bgm_->PlayBGM(0);
-	bgm_->SetVolume(0.1f);
+	
 	Animation();
 	switch (phase_) {
 	case MenuScene::Phase::kFadeIn:
@@ -83,6 +79,7 @@ void MenuScene::Update()
 		break;
 
 	case MenuScene::Phase::kFadeOut:
+	
 		if (fade_->IsFinished()) { // フェードアウトが完了したらシーンを終了
 			bgm_->Stop();
 			switch (StageNow)
