@@ -27,6 +27,15 @@ namespace {
 		{"16", MapChipType::kGate4},
 		{"17", MapChipType::kButton5},
 		{"18", MapChipType::kGate5},
+
+		{"19", MapChipType::kBbone},
+		{"20", MapChipType::kBPumpkin},
+		{"21", MapChipType::kBCandlestick},
+		{"22", MapChipType::tutorialJump},
+		{"23", MapChipType::tutorialShoot},
+		{"24", MapChipType::tutorialSwitch},
+		{"25", MapChipType::tutorialWalk},
+
 	};
 }
 

@@ -128,13 +128,84 @@ private:
 class BackGroundBlock : public Block
 {
 public:
-	BackGroundBlock(){}
-	~BackGroundBlock(){}
+	BackGroundBlock() {}
+	~BackGroundBlock() {}
 	void Initialize(Vector2 pos) override;
 private:
 
 };
+class BackGroundBone : public Block
+{
+public:
+	BackGroundBone() {}
+	~BackGroundBone() {}
+	void Initialize(Vector2 pos) override;
+	void Draw(Camera* camera) override;
+private:
 
+};
+class BackGroundCandlestick : public Block
+{
+public:
+	BackGroundCandlestick() {}
+	~BackGroundCandlestick() {}
+	void Initialize(Vector2 pos) override;
+	void Draw(Camera* camera) override;
+private:
+	int handle;
+	int time = 0;
+	int count = 0;
+	int texture[2];
+};
+class BackGroundPumpkin : public Block
+{
+public:
+	BackGroundPumpkin() {}
+	~BackGroundPumpkin() {}
+	void Initialize(Vector2 pos) override;
+private:
+
+};
+class BackJump : public Block
+{
+public:
+	BackJump() {}
+	~BackJump() {}
+	void Initialize(Vector2 pos) override;
+	void Draw(Camera* camera) override;
+private:
+
+};
+class BackMove : public Block
+{
+public:
+	BackMove() {}
+	~BackMove() {}
+	void Initialize(Vector2 pos) override;
+	void Draw(Camera* camera) override;
+private:
+
+};
+class BackAttack : public Block
+{
+public:
+	BackAttack() {}
+	~BackAttack() {}
+	void Initialize(Vector2 pos) override;
+	void Draw(Camera* camera) override;
+private:
+
+};
+class BackAstral : public Block
+{
+public:
+	BackAstral() {}
+	~BackAstral() {}
+	void Initialize(Vector2 pos) override;
+	void Draw(Camera* camera) override;
+private:
+
+};
 class MapBlockManager
 {
 public:

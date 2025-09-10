@@ -75,7 +75,7 @@ void Game::Update() {
 	switch (phase_) {
 	case Game::Phase::kPlay:
 		camera_->Update();
-		
+
 		player_->Update();
 		enemyManager.Update();
 		// 全ての当たり判定をチェック
@@ -84,7 +84,7 @@ void Game::Update() {
 		BackGroundBlockManger->Update();
 		break;
 	case Game::Phase::kDeath:
-		
+
 		break;
 	default:
 		break;
@@ -115,6 +115,8 @@ void Game::GenerateBlocks() {
 	// 列数を設定(縦方向ブロック数)
 	blockManger->setSize(numBlockX, numBlockY);
 	BackGroundBlockManger->setSize(numBlockXBG, numBlockYBG);
+	
+
 	for (uint32_t y = 0; y < numBlockYBG; y++) {
 		for (uint32_t x = 0; x < numBlockXBG; x++) {
 
@@ -126,8 +128,43 @@ void Game::GenerateBlocks() {
 			}
 		}
 	}
+	for (uint32_t y = 0; y < numBlockYBG; y++) {
+		for (uint32_t x = 0; x < numBlockXBG; x++) {
+			MapChipType mapChipType = backGroundMapChipField_->GetMapChipTypeIndex(x, y);
+			Vector2 pos = backGroundMapChipField_->GetMapChipPositionByIndex(x, y);
+			if (mapChipType == MapChipType::kBPumpkin) {
 
+				BackGroundBlockManger->pushBlock(new BackGroundPumpkin(), pos, x, y);
+			}
 
+			if (mapChipType == MapChipType::kBCandlestick) {
+
+				BackGroundBlockManger->pushBlock(new BackGroundCandlestick(), pos, x, y);
+			}
+		}
+	}
+	for (uint32_t y = 0; y < numBlockYBG; y++) {
+		for (uint32_t x = 0; x < numBlockXBG; x++) {
+			MapChipType mapChipType = backGroundMapChipField_->GetMapChipTypeIndex(x, y);
+			Vector2 pos = backGroundMapChipField_->GetMapChipPositionByIndex(x, y);
+			if (mapChipType == MapChipType::kBbone) {
+
+				BackGroundBlockManger->pushBlock(new BackGroundBone(), pos, x, y);
+			}
+			if (mapChipType == MapChipType::tutorialJump) {
+				
+				BackGroundBlockManger->pushBlock(new BackJump(), pos, x, y);
+			}if (mapChipType == MapChipType::tutorialShoot) {
+				BackGroundBlockManger->pushBlock(new BackAttack(), pos, x, y);
+			}if (mapChipType == MapChipType::tutorialSwitch) {
+				BackGroundBlockManger->pushBlock(new BackAstral(), pos, x, y);
+			}if (mapChipType == MapChipType::tutorialWalk) {
+				BackGroundBlockManger->pushBlock(new BackMove(), pos, x, y);
+				
+			}
+		}
+	}
+	
 	// ブロックの生成
 	for (uint32_t y = 0; y < numBlockY; y++) {
 		for (uint32_t x = 0; x < numBlockX; x++) {
@@ -260,7 +297,7 @@ void Game::GenerateBlocks() {
 	}
 
 	blockManger->BindButtonAndGates();
-	
+
 }
 
 void Game::CheckAllCollisions()
@@ -518,7 +555,7 @@ void Game::ChangePhase() {
 				SceneNo = Scene::kReset; // シーンを終了
 			}
 		}
-		
+
 		break;
 	default:
 		break;
@@ -530,11 +567,15 @@ void Stage1::Initialize()
 	// マップチップフィールドの初期化
 	mapChipField_ = new MapChipField();
 	mapChipField_->LoadMapChipCsv("Resources/MapData/stage1.csv");
+	backGroundMapChipField_ = new MapChipField();
+	backGroundMapChipField_->LoadMapChipCsv("Resources/MapData/stage1_bk.csv");
 	camera_ = new Camera({ 0,0 });
 	camera_->Initialize(1280, 720);
 	blockManger = new MapBlockManager();
 	blockManger->setCamera(camera_);
 	blockManger->setMapChipField(mapChipField_);
+	BackGroundBlockManger = new MapBlockManager();
+	BackGroundBlockManger->setCamera(camera_);
 	// プレイヤーの初期化
 	player_ = new Player();
 	player_->SetMapChipField(mapChipField_);
@@ -545,11 +586,9 @@ void Stage1::Initialize()
 
 	bgm_ = new BGM();
 	bgm_->Initialize();
-	
+	blockManger->setPlayer(player_);
+	camera_->setTarget(player_);
 	enemyManager.setPlayer(player_);
 	blockManger->setEnemies(&enemyManager);
 	GenerateBlocks();
-
-	blockManger->setPlayer(player_);
-	camera_->setTarget(player_);
 }

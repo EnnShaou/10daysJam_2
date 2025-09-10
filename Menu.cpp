@@ -88,7 +88,7 @@ void MenuScene::Update()
 			switch (StageNow)
 			{
 			case MenuScene::Stage::STAGE1:
-				SceneNo = Scene::kGame;
+				SceneNo = Scene::kStage1;
 				break;
 			case MenuScene::Stage::STAGE2:
 				break;
