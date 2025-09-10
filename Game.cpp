@@ -538,10 +538,12 @@ void Game::ChangePhase() {
 		//}
 		break;
 	case Game::Phase::kFadeOut:
+		bgm_->Stop();
 		fade_->Update(); // フェードの更新
 		if (player_->IsClear()) {
 			if (fade_->IsFinished()) {   // フェードアウトが完了したらシーンを終了
 				SceneNo = Scene::kMenu; // シーンを終了
+				
 			}
 		}
 		//else if (player_->IsDead()) {
@@ -551,7 +553,6 @@ void Game::ChangePhase() {
 		//}
 		else {
 			if (fade_->IsFinished()) {   // フェードアウトが完了したらシーンを終了
-				bgm_->Stop();
 				SceneNo = Scene::kReset; // シーンを終了
 			}
 		}
