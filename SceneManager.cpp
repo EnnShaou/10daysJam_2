@@ -2,13 +2,13 @@
 #include "Title.h"
 #include"Menu.h"
 #include"Game.h"
-Scene IScene::SceneNo = Scene::kStage1; // 現在のシーン番号を初期化
-Scene IScene::PreSceneNO = Scene::kStage1;
+Scene IScene::SceneNo = Scene::kTitle; // 現在のシーン番号を初期化
+Scene IScene::PreSceneNO = Scene::kTitle;
 sceneManage::sceneManage() {
 	// シーンの配列を初期化
-	currentSceneNo_ = Scene::kStage1;
-	preSceneNo_ = Scene::kStage1;
-	SceneArr_[static_cast<int>(currentSceneNo_)] = std::make_unique<Stage1>();
+	currentSceneNo_ = Scene::kTitle;
+	preSceneNo_ = Scene::kTitle;
+	SceneArr_[static_cast<int>(currentSceneNo_)] = std::make_unique<TitleScene>();
 }
 
 sceneManage::~sceneManage() {}
@@ -38,12 +38,19 @@ void sceneManage::Update() {
 		case Scene::kStage1:
 			SceneArr_[static_cast<int>(Scene::kStage1)] = std::make_unique<Stage1>();
 			break;
-		case Scene::kClear:
-			//SceneArr_[static_cast<int>(Scene::kClear)] = std::make_unique<ClearScene>();
+		case Scene::kStage2:
+			SceneArr_[static_cast<int>(Scene::kStage2)] = std::make_unique<Stage2>();
 			break;
-		case Scene::kOver:
-			//SceneArr_[static_cast<int>(Scene::kOver)] = std::make_unique<OverScene>();
+		case Scene::kStage3:
+			SceneArr_[static_cast<int>(Scene::kStage3)] = std::make_unique<Stage3>();
 			break;
+		case Scene::kStage4:
+			SceneArr_[static_cast<int>(Scene::kStage4)] = std::make_unique<Stage4>();
+			break;
+		case Scene::kStage5:
+			SceneArr_[static_cast<int>(Scene::kStage5)] = std::make_unique<Stage5>();
+			break;
+
 		case Scene::kReset:
 			SceneArr_[static_cast<int>(Scene::kReset)] = std::make_unique<Reset>();
 			SceneArr_[static_cast<int>(Scene::kReset)]->SetPreSceneNo(preSceneNo_);

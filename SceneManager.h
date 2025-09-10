@@ -1,7 +1,7 @@
 #pragma once
 #include <memory>
 
-enum class Scene { kUnknown = -1, kTitle, kGame, kMenu, kStage1, kClear, kReset, kOver, SceneNem };
+enum class Scene { kUnknown = -1, kTitle, kGame, kMenu, kStage1, kStage2, kStage3, kStage4, kStage5, kClear, kReset, kOver, SceneNem };
 
 class IScene { // インターフェースクラス
 public:

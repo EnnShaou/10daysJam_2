@@ -46,7 +46,7 @@ private:
 	int animePosX = 0;
 	int imageWidth = 32;
 	int imageHeight = 32;
-
+	int bgAnimePosX;
 	void Animation();
 };
 class Reset : public IScene

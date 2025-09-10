@@ -56,3 +56,51 @@ public:
 private:
 
 };
+
+class Stage2 :public Game
+{
+public:
+	Stage2() {}
+	~Stage2() {}
+
+	void Initialize()override;
+
+private:
+
+};
+
+class Stage3 :public Game
+{
+public:
+	Stage3() {}
+	~Stage3() {}
+
+	void Initialize()override;
+
+private:
+
+};
+
+class Stage4 :public Game
+{
+public:
+	Stage4() {}
+	~Stage4() {}
+
+	void Initialize()override;
+
+private:
+
+};
+
+class Stage5 :public Game
+{
+public:
+	Stage5() {}
+	~Stage5() {}
+
+	void Initialize()override;
+
+private:
+
+};

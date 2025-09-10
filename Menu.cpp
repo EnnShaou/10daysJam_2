@@ -90,6 +90,16 @@ void MenuScene::Update()
 				SceneNo = Scene::kStage1;
 				break;
 			case MenuScene::Stage::STAGE2:
+				SceneNo = Scene::kStage2;
+			break; 
+			case MenuScene::Stage::STAGE3:
+				SceneNo = Scene::kStage3;
+			break;
+			case MenuScene::Stage::STAGE4:
+				SceneNo = Scene::kStage4;
+			break; 
+			case MenuScene::Stage::STAGE5:
+				SceneNo = Scene::kStage5;
 				break;
 			}
 			
@@ -133,6 +143,12 @@ void MenuScene::Animation() {
 	if (animePosX >= imageWidth * animationMax) {
 		animePosX = 0;
 	}
+
+	// background
+	if (bgAnimePosX >= 1280 * 4) {
+		bgAnimePosX = 0;
+	}
+
 }
 
 void Reset::Update()
