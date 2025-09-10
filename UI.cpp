@@ -8,6 +8,8 @@ void UI::Initialize()
 	iconSprite = Novice::LoadTexture("./Resources/UI/hpIcon.png"); 
 	gaugeSprite = Novice::LoadTexture("./Resources/UI/gauge.png"); 
 	gaugeSprite2 = Novice::LoadTexture("./Resources/UI/gauge2.png");
+	backTitle = Novice::LoadTexture("./Resources/UI/BACKTITLE.png");
+	reset = Novice::LoadTexture("./Resources/UI/RESET.png");
 }
 
 void UI::Draw(int hp,float timer, float coolTimer)
@@ -68,4 +70,28 @@ void UI::Draw(int hp,float timer, float coolTimer)
 		posX, posY + height, posX + width, posY + height,
 		0, 0, width, height,
 		gaugeSprite, WHITE);
+
+	// --- タイトルに戻るキー入力表記 ---
+	posX = 10;
+	posY = 600;
+	width = 94;
+	height = 48;
+
+	Novice::DrawQuad(
+		posX, posY, posX + width, posY,
+		posX, posY + height, posX + width, posY + height,
+		0, 0, width, height,
+		backTitle, WHITE);
+
+	// --- リセットキー入力表記 ---
+	posX = 10;
+	posY = 650;
+	width = 94;
+	height = 48;
+
+	Novice::DrawQuad(
+		posX, posY, posX + width, posY,
+		posX, posY + height, posX + width, posY + height,
+		0, 0, width, height,
+		reset, WHITE);
 }

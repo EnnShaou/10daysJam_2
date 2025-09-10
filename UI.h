@@ -17,6 +17,8 @@ private:
 	int iconSprite;   // 本体のHPアイコン
 	int gaugeSprite;  // 幽体状態のHPゲージ
 	int gaugeSprite2; // 幽体状態になるまでのクールタイムゲージ
+	int backTitle;    // タイトルに戻るキー入力表記
+	int reset;        // リセットキー入力表記
 
 	int posX = 0;   // 描画位置X
 	int posY = 0;   // 描画位置Y
