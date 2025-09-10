@@ -37,7 +37,7 @@ void MenuScene::Initialize()
 
 void MenuScene::Update()
 {
-	
+	bgm_->PlayBGM(0);
 	Animation();
 	switch (phase_) {
 	case MenuScene::Phase::kFadeIn:
