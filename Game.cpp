@@ -356,12 +356,17 @@ void Game::CheckAllCollisions()
 			// 敵の情報を取得
 			Rect enemyRect = { bat->GetPos().x, bat->GetPos().y, bat->GetSize().x, bat->GetSize().y };
 
-			// 当たり判定のチェック
-			for (const auto& bullet : player_->GetBullets().GetPlayerBullets())
+			// プレイヤーの弾のリストを取得
+			auto& bullets = player_->GetBullets().GetPlayerBullets();
+
+			// イテレータでループ（弾を安全に消すため）
+			for (auto it = bullets.begin(); it != bullets.end(); )
 			{
-				// 弾が存在しない場合はスキップ
+				const auto& bullet = *it;
+
 				if (!bullet)
 				{
+					++it;
 					continue;
 				}
 
@@ -370,8 +375,15 @@ void Game::CheckAllCollisions()
 
 				if (bulletRect.IsCollision(enemyRect))
 				{
-					//Novice::ScreenPrintf(30, 240, "HitBatBullet!)");
+					// 衝突処理
 					enemy->OnCollision();
+
+					// 弾を死亡状態に（またはその場で削除）
+					it = bullets.erase(it);  // 削除して次へ
+				}
+				else
+				{
+					++it; // 衝突してないなら次へ
 				}
 			}
 		}
@@ -419,12 +431,17 @@ void Game::CheckAllCollisions()
 			// 敵の情報を取得
 			Rect enemyRect = { mummy->GetPos().x, mummy->GetPos().y, mummy->GetSize().x, mummy->GetSize().y };
 
-			// 当たり判定のチェック
-			for (const auto& bullet : player_->GetBullets().GetPlayerBullets())
+			// プレイヤーの弾のリストを取得
+			auto& bullets = player_->GetBullets().GetPlayerBullets();
+
+			// イテレータでループ（弾を安全に消すため）
+			for (auto it = bullets.begin(); it != bullets.end(); )
 			{
-				// 弾が存在しない場合はスキップ
+				const auto& bullet = *it;
+
 				if (!bullet)
 				{
+					++it;
 					continue;
 				}
 
@@ -433,13 +450,21 @@ void Game::CheckAllCollisions()
 
 				if (bulletRect.IsCollision(enemyRect))
 				{
-					//Novice::ScreenPrintf(30, 240, "HitMummyBullet!)");
+					// 衝突処理
 					enemy->OnCollision();
+
+					// 弾を死亡状態に（またはその場で削除）
+					it = bullets.erase(it);  // 削除して次へ
+				}
+				else
+				{
+					++it; // 衝突してないなら次へ
 				}
 			}
 		}
 	}
 #pragma endregion
+
 }
 
 void Game::ChangePhase() {
