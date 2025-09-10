@@ -195,7 +195,7 @@ void Player::Draw()
 	Novice::ScreenPrintf(30, 150, "astralBodyTimer: %f", astralBodyTimer_);
 	Novice::ScreenPrintf(1000, 10, "invincible: %d", isInvincible_);*/
 
-	Novice::ScreenPrintf(0, 500, "currentBehavier = %d", behavior_);
+	//Novice::ScreenPrintf(0, 500, "currentBehavier = %d", behavior_);
 }
 void Player::Move()
 {

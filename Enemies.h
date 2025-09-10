@@ -205,7 +205,7 @@ public:
 	// 当たり判定
 	void OnCollision() override;
 
-	bool GetIsDead() { return isDead_;}
+	bool GetIsDead() const { return isDead_;}
 
 private:
 
