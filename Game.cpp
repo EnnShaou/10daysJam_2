@@ -390,37 +390,41 @@ void Game::CheckAllCollisions()
 	{
 		if (EnemyBat* bat = dynamic_cast<EnemyBat*>(enemy))
 		{
-			// 敵の情報を取得
-			Rect enemyRect = { bat->GetPos().x, bat->GetPos().y, bat->GetSize().x, bat->GetSize().y };
+			if (bat->GetIsDead() == false) {
+				// 敵の情報を取得
+				Rect enemyRect = { bat->GetPos().x, bat->GetPos().y, bat->GetSize().x, bat->GetSize().y };
 
-			// プレイヤーの弾のリストを取得
-			auto& bullets = player_->GetBullets().GetPlayerBullets();
+				// プレイヤーの弾のリストを取得
+				auto& bullets = player_->GetBullets().GetPlayerBullets();
 
-			// イテレータでループ（弾を安全に消すため）
-			for (auto it = bullets.begin(); it != bullets.end(); )
-			{
-				const auto& bullet = *it;
-
-				if (!bullet)
+				// イテレータでループ（弾を安全に消すため）
+				for (auto it = bullets.begin(); it != bullets.end(); )
 				{
-					++it;
-					continue;
-				}
+					const auto& bullet = *it;
 
-				// 弾の情報を取得
-				Rect bulletRect = { bullet->GetPos().x, bullet->GetPos().y, bullet->GetSize().x, bullet->GetSize().y };
+					if (!bullet)
+					{
+						++it;
+						continue;
+					}
 
-				if (bulletRect.IsCollision(enemyRect))
-				{
-					// 衝突処理
-					enemy->OnCollision();
+					// 弾の情報を取得
+					Rect bulletRect = { bullet->GetPos().x, bullet->GetPos().y, bullet->GetSize().x, bullet->GetSize().y };
 
-					// 弾を死亡状態に（またはその場で削除）
-					it = bullets.erase(it);  // 削除して次へ
-				}
-				else
-				{
-					++it; // 衝突してないなら次へ
+
+					if (bulletRect.IsCollision(enemyRect))
+					{
+
+						// 衝突処理
+						enemy->OnCollision();
+
+						// 弾を死亡状態に（またはその場で削除）
+						it = bullets.erase(it);  // 削除して次へ
+					}
+					else
+					{
+						++it; // 衝突してないなら次へ
+					}
 				}
 			}
 		}
