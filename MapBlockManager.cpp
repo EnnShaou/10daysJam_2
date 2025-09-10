@@ -253,22 +253,21 @@ void HiddenFloor::Update()
 		}
 	}
 
-	auto index = mapChipField_->GetMapChipIndexByPosition(wtf_.translation_);
-	auto type = mapChipField_->GetMapChipTypeIndex(index.xIndex, index.yIndex);
 
+	auto index = mapChipField_->GetMapChipIndexByPosition(wtf_.translation_);
 	if (isShow) {
-		if (type == MapChipType::kBlank) {
-			mapChipField_->setMapChipData(MapChipType::kBlock, index.xIndex, index.yIndex);
-			sprite->SetTexture(showTexture);
-			sprite->SetColor(0xffffffff);
-		}
+
+		mapChipField_->setMapChipData(MapChipType::kBlock, index.xIndex, index.yIndex);
+		sprite->SetTexture(showTexture);
+		sprite->SetColor(0xffffffff);
+
 	}
 	else {
-		if (type == MapChipType::kBlock) {
-			mapChipField_->setMapChipData(MapChipType::kBlank, index.xIndex, index.yIndex);
-			sprite->SetTexture(texture);
-			sprite->SetColor(0xffffff11);
-		}
+
+		mapChipField_->setMapChipData(MapChipType::kBlank, index.xIndex, index.yIndex);
+		sprite->SetTexture(texture);
+		sprite->SetColor(0xffffff11);
+
 	}
 	wtf_.Update();
 }
@@ -303,7 +302,7 @@ void Clear::Initialize(Vector2 pos)
 	sprite = new DrawSprite(Novice::LoadTexture("./Resources/Block/clear.png"), { 96,128 });
 	wtf_.Initialize();
 	wtf_.translation_ = pos;
-	
+
 	wtf_.translation_.y += 16.f;
 }
 

@@ -115,7 +115,7 @@ void Game::GenerateBlocks() {
 	// 列数を設定(縦方向ブロック数)
 	blockManger->setSize(numBlockX, numBlockY);
 	BackGroundBlockManger->setSize(numBlockXBG, numBlockYBG);
-	
+
 
 	for (uint32_t y = 0; y < numBlockYBG; y++) {
 		for (uint32_t x = 0; x < numBlockXBG; x++) {
@@ -152,7 +152,7 @@ void Game::GenerateBlocks() {
 				BackGroundBlockManger->pushBlock(new BackGroundBone(), pos, x, y);
 			}
 			if (mapChipType == MapChipType::tutorialJump) {
-				
+
 				BackGroundBlockManger->pushBlock(new BackJump(), pos, x, y);
 			}if (mapChipType == MapChipType::tutorialShoot) {
 				BackGroundBlockManger->pushBlock(new BackAttack(), pos, x, y);
@@ -160,11 +160,11 @@ void Game::GenerateBlocks() {
 				BackGroundBlockManger->pushBlock(new BackAstral(), pos, x, y);
 			}if (mapChipType == MapChipType::tutorialWalk) {
 				BackGroundBlockManger->pushBlock(new BackMove(), pos, x, y);
-				
+
 			}
 		}
 	}
-	
+
 	// ブロックの生成
 	for (uint32_t y = 0; y < numBlockY; y++) {
 		for (uint32_t x = 0; x < numBlockX; x++) {
@@ -529,6 +529,11 @@ void Game::ChangePhase() {
 			fade_->Start(Fade::Status::FadeOut, 1.0f);
 			phase_ = Game::Phase::kFadeOut;
 		}
+		if (Keys::IsTrigger(DIK_T))
+		{
+			bgm_->Stop();
+			SceneNo = Scene::kMenu;
+		}
 		break;
 	case Game::Phase::kDeath:
 		//// タイマーを初期化
@@ -569,6 +574,131 @@ void Stage1::Initialize()
 	mapChipField_->LoadMapChipCsv("Resources/MapData/stage1.csv");
 	backGroundMapChipField_ = new MapChipField();
 	backGroundMapChipField_->LoadMapChipCsv("Resources/MapData/stage1_bk.csv");
+	camera_ = new Camera({ 0,0 });
+	camera_->Initialize(1280, 720);
+	blockManger = new MapBlockManager();
+	blockManger->setCamera(camera_);
+	blockManger->setMapChipField(mapChipField_);
+	BackGroundBlockManger = new MapBlockManager();
+	BackGroundBlockManger->setCamera(camera_);
+	// プレイヤーの初期化
+	player_ = new Player();
+	player_->SetMapChipField(mapChipField_);
+
+	// フェードの初期化
+	fade_ = new Fade();
+	fade_->Initialize();
+
+	bgm_ = new BGM();
+	bgm_->Initialize();
+	blockManger->setPlayer(player_);
+	camera_->setTarget(player_);
+	enemyManager.setPlayer(player_);
+	blockManger->setEnemies(&enemyManager);
+	GenerateBlocks();
+}
+
+void Stage2::Initialize()
+{
+	// マップチップフィールドの初期化
+	mapChipField_ = new MapChipField();
+	mapChipField_->LoadMapChipCsv("Resources/MapData/stage2.csv");
+	backGroundMapChipField_ = new MapChipField();
+	backGroundMapChipField_->LoadMapChipCsv("Resources/MapData/stage2_bk.csv");
+	camera_ = new Camera({ 0,0 });
+	camera_->Initialize(1280, 720);
+	blockManger = new MapBlockManager();
+	blockManger->setCamera(camera_);
+	blockManger->setMapChipField(mapChipField_);
+	BackGroundBlockManger = new MapBlockManager();
+	BackGroundBlockManger->setCamera(camera_);
+	// プレイヤーの初期化
+	player_ = new Player();
+	player_->SetMapChipField(mapChipField_);
+
+	// フェードの初期化
+	fade_ = new Fade();
+	fade_->Initialize();
+
+	bgm_ = new BGM();
+	bgm_->Initialize();
+	blockManger->setPlayer(player_);
+	camera_->setTarget(player_);
+	enemyManager.setPlayer(player_);
+	blockManger->setEnemies(&enemyManager);
+	GenerateBlocks();
+}
+
+void Stage3::Initialize()
+{
+	// マップチップフィールドの初期化
+	mapChipField_ = new MapChipField();
+	mapChipField_->LoadMapChipCsv("Resources/MapData/stage3.csv");
+	backGroundMapChipField_ = new MapChipField();
+	backGroundMapChipField_->LoadMapChipCsv("Resources/MapData/stage3_bk.csv");
+	camera_ = new Camera({ 0,0 });
+	camera_->Initialize(1280, 720);
+	blockManger = new MapBlockManager();
+	blockManger->setCamera(camera_);
+	blockManger->setMapChipField(mapChipField_);
+	BackGroundBlockManger = new MapBlockManager();
+	BackGroundBlockManger->setCamera(camera_);
+	// プレイヤーの初期化
+	player_ = new Player();
+	player_->SetMapChipField(mapChipField_);
+
+	// フェードの初期化
+	fade_ = new Fade();
+	fade_->Initialize();
+
+	bgm_ = new BGM();
+	bgm_->Initialize();
+	blockManger->setPlayer(player_);
+	camera_->setTarget(player_);
+	enemyManager.setPlayer(player_);
+	blockManger->setEnemies(&enemyManager);
+	GenerateBlocks();
+
+}
+
+void Stage4::Initialize()
+{
+	// マップチップフィールドの初期化
+	mapChipField_ = new MapChipField();
+	mapChipField_->LoadMapChipCsv("Resources/MapData/stage4.csv");
+	backGroundMapChipField_ = new MapChipField();
+	backGroundMapChipField_->LoadMapChipCsv("Resources/MapData/stage4_bk.csv");
+	camera_ = new Camera({ 0,0 });
+	camera_->Initialize(1280, 720);
+	blockManger = new MapBlockManager();
+	blockManger->setCamera(camera_);
+	blockManger->setMapChipField(mapChipField_);
+	BackGroundBlockManger = new MapBlockManager();
+	BackGroundBlockManger->setCamera(camera_);
+	// プレイヤーの初期化
+	player_ = new Player();
+	player_->SetMapChipField(mapChipField_);
+
+	// フェードの初期化
+	fade_ = new Fade();
+	fade_->Initialize();
+
+	bgm_ = new BGM();
+	bgm_->Initialize();
+	blockManger->setPlayer(player_);
+	camera_->setTarget(player_);
+	enemyManager.setPlayer(player_);
+	blockManger->setEnemies(&enemyManager);
+	GenerateBlocks();
+}
+
+void Stage5::Initialize()
+{
+	// マップチップフィールドの初期化
+	mapChipField_ = new MapChipField();
+	mapChipField_->LoadMapChipCsv("Resources/MapData/stage5.csv");
+	backGroundMapChipField_ = new MapChipField();
+	backGroundMapChipField_->LoadMapChipCsv("Resources/MapData/stage5_bk.csv");
 	camera_ = new Camera({ 0,0 });
 	camera_->Initialize(1280, 720);
 	blockManger = new MapBlockManager();
