@@ -534,7 +534,7 @@ void EnemyLamp::Update()
 
 void EnemyLamp::Draw()
 {
-	DrawCircle(wtf, camera_, int(lightRadius_), RED);
+	//DrawCircle(wtf, camera_, int(lightRadius_), RED);
 	lightSprite->Draw(lightWtf, camera_, 0, 0, 560, 560);
 	sprite->Draw(wtf, camera_, animePosX_, animePosY_, imageHeight_, imageWidth_);
 	//DrawHitBox(wtf, camera_, int(kWidth), int(kHeight));
