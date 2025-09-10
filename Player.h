@@ -58,7 +58,7 @@ public:
 		kAttack,
 		kAstral,
 		kKnockback,
-		kDeadShrink,
+		kDead,
 		kUnknown
 	};
 
@@ -107,7 +107,7 @@ public:
 
 
 	// --- 行動パターン初期化・更新 ---
-	void BehaviorRootInitialize();
+	void BehaviorRootInitialize(); 
 	void BehaviorRootUpdate();
 
 	void BehaviorAttackInitialize();
@@ -118,6 +118,9 @@ public:
 
 	void BehaviorKnockbackInitialize();
 	void BehaviorKnockbackUpdate();
+
+	void BehaviorDeadInitialize();
+	void BehaviorDeadUpdate();
 
 	// --- 幽体状態の切り替え処理 ---
 	void SwitchBody();
@@ -152,14 +155,14 @@ public:
 	Vector2 GetAstralSize() const { return astralSize; }
 
 	bool IsAstral() const { return isAstral; }                                                                     
-	const PlayerBulletManager& GetBullets() const { return playerBullets_; } 
+	PlayerBulletManager& GetBullets()  { return playerBullets_; } 
 
 	int GetHp() const { return nomalBodyHP; }
 
 	float GetAstralTimer() const { return astralBodyTimer_; }
 
 	float GetCoolTime() const { return coolTime_; }
-
+	
 	// --- セッター ---
 	void SetMapChipField(MapChipField* mapChipField) { mapChipField_ = mapChipField; }
 
@@ -201,6 +204,7 @@ private:
 	bool isClear = false;              // ステージクリアしたかどうか
 	bool isAstral = false;             // 幽体状態かどうか
 	bool pendingAstralDamage_ = false; // ダメージを減らす状態かどうか
+	bool deathAnimEnded_ = false;      // アニメーションが終わっているかどうか
 
 	// --- マップ ---
 	MapChipField* mapChipField_ = nullptr; // マップフィールドポインタ
@@ -219,6 +223,8 @@ private:
 	int damageCooldown_ = 0;
 	const int damageCooldownMax = 30;
 	float deathCount;
+
+	int deathWaitTimer_ = 0;
 
 	float legSpeed = 0.05f;
 

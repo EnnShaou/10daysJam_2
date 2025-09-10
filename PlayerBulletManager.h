@@ -25,7 +25,7 @@ public:
 	void ClearHoldingBullets();
 
 	// --- ゲッター ---
-	const std::list<std::unique_ptr<PlayerBullets>>& GetPlayerBullets() const { return activeBullets_; }
+	std::list<std::unique_ptr<PlayerBullets>>& GetPlayerBullets()  { return activeBullets_; }
 
 private:
 	std::vector<std::unique_ptr<PlayerBullets>> holdingBullets_;  // 待機弾

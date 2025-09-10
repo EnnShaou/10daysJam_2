@@ -22,5 +22,7 @@ private:
 	int posY = 0;   // 描画位置Y
 	int width = 0;  // 描画幅X
 	int height = 0; // 描画幅Y
+
+	unsigned int color = WHITE; // スプライトの色
 };
 

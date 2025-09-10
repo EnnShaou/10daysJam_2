@@ -32,7 +32,10 @@ void Player::Initialize(Camera* camera, Vector2& pos)
 	ui_ = new UI();
 	ui_->Initialize();
 
-	deathCount = 0.01f;
+	//deathCount = 0.01f;
+
+	deathAnimEnded_ = false;     // 死亡アニメーションが切り替わったのでリセット
+	deathWaitTimer_ = 0;         // 待機タイマーもリセット
 }
 
 void Player::Update()
@@ -64,6 +67,12 @@ void Player::Update()
 		case Behavior::kAstral:
 			BehaviorAstralInitialize();
 			break;
+		case Behavior::kKnockback:
+			BehaviorKnockbackInitialize();
+			break;
+		case Behavior::kDead:
+			BehaviorDeadInitialize();
+			break;
 		default:
 			break;
 		}
@@ -83,6 +92,9 @@ void Player::Update()
 		break;
 	case Behavior::kKnockback:
 		BehaviorKnockbackUpdate();
+		break;
+	case Behavior::kDead:
+		BehaviorDeadUpdate();
 		break;
 	default:
 		break;
@@ -155,7 +167,7 @@ void Player::Draw()
 			playerSprite_->Draw(worldTransform_, camera_, texX, texY, scaleX, 72, lrDirection_);
 		}
 
-		DrawHitBox(worldTransform_, camera_, int(nomalSize.x), int(nomalSize.y));
+		//DrawHitBox(worldTransform_, camera_, int(nomalSize.x), int(nomalSize.y));
 	}
 
 	if (animationBehavior_ == AnimationBehavior::kDamage)
@@ -177,6 +189,8 @@ void Player::Draw()
 	Novice::ScreenPrintf(30, 130, "AstralbehaviorNext_: %d", AstralbehaviorNext_);
 	Novice::ScreenPrintf(30, 150, "astralBodyTimer: %f", astralBodyTimer_);
 	Novice::ScreenPrintf(1000, 10, "invincible: %d", isInvincible_);*/
+
+	Novice::ScreenPrintf(0, 500, "currentBehavier = %d", behavior_);
 }
 void Player::Move()
 {
@@ -329,9 +343,12 @@ void Player::MapCollision(CollisonMapInfo& info) {
 	}
 	auto index2 = mapChipField_->GetMapChipIndexByPosition(worldTransform_.translation_ + Vector2(0.f, kHeight / 2));
 	auto type2 = mapChipField_->GetMapChipTypeIndex(index2.xIndex, index2.yIndex);
-	if (type2 == MapChipType::kThorn)
+	if (type2 == MapChipType::kThorn && nomalBodyHP != 0)
 	{
-		isDead_ = true;
+		nomalBodyHP = 0;
+		animationBehaviorNext_ = AnimationBehavior::kDeath;
+		behaviorNext_ = Behavior::kDead;
+		
 	}
 }
 void Player::MapCollisionTop(CollisonMapInfo& info) {
@@ -522,8 +539,8 @@ void Player::OnCollisionNomal(const Enemies* enemies)
 	(void)enemies;
 	
 	
-	// ダメージ無敵時間中はダメージを受けない
-	if (damageCooldown_ > 0)
+	// ダメージ無敵時間中と死んでる時はダメージを受けない
+	if (damageCooldown_ > 0 || isDead_)
 	{
 		return;
 	}
@@ -531,23 +548,24 @@ void Player::OnCollisionNomal(const Enemies* enemies)
 	// ダメージ処理
 	nomalBodyHP--;
 
-	// HPが0以下になったら死亡フラグを立てる
-	if (nomalBodyHP <= 0)
-	{
-		animationBehaviorNext_ = AnimationBehavior::kDeath;
-	}
+	//// HPが0以下になったら死亡行動へ移行
+	//if (nomalBodyHP <= 0)
+	//{
+	//	animationBehaviorNext_ = AnimationBehavior::kDeath;
+	//	behaviorNext_ = Behavior::kDead;
+	//}
 
-	// アニメーションが終わったら死亡フラグをオンにする
-	if (deathCount <= 0.0f)
-	{
-		isDead_ = true;
-	}
+	//// アニメーションが終わったら死亡フラグをオンにする
+	//if (deathCount <= 0.0f)
+	//{
+	//	isDead_ = true;
+	//}
 
 	// ダメージ無敵時間をリセット
 	damageCooldown_ = damageCooldownMax;
 
 	// ノックバック処理
-	if (enemies && nomalBodyHP > 0)
+	if (enemies)
 	{
 		Novice::PlayAudio(bodyDamagedSFX, 0, 1.0f);
 
@@ -637,7 +655,7 @@ void Player::BehaviorAttackInitialize()
 
 void Player::BehaviorAttackUpdate()
 {
-	behaviorNext_ = Behavior::kRoot; // 攻撃行動が終了したらルートに戻る
+	//behaviorNext_ = Behavior::kRoot; // 攻撃行動が終了したらルートに戻る
 }
 
 void Player::BehaviorAstralInitialize()
@@ -668,6 +686,9 @@ void Player::BehaviorAstralUpdate()
 			break;
 		case AstralBehavior::kAttack:
 			AstralBodyBehaviorAttackInitialize();
+			break;
+		case AstralBehavior::kKnockback:
+			AstralBodyBehaviorKnockbackInitialize();
 			break;
 		default:
 			break;
@@ -717,8 +738,28 @@ void Player::BehaviorKnockbackUpdate()
 	knockbackTimer_ -= frameTime;
 	if (knockbackTimer_ <= 0.0f)
 	{
-		behaviorNext_ = Behavior::kRoot;
+		// HPが0以下になったら死亡行動へ移行
+		if (nomalBodyHP <= 0)
+		{
+			animationBehaviorNext_ = AnimationBehavior::kDeath;
+			behaviorNext_ = Behavior::kDead;
+		}
+		else
+		{
+			behaviorNext_ = Behavior::kRoot;
+		}
 	}
+}
+
+void Player::BehaviorDeadInitialize()
+{
+	behavior_ = Behavior::kDead;
+	
+}
+
+void Player::BehaviorDeadUpdate()
+{
+	
 }
 
 void Player::SwitchBody()
@@ -899,7 +940,7 @@ void Player::AstralBodyBehaviorKnockbackUpdate()
 
 void Player::Animation()
 {
-	animationTimer++;
+	//animationTimer++;
 	if (animationBehaviorNext_ != AnimationBehavior::kUnknown)
 	{
 		animationBehavior_ = animationBehaviorNext_;
@@ -927,11 +968,11 @@ void Player::Animation()
 		case Player::AnimationBehavior::kDamage:
 			animationMax = 2;
 			break;
-		case Player::AnimationBehavior::kDeath:
-			animationMax = 4;
-			break;
 		case Player::AnimationBehavior::kAstralBodyIdle:
 			animationMax = 1;
+			break;
+		case Player::AnimationBehavior::kDeath:
+			animationMax = 4;
 			break;
 		case AnimationBehavior::kAstralRoot:
 			animationMax = 4;
@@ -1009,21 +1050,64 @@ void Player::Animation()
 		break;
 
 	case Player::AnimationBehavior::kDeath:
-		deathCount -= frameTime;
+		//deathCount -= frameTime;
+
+		// 死亡アニメーション終了済みなら待機カウント
+		if (deathAnimEnded_)
+		{
+			deathWaitTimer_++;
+			if (deathWaitTimer_ >= 30)
+			{
+				isDead_ = true;
+			}
+		}
 
 		break;
+	case AnimationBehavior::kAstralRoot:
 		
+		break;
+	case AnimationBehavior::kAstralAttack:
+		
+		break;
+	case AnimationBehavior::kAstralDeath:
+		
+		break;
 	default:
 		break;
 	}
 
 
-	// attack の場合はアニメーションしない
 	
+	if (!deathAnimEnded_)
+	{
+		animationTimer++;
+	}
 
-	if (animationTimer >= 60 / (animationMax * 2)) {
-		animationTimer = 0;// 60フレームに1回
-		animationCount = (animationCount + 1) % animationMax;
+	static int prevAnimationCount = -1;
+
+	if (animationTimer >= 60 / (animationMax * 2)) 
+	{
+		animationTimer = 0;
+
+		if (animationBehavior_ == Player::AnimationBehavior::kDeath)
+		{
+			// アニメーションをループさせず、最後の一枚で固定
+			if (!deathAnimEnded_) 
+			{
+				animationCount = (animationCount + 1);
+
+				if (animationCount >= animationMax) 
+				{
+					animationCount = animationMax - 1;  // 最後のフレームで止める
+					deathAnimEnded_ = true;            // フラグで完了扱いに
+				}
+			}
+		}
+		else 
+		{
+			// 通常のループ処理
+			animationCount = (animationCount + 1) % animationMax;
+		}
 	}
 }
 
