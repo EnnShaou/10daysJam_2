@@ -1077,9 +1077,9 @@ void Player::Animation()
 	case AnimationBehavior::kAstralAttack:
 		
 		break;
-	case AnimationBehavior::kAstralDeath:
+	/*case AnimationBehavior::kAstralDeath:
 		
-		break;
+		break;*/
 	default:
 		break;
 	}
