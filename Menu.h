@@ -1,7 +1,6 @@
 #pragma once
 #include"SceneManager.h"
 #include"Fade.h"
-#include "BGM.h"
 class MenuScene : public IScene {
 
 public:
@@ -37,7 +36,6 @@ private:
 	int backgroundHandle_ = 0;
 	int stageTextureHandle_[static_cast<int>(Stage::KNUMBER)] = { 0 };
 	int cursorTextureHandle_ = 0;
-	BGM* bgm_ = nullptr;
 
 	int chooseSFX;		// 上下ボタン
 	int confirmSFX;		// 選択を確定

@@ -4,6 +4,7 @@
 
 BGM::BGM() {
 	
+	
 }
 
 void BGM::Initialize() {
@@ -16,7 +17,6 @@ void BGM::Initialize() {
 	playStage1_ = -1;
 	playStage2_ = -1;
 	playStage3_ = -1;
-
 	volume_ = 0.15f;
 }
 
@@ -73,9 +73,7 @@ void BGM::PlayBGM(int const& num) {
 		}
 		break;
 	default:
-		if (!Novice::IsPlayingAudio(playTitle_)) {
-			playTitle_ = Novice::PlayAudio(title_, 1, volume_);
-		}
+		
 		break;
 	}
 }

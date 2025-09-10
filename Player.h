@@ -259,7 +259,7 @@ private:
 
 	// --- 当たり判定 ---
 	Vector2 nomalSize = { 25.0f,50.0f };
-	Vector2 astralSize = { 45.0f,45.0f };
+	Vector2 astralSize = { 32.0f,32.0f };
 
 	const float knockbackDuration_ = 0.5f; // ノックバックが続く秒数
 

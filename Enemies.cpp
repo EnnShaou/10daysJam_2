@@ -445,7 +445,7 @@ void EnemyPumpkin::Update() {
 void EnemyPumpkin::Draw()
 {
 	sprite->Draw(wtf, camera_, animePosX_, animePosY_, imageWidth_, imageHeight_);
-	DrawHitBox(wtf, camera_, int(kWidth), int(kHeight));
+	//DrawHitBox(wtf, camera_, int(kWidth), int(kHeight));
 	//Novice::ScreenPrintf(10, 400, "PumpkinVelY %0.2f", vel_.y);
 }
 
@@ -537,7 +537,7 @@ void EnemyLamp::Draw()
 	DrawCircle(wtf, camera_, int(lightRadius_), RED);
 	lightSprite->Draw(lightWtf, camera_, 0, 0, 560, 560);
 	sprite->Draw(wtf, camera_, animePosX_, animePosY_, imageHeight_, imageWidth_);
-	DrawHitBox(wtf, camera_, int(kWidth), int(kHeight));
+	//DrawHitBox(wtf, camera_, int(kWidth), int(kHeight));
 }
 
 void EnemyLamp::OnCollision()
@@ -685,7 +685,7 @@ void EnemyBat::Draw()
 {
 	sprite->Draw(wtf, camera_, animePosX_, animePosY_, imageWidth_, imageHeight_, lrDirection_);
 
-	DrawHitBox(wtf, camera_, int(kWidth), int(kHeight));
+	//DrawHitBox(wtf, camera_, int(kWidth), int(kHeight));
 }
 
 void EnemyBat::Animation()
@@ -882,7 +882,7 @@ void EnemyMummy::Update()
 void EnemyMummy::Draw()
 {
 	sprite->Draw(wtf, camera_, animePosX_, animePosY_, imageWidth_, imageHeight_, lrDirection_);
-	DrawHitBox(wtf, camera_, int(kWidth), int(kHeight));
+	//DrawHitBox(wtf, camera_, int(kWidth), int(kHeight));
 }
 
 void EnemyMummy::OnCollision()

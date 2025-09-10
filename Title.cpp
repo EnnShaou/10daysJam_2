@@ -13,8 +13,6 @@ TitleScene::~TitleScene() {
 		fade_ = nullptr;
 	}
 
-	delete bgm_;
-	bgm_ = nullptr;
 }
 
 void TitleScene::Initialize() {
@@ -22,9 +20,9 @@ void TitleScene::Initialize() {
 	fade_ = new Fade();                       // フェードイン・フェードアウト用のオブジェクトを生成
 	fade_->Initialize();                      // フェードの初期化
 	fade_->Start(Fade::Status::FadeIn, 1.0f); // フェードインを開始
-
-	bgm_ = new BGM();
+	bgm_ = new BGM;
 	bgm_->Initialize();
+
 
 	confirmSFX = Novice::LoadAudio("./Resources/Audio/sfx/confirm.mp3");
 	backgroundHandle_ = Novice::LoadTexture("./Resources/Scene/titleSceen.png");
@@ -33,13 +31,13 @@ void TitleScene::Initialize() {
 
 void TitleScene::Update() {
 
-	bgm_->PlayBGM(0);
+	
 	bgm_->SetVolume(0.15f);
 	Animation();
 	switch (phase_) {
 	case TitleScene::Phase::kFadeIn:
 		phase_ = TitleScene::Phase::kMaui;
-		
+		bgm_->PlayBGM(0);
 		break;
 	case TitleScene::Phase::kMaui:
 		fade_->Update(); // フェードの更新
@@ -58,7 +56,7 @@ void TitleScene::Update() {
 
 	case TitleScene::Phase::kFadeOut:
 		if (fade_->IsFinished()) { // フェードアウトが完了したらシーンを終了
-			bgm_->Stop();
+			//bgm_->Stop();
 			SceneNo =Scene::kMenu;
 		}
 		fade_->Update();        // フェードの更新

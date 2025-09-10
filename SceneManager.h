@@ -1,5 +1,6 @@
 #pragma once
 #include <memory>
+#include "BGM.h"
 
 enum class Scene { kUnknown = -1, kTitle, kGame, kMenu, kStage1, kStage2, kStage3, kStage4, kStage5, kClear, kReset, kOver, SceneNem };
 
@@ -16,7 +17,10 @@ public:
 	Scene GetSceneNo() const { return SceneNo; } // 現在のシーン番号を取得
 	void SetPreSceneNo(Scene scene) { PreSceneNO = scene; }
 
+protected:
+	 static inline BGM* bgm_=nullptr;
 private:
+
 };
 
 class sceneManage { // シーン管理クラス
