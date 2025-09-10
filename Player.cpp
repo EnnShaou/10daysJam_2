@@ -141,11 +141,16 @@ void Player::Draw()
 			break;
 		case AnimationBehavior::kAstralDeath:
 			texY = 128;
+			if (texX >= (3 * 64) - 1) {
+				texX = 192;
+			}
 			break;
 		default:
 			texY = 0;
 			break;
 		}
+
+	
 
 		astralBodySprite_->Draw(worldTransform_, camera_, texX, texY, scaleX, 64, lrDirection_);
 
@@ -872,7 +877,7 @@ void Player::AstralBodyBehaviorAttackUpdate()
 void Player::AstralBodyBehaviorKnockbackInitialize()
 {
 	Astralbehavior_ = AstralBehavior::kKnockback;
-
+	animationTimer = 0;
 	knockbackTimer_ = 0.5f;
 	vel_ = { 0.0f, 0.0f };
 }
@@ -981,7 +986,7 @@ void Player::Animation()
 			animationMax = 2;
 			break;
 		case AnimationBehavior::kAstralDeath:
-			animationMax = 4;
+			animationMax = 5;
 			break;
 		}
 	}
@@ -1047,6 +1052,9 @@ void Player::Animation()
 
 	case Player::AnimationBehavior::kAstralBodyIdle:
 
+		break;
+	case AnimationBehavior::kAstralDeath:
+		
 		break;
 
 	case Player::AnimationBehavior::kDeath:

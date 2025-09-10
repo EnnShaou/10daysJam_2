@@ -28,4 +28,16 @@ private:
 	BGM* bgm_ = nullptr;
 
 	int confirmSFX;
+
+	int backgroundHandle_ = 0;
+	int spaceHandle_ = 0;
+
+	// animation
+	int animationTimer = 0;
+	int animationMax = 4;
+	int animePosX = 0;
+	int imageWidth = 1280;
+	int imageHeight = 720;
+
+	void Animation();
 };
