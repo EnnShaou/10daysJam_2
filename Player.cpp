@@ -158,7 +158,7 @@ void Player::Draw()
 		int playerTexY = 72 * 5;
 		playerSprite_->Draw(tentativeWorldTransform_, camera_, 0, playerTexY, 68, 72, templrDirection_);
 
-		DrawHitBox(worldTransform_, camera_, int(astralSize.x), int(astralSize.y));
+		//DrawHitBox(worldTransform_, camera_, int(astralSize.x), int(astralSize.y));
 	}
 	else
 	{
