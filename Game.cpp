@@ -99,9 +99,9 @@ void Game::Draw() {
 	Novice::DrawBox(0, 0, 1280, 720, 0.f, BLACK, kFillModeSolid);
 	BackGroundBlockManger->Draw();
 	blockManger->Draw();
-	player_->Draw();
+	
 	enemyManager.Draw();
-
+	player_->Draw();
 	fade_->Draw(); // フェードの描画
 }
 

@@ -152,12 +152,12 @@ void Player::Draw()
 
 	
 
-		astralBodySprite_->Draw(worldTransform_, camera_, texX, texY, scaleX, 64, lrDirection_);
+		
 
 		// 肉体（留まってる本体）描画も必要なら
 		int playerTexY = 72 * 5;
 		playerSprite_->Draw(tentativeWorldTransform_, camera_, 0, playerTexY, 68, 72, templrDirection_);
-
+		astralBodySprite_->Draw(worldTransform_, camera_, texX, texY, scaleX, 64, lrDirection_);
 		//DrawHitBox(worldTransform_, camera_, int(astralSize.x), int(astralSize.y));
 	}
 	else

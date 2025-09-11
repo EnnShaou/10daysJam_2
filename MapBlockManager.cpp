@@ -117,14 +117,14 @@ void Gate::Initialize(Vector2 pos) {
 
 void Gate::Update() {
 	drawWtf.translation_.y = wtf_.translation_.y - (gateIndex - 1) * 32;
-	if (Keys::IsTrigger(DIK_L))
+	/*if (Keys::IsTrigger(DIK_L))
 	{
 		Close();
 	}
 	if (Keys::IsTrigger(DIK_O))
 	{
 		Open();
-	}
+	}*/
 
 
 	wtf_.Update();
